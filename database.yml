@@ -1,0 +1,16 @@
+---
+development:
+  dialect: postgres
+  database: virtuozplay_development
+  user: postgres
+  password: postgres
+  host: 127.0.0.1
+  pool: 5
+
+# prettier-ignore
+test:
+  url: {{envOr "TEST_DATABASE_URL" "postgres://postgres:postgres@127.0.0.1:5432/virtuozplay_test?sslmode=disable"}}
+
+# prettier-ignore
+production:
+  url: {{envOr "DATABASE_URL" "postgres://postgres:postgres@127.0.0.1:5432/virtuozplay_production?sslmode=disable"}}

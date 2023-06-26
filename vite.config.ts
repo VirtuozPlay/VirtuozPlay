@@ -23,4 +23,10 @@ export default defineConfig({
             '@': fileURLToPath(new URL('./assets', import.meta.url)),
         },
     },
+    test: {
+        coverage: {
+            provider: 'istanbul',
+            reporter: ['text', 'html', 'json'],
+        },
+    },
 });

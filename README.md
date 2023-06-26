@@ -53,11 +53,11 @@ buffalo plugins install
    run powershell in administrator
    follow the instructions -> https://chocolatey.org/install
    run `choco`
-   
 4. change password in database.yml
    password: ...
 
 5. install Buffalo + plugins
+
    ```cmd
    choco install buffalo
    buffalo plugins install
@@ -87,7 +87,7 @@ buffalo plugins install
 - [Tailwind CSS](https://plugins.jetbrains.com/plugin/12075-tailwind-css)
 - [Vue.js](https://plugins.jetbrains.com/plugin/9442-vue-js)
 - [Vite](https://plugins.jetbrains.com/plugin/14632-vite)
-  
+
 ### Database Setup
 
 You may need to do is open up the "database.yml" file and edit it to use the correct usernames, passwords, hosts, etc... that are appropriate for your environment.

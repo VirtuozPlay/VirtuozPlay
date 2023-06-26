@@ -1,0 +1,236 @@
+name: Main
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+  merge_group:
+    types: ['checks_requested']
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+
+      - name: Setup NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'yarn'
+
+      - name: Install PostgreSQL Client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Install Frontend Dependencies
+        run: |
+          yarn install
+
+      - name: Restore GOPATH Cache
+        id: build-restore-gopath
+        uses: actions/cache/restore@v3
+        with:
+          path: /home/runner/go
+          key: ${{ runner.os }}-gopath
+
+      - name: Install Dependencies
+        if: steps.build-restore-gopath.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p public/assets
+          go mod download
+          go install github.com/gobuffalo/cli/cmd/buffalo@v0.18.14
+          buffalo plugins install
+          yarn install
+        env:
+          GOPATH: /home/runner/go
+
+      - name: Save GOPATH Cache
+        id: build-save-gopath
+        uses: actions/cache/save@v3
+        with:
+          path: /home/runner/go
+          key: ${{ runner.os }}-gopath
+
+      - name: Build
+        run: buffalo build --verbose
+        env:
+          GOPATH: /home/runner/go
+
+      - name: Upload dist Folder
+        uses: actions/upload-artifact@v3
+        with:
+          name: virtuozplay-dist
+          path: dist/
+
+      - name: Upload bin Folder
+        uses: actions/upload-artifact@v3
+        with:
+          name: virtuozplay-bin
+          path: bin/
+
+  test-backend:
+    name: Test Backend
+    runs-on: ubuntu-22.04
+    needs: build
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # maps tcp port 5432 on service container to the host
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+
+      - name: Install PostgreSQL Client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Restore GOPATH Cache
+        id: test-restore-gopath
+        uses: actions/cache/restore@v3
+        with:
+          path: /home/runner/go
+          key: ${{ runner.os }}-gopath
+
+      - name: Install Dependencies
+        if: steps.test-restore-gopath.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p public/assets
+          go mod download
+          go install github.com/gobuffalo/cli/cmd/buffalo@v0.18.14
+          buffalo plugins install
+        env:
+          GOPATH: /home/runner/go
+
+      - name: Create Test Database
+        run: |
+          buffalo pop create
+        env:
+          GOPATH: /home/runner/go
+          GO_ENV: 'test'
+          TEST_DATABASE_URL: 'postgres://postgres:postgres@localhost:5432/virtuozplay_test?sslmode=disable'
+
+      - name: Restore dist folder
+        uses: actions/download-artifact@v3
+        with:
+          name: virtuozplay-dist
+          path: dist/
+
+      - name: Copy dist Folder to public
+        run: |
+          rm -rf public/
+          cp -R dist/ public
+
+      - name: Run Backend Tests
+        run: |
+          mkdir -p coverage
+          buffalo test -v -coverprofile=coverage/backend-coverage.out ./...
+        env:
+          GOPATH: /home/runner/go
+          GO_ENV: 'test'
+          TEST_DATABASE_URL: 'postgres://postgres:postgres@localhost:5432/virtuozplay_test?sslmode=disable'
+
+      - name: Backend Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/backend-coverage.out
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  test-frontend:
+    name: Test Frontend
+    runs-on: ubuntu-22.04
+    needs: build
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'yarn'
+
+      - name: Install Dependencies
+        run: |
+          mkdir -p public/assets
+          yarn install
+
+      - name: Run Frontend Tests
+        run: yarn test:unit
+
+      - name: Frontend Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/coverage-final.json
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  check-backend-format:
+    name: Check Backend Formatting
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+
+      - name: Check Backend Formatting
+        run: |
+          echo 'The following files are not correctly formatted, please run `gofmt -w -s` to fix them:'
+          gofmt -d -s -l `find . -name '*.go' -not -path './.devenv/*'` 2>&1 | tee /tmp/gofmt.out
+          ! grep -q '[^[:space:]]' /tmp/gofmt.out 2> /dev/null
+
+  check-frontend-format:
+    name: Check Front-end Formatting & Linting
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'yarn'
+
+      - name: Install Dependencies
+        run: |
+          npm install -g yarn
+          npm install -g prettier
+          yarn install
+
+      - name: Check Frontend Formatting
+        run: |
+          echo 'The following files are not correctly formatted, please run `yarn format` to fix them:'
+          prettier --list-different --config .prettierrc --ignore-path .gitignore --no-error-on-unmatched-pattern . 2>&1 | tee /tmp/prettier.out
+          ! grep -q '[^[:space:]]' /tmp/prettier.out 2> /dev/null
+
+      - name: Frontend Linting
+        run: yarn lint

@@ -1,0 +1,11 @@
+# GraphQL schema
+#
+# Documentation at: https://gqlgen.com/getting-started/
+
+type VirtuozPlay {
+  version: String!
+}
+
+type Query {
+  virtuozPlay: VirtuozPlay!
+}

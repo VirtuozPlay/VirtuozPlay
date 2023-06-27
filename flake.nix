@@ -10,7 +10,7 @@
   flake-utils.lib.eachDefaultSystem (system:
   let
     pkgs = nixpkgs.legacyPackages.${system};
-    buffalo-version = "0.18.4";
+    buffalo-version = "0.18.14";
   in
   {
     devShells.default = devenv.lib.mkShell {

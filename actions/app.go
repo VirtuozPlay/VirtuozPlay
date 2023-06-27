@@ -65,9 +65,12 @@ func App() *buffalo.App {
 		// Protect against CSRF attacks. https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)
 		app.GET("/", csrf.New(HomeHandler))
 
-		// GraphQL endpoint
+		// GraphQL endpoints
 		// TODO add CSRF protection
 		app.ANY("/graphql", GraphQLHandler())
+		if ENV != "production" {
+			app.ANY("/graphql/playground", GraphQLPlaygroundHandler())
+		}
 
 		app.ServeFiles("/", http.FS(DistFS())) // serve files from the public directory
 	}

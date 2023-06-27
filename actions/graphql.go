@@ -1,54 +1,42 @@
 package actions
 
 import (
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/extension"
+	"github.com/99designs/gqlgen/graphql/handler/lru"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
+	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gobuffalo/buffalo"
-	"github.com/graphql-go/graphql"
-	"github.com/graphql-go/handler"
-	"log"
+	"virtuozplay/graph"
 )
 
-var schema = makeSchema()
+var srv *handler.Server
+
+func init() {
+	// Initialize the GraphQL server
+	srv = handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+
+	// Supported ways to submit queries
+	srv.AddTransport(transport.GRAPHQL{})
+	srv.AddTransport(transport.Options{})
+	srv.AddTransport(transport.GET{})
+	srv.AddTransport(transport.POST{})
+	srv.AddTransport(transport.MultipartForm{})
+
+	srv.SetQueryCache(lru.New(1000))
+
+	srv.Use(extension.Introspection{})
+	srv.Use(extension.AutomaticPersistedQuery{
+		Cache: lru.New(100),
+	})
+}
 
 // GraphQLHandler Manages the GraphQL endpoint of VirtuozPlay
 func GraphQLHandler() buffalo.Handler {
-	devMode := ENV != "production"
-
-	h := handler.New(&handler.Config{
-		Schema:     &schema,
-		Pretty:     devMode,
-		GraphiQL:   devMode,
-		Playground: devMode,
-	})
-
-	return buffalo.WrapHandler(h)
+	return buffalo.WrapHandler(srv)
 }
 
-// makeSchema Creates the GraphQL schema for VirtuozPlay
-// TODO: replace by gqlgen, and actual data
-func makeSchema() graphql.Schema {
-	virtuozPlayObject := graphql.NewObject(graphql.ObjectConfig{
-		Name: "VirtuozPlay",
-		Fields: graphql.Fields{
-			"version": &graphql.Field{
-				Type: graphql.String,
-				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					return "0.1.0", nil
-				},
-			},
-		},
-	})
-	rootQuery := graphql.ObjectConfig{Name: "RootQuery", Fields: graphql.Fields{
-		"virtuozPlay": &graphql.Field{
-			Type: virtuozPlayObject,
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				return p.Source, nil
-			},
-		},
-	}}
-
-	schema, err := graphql.NewSchema(graphql.SchemaConfig{Query: graphql.NewObject(rootQuery)})
-	if err != nil {
-		log.Fatalf("failed to create new schema, error: %v", err)
-	}
-	return schema
+// GraphQLPlaygroundHandler gives access to an interactive GraphQL playground in the browser
+func GraphQLPlaygroundHandler() buffalo.Handler {
+	return buffalo.WrapHandler(playground.Handler("GraphQL playground", "/graphql"))
 }

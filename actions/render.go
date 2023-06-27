@@ -7,8 +7,6 @@ import (
 	"github.com/gobuffalo/plush/v4"
 	tags2 "github.com/gobuffalo/tags/v3"
 	"io/fs"
-	"os"
-	"virtuozplay/dist"
 	"virtuozplay/templates"
 
 	"github.com/gobuffalo/buffalo/render"
@@ -31,16 +29,12 @@ type mapping struct {
 }
 
 func init() {
-	var assetsFS = dist.FS()
 	r = render.New(render.Options{
 		// HTML layout to be used for all HTML requests:
 		HTMLLayout: "application.plush.html",
 
 		// fs.FS containing templates
 		TemplatesFS: templates.FS(),
-
-		// fs.FS containing assets
-		AssetsFS: assetsFS,
 
 		// Add template helpers here:
 		Helpers: render.Helpers{
@@ -49,7 +43,7 @@ func init() {
 			// forms.FormKey:     forms.Form,
 			// forms.FormForKey:  forms.FormFor,
 			"viteClientTag":      viteClientTag(),
-			"viteEntryPointTags": viteEntryPointTags(assetsFS),
+			"viteEntryPointTags": viteEntryPointTags(DistFS()),
 		},
 	})
 }
@@ -58,7 +52,7 @@ func init() {
 func viteEntryPointTags(assetsFS fs.FS) func(entrypoint string, c plush.Context) (template.HTML, error) {
 	return func(entrypoint string, c plush.Context) (template.HTML, error) {
 		// When not in production, load entrypoint from Vite server
-		if os.Getenv("GO_ENV") != "production" {
+		if ENV != "production" {
 			return jsm("http://localhost:5173/" + entrypoint), nil
 		}
 
@@ -89,7 +83,7 @@ func viteEntryPointTags(assetsFS fs.FS) func(entrypoint string, c plush.Context)
 // Generates the tag needed to enable Vite hot reloading functionality in development mode
 func viteClientTag() func() template.HTML {
 	return func() template.HTML {
-		if os.Getenv("GO_ENV") != "production" {
+		if ENV != "production" {
 			return jsm("http://localhost:5173/@vite/client")
 		}
 		return ""

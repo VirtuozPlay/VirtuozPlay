@@ -15,7 +15,10 @@ require (
 	github.com/gobuffalo/pop/v6 v6.1.1
 	github.com/gobuffalo/suite/v4 v4.0.4
 	github.com/gobuffalo/tags/v3 v3.1.4
+	github.com/graphql-go/graphql v0.8.1
+	github.com/graphql-go/handler v0.2.3
 	github.com/markbates/grift v1.5.0
+	github.com/rs/cors v1.9.0
 	github.com/unrolled/secure v1.13.0
 )
 

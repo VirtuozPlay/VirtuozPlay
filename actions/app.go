@@ -1,17 +1,16 @@
 package actions
 
 import (
+	csrf "github.com/gobuffalo/mw-csrf"
+	"github.com/rs/cors"
 	"net/http"
 	"strconv"
-	"virtuozplay/dist"
-
 	"virtuozplay/locales"
 	"virtuozplay/models"
 
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/buffalo-pop/v3/pop/popmw"
 	"github.com/gobuffalo/envy"
-	csrf "github.com/gobuffalo/mw-csrf"
 	forcessl "github.com/gobuffalo/mw-forcessl"
 	i18n "github.com/gobuffalo/mw-i18n/v2"
 	paramlogger "github.com/gobuffalo/mw-paramlogger"
@@ -46,6 +45,8 @@ func App() *buffalo.App {
 		app = buffalo.New(buffalo.Options{
 			Env:         ENV,
 			SessionName: "_virtuozplay_session",
+			// Setup CORS to allow all localhost:* origins in dev mode
+			PreWares: []buffalo.PreWare{corsConfiguration().Handler},
 		})
 
 		// Automatically redirect to SSL
@@ -54,10 +55,6 @@ func App() *buffalo.App {
 		// Log request parameters (filters apply).
 		app.Use(paramlogger.ParameterLogger)
 
-		// Protect against CSRF attacks. https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)
-		// Remove to disable this.
-		app.Use(csrf.New)
-
 		// Wraps each request in a transaction.
 		//   c.Value("tx").(*pop.Connection)
 		// Remove to disable this.
@@ -65,9 +62,14 @@ func App() *buffalo.App {
 		// Setup and use translations:
 		app.Use(translations())
 
-		app.GET("/", HomeHandler)
+		// Protect against CSRF attacks. https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)
+		app.GET("/", csrf.New(HomeHandler))
 
-		app.ServeFiles("/", http.FS(dist.FS())) // serve files from the public directory
+		// GraphQL endpoint
+		// TODO add CSRF protection
+		app.ANY("/graphql", GraphQLHandler())
+
+		app.ServeFiles("/", http.FS(DistFS())) // serve files from the public directory
 	}
 
 	return app
@@ -114,4 +116,19 @@ func loadForceSSL() bool {
 	}
 
 	return value
+}
+
+// corsConfiguration returns the CORS configuration for VirtuozPlay
+// All other origins are blocked by default unless in development mode where
+// localhost:* is allowed.
+func corsConfiguration() *cors.Cors {
+	if ENV == "production" {
+		return cors.Default()
+	}
+	return cors.New(cors.Options{
+		AllowedOrigins: []string{
+			"http://localhost:*",
+			"https://localhost:*",
+		},
+	})
 }

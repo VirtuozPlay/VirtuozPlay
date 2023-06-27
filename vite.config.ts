@@ -9,6 +9,10 @@ export default defineConfig({
     server: {
         proxy: {
             '^/$': 'http://127.0.0.1:3000',
+            '^/graphql': {
+                target: 'http://127.0.0.1:3000',
+                changeOrigin: true,
+            },
         },
     },
     build: {

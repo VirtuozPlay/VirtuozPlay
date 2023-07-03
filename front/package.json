@@ -16,9 +16,12 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path ../.gitignore",
     "format": "prettier --ignore-path .gitignore -w ."
   },
-  "repository": "github.com/gobuffalo/buffalo",
+  "repository": "github.com/VirtuozPlay/VirtuozPlay",
   "dependencies": {
     "@apollo/client": "^3.7.16",
+    "@fortawesome/fontawesome-svg-core": "^6.4.0",
+    "@fortawesome/free-solid-svg-icons": "^6.4.0",
+    "@fortawesome/vue-fontawesome": "latest-3",
     "@graphql-codegen/near-operation-file-preset": "^2.5.0",
     "@graphql-typed-document-node/core": "^3.2.0",
     "@vue/apollo-components": "^4.0.0-beta.5",

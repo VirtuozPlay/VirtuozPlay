@@ -16,6 +16,7 @@
     "lint": "cd front && yarn run lint",
     "format": "prettier --ignore-path .gitignore -w ."
   },
+  "repository": "github.com/VirtuozPlay/VirtuozPlay",
   "dependencies": {
     "front": "^0.0.1"
   }

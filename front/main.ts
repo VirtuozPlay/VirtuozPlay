@@ -2,7 +2,6 @@ import 'vite/modulepreload-polyfill';
 
 import './assets/main.css';
 
-// @ts-ignore
 import VueApolloComponents from '@vue/apollo-components';
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';

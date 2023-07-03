@@ -61,7 +61,9 @@ jobs:
           key: ${{ runner.os }}-gopath
 
       - name: Build
-        run: buffalo build --verbose
+        run: |
+          cp -R public dist
+          buffalo build --verbose
         env:
           GOPATH: /home/runner/go
 

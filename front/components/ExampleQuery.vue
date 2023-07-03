@@ -15,7 +15,7 @@ import type { QueryResult } from '@apollo/client';
             `
         "
     >
-        <template v-slot="{ loading, error, data }: QueryResult<{ virtuozPlay: { version: string } }>">
+        <template #default="{ loading, error, data }: QueryResult<{ virtuozPlay: { version: string } }>">
             <!-- Loading -->
             <div v-if="loading" class="loading apollo">Loading...</div>
 

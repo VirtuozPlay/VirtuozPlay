@@ -17,14 +17,14 @@ export default defineConfig({
     },
     build: {
         manifest: true,
-        outDir: path.resolve(__dirname, 'dist'),
+        outDir: path.resolve(__dirname, '..', 'dist'),
         rollupOptions: {
-            input: path.resolve(__dirname, 'assets/main.ts'),
+            input: path.resolve(__dirname, 'main.ts'),
         },
     },
     resolve: {
         alias: {
-            '@': fileURLToPath(new URL('./assets', import.meta.url)),
+            '@': fileURLToPath(new URL('.', import.meta.url)),
         },
     },
     test: {

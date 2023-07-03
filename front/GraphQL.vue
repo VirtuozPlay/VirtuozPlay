@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// @ts-ignore
+// noinspection JSDeprecatedSymbols
 import { ApolloQuery } from '@vue/apollo-components';
 import type { DocumentNode } from 'graphql/language';
 import type { QueryResult } from '@apollo/client';
@@ -12,6 +12,7 @@ defineProps<{
     query: (gql: GQLTag) => DocumentNode;
 }>();
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 defineSlots<QueryResult & { default: any }>();
 </script>
 
@@ -21,8 +22,8 @@ defineSlots<QueryResult & { default: any }>();
 -->
 <template>
     <ApolloQuery :query="$props.query">
-        <template v-slot="{ result }: { result: QueryResult }">
-          <slot v-bind="result"></slot>
+        <template #default="{ result }: { result: QueryResult }">
+            <slot v-bind="result"></slot>
         </template>
     </ApolloQuery>
 </template>

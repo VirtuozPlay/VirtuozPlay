@@ -5,6 +5,8 @@
   "compilerOptions": {
     "composite": true,
     "baseUrl": ".",
+    "isolatedModules": true,
+    "strict": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "noImplicitOverride": true,

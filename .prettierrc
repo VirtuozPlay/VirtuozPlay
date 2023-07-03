@@ -7,7 +7,7 @@
   "singleQuote": true,
   "overrides": [
     {
-      "files": ["*.js", "*.ts", "*.vue", "*.css"],
+      "files": ["*.js", "*.mjs", "*.cjs", "*.ts", "*.mts", "*.cts", "*.vue", "*.css"],
       "options": {
         "tabWidth": 4
       }

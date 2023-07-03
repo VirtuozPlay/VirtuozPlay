@@ -14,7 +14,7 @@ defineComponent({
 </script>
 
 <template>
-    <div class="about main items-center">
+    <div class="about items-center mt-16 w-80vw flex justify-center">
         <CardApp>
             <HelloWorld msg="Hi, VirtuozPlay" />
             <div>

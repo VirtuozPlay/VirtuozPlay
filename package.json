@@ -19,5 +19,8 @@
   "repository": "github.com/VirtuozPlay/VirtuozPlay",
   "dependencies": {
     "front": "^0.0.1"
+  },
+  "devDependencies": {
+    "prettier": "^2.8.8"
   }
 }

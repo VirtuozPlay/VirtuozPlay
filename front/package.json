@@ -14,7 +14,7 @@
     "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
     "codegen": "graphql-codegen --config codegen.ts",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path ../.gitignore",
-    "format": "prettier --ignore-path .gitignore -w ."
+    "format": "cd .. && yarn run format"
   },
   "repository": "github.com/VirtuozPlay/VirtuozPlay",
   "dependencies": {

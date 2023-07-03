@@ -10641,6 +10641,7 @@ __metadata:
   resolution: "virtuozplay-workspace@workspace:."
   dependencies:
     front: ^0.0.1
+    prettier: ^2.8.8
   languageName: unknown
   linkType: soft
 

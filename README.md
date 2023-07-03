@@ -78,6 +78,7 @@ buffalo plugins install
 - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 - [Material Icon Theme](https://marketplace.visualstudio.com/items?itemName=PKief.material-icon-theme)
 - [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) (Vue.js 3 support)
+- [Apollo GraphQL](https://marketplace.visualstudio.com/items?itemName=apollographql.vscode-apollo)
 
 #### GoLand / IntelliJ
 
@@ -87,6 +88,7 @@ buffalo plugins install
 - [Tailwind CSS](https://plugins.jetbrains.com/plugin/12075-tailwind-css)
 - [Vue.js](https://plugins.jetbrains.com/plugin/9442-vue-js)
 - [Vite](https://plugins.jetbrains.com/plugin/14632-vite)
+- [JS GraphQL](https://plugins.jetbrains.com/plugin/8097-js-graphql)
 
 ### Database Setup
 

@@ -1,5 +1,7 @@
 # How to become a contributor
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 ✔️ You agree to the [Contributor License Agreements](https://www.contributor-covenant.org)
 
 ✔️ Make sure your code adheres to the existing style, technologies, and coding standards recommended for this project.
@@ -39,27 +41,15 @@
   ```sh
   Example:
 
-  $> git commit -m 'Fix: infinite loop when pressing Alt-F4
+  $> git commit -m 'Infinite loop when pressing Alt-F4
 
   This was caused by a missing check in the event loop
   The program now checks when the window is set to close'
   ```
 
-- Defines the type of commit
-
-  - **build:** Build system (example: gulp, webpack, npm)
-  - **ci:** Continuous integration (github action)
-  - **doc:** Documentation
-  - **feat:** Added a feature
-  - **hotfix:** Bug fix
-  - **perf:** performance improvement
-  - **refactor:** Code changes that doesn't change how it works
-  - **style:** Changing the style of the code (without changing the logic)
-  - **test:** Editing tests
-
 ### How to submit a pull request?
 
-- Format your code using Pretier
+- Format your code using Prettier
 
 ```sh
 yarn run format
@@ -75,8 +65,6 @@ yarn run test:unit
 - Once validated, merge to PR to `main` and remove the source branch (with `git branch -D <branch_name>`.
 
 ---
-
-[![License](https://img.shields.io/github/license/rails/rails)](https://github.com/rails/rails)
 
 THANKS! 💚
 

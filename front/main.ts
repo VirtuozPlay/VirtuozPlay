@@ -20,4 +20,4 @@ app.use(router);
 app.use(apolloProvider);
 app.use(VueApolloComponents);
 app.mount('#app');
-app.component("FontAwesomeIcon", FontAwesomeIcon)
+app.component('FontAwesomeIcon', FontAwesomeIcon);

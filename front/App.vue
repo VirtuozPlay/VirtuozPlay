@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue';
 import NavBar from '../assets/components/NavBar.vue';
+import { RouterView } from 'vue-router';
 </script>
 
 <template>

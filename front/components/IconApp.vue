@@ -6,29 +6,22 @@
     </div>
 </template>
 
-<script>
-export default {
-    name: 'Icon',
-    props: {
-        icon: {
-            type: String,
-            required: true,
-        },
-        color: {
-            type: String,
-            default: '#C2C1FF',
-        },
+<script setup lang="ts">
+const props = defineProps({
+    icon: {
+        type: String,
+        required: true,
     },
-    computed: {
-        iconClass() {
-            return `fa-${this.icon}`;
-        },
+    color: {
+        type: String,
+        default: '#C2C1FF',
     },
-    methods: {
-        handleClick() {
-            console.log('hello world');
-        },
-    },
+});
+
+const iconClass = `fa-${props.icon}`;
+
+const handleClick = (): void => {
+    console.log('Hello world');
 };
 </script>
 

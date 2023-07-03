@@ -1,13 +1,17 @@
-<script>
-import { RouterLink, RouterView } from 'vue-router';
-import Icon from './Icon.vue';
-export default {
+<script setup lang="ts">
+import { defineComponent } from 'vue';
+import { RouterLink } from 'vue-router';
+import IconApp from './IconApp.vue';
+
+defineComponent({
     name: 'NavBar',
     components: {
-        Icon,
+        RouterLink,
+        IconApp,
     },
-};
+});
 </script>
+
 <template>
     <div class="flex flex-wrap items-center navbar justify-between">
         <div class="p-4">
@@ -16,8 +20,8 @@ export default {
         <nav class="m-8 flex items-center flex-wrap p-4">
             <RouterLink to="/about">About</RouterLink>
             <RouterLink class="noeffect" to="/">
-                <font-awesome-icon icon="fa-solid fa-bars" size="3x" />
-                <div style="display: none"><Icon icon="bars"></Icon></div>
+                <div style="display: none"><font-awesome-icon icon="fa-solid fa-bars" size="3x" /></div>
+                <IconApp icon="bars"></IconApp>
             </RouterLink>
         </nav>
     </div>

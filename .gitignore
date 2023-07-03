@@ -39,3 +39,6 @@ cypress/videos
 .devenv/
 .direnv/
 result/
+
+## vs
+.vs/

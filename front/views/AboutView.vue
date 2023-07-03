@@ -1,24 +1,21 @@
-<script>
-import Card from '../components/Card.vue';
-import HelloWorld from '../components/HelloWorld.vue';
-import Button from '../components/Button.vue';
-import Icon from '../components/Icon.vue';
-const handleClick = () => {
-    console.log('Bouton cliqué !');
-};
+<script setup lang="ts">
+import { defineComponent } from 'vue';
+import CardApp from '../components/CardApp.vue';
+import ButtonApp from '../components/ButtonApp.vue';
+import IconApp from '../components/IconApp.vue';
 
-export default {
+defineComponent({
     components: {
-        Card,
-        Button,
-        Icon,
+        CardApp,
+        ButtonApp,
+        IconApp,
     },
-};
+});
 </script>
 
 <template>
     <div class="about main items-center">
-        <Card>
+        <CardApp>
             <HelloWorld msg="Hi, VirtuozPlay" />
             <div>
                 <h1>About</h1>
@@ -26,16 +23,16 @@ export default {
                 <h3>Crédit musique</h3>
                 <p>Partie sur les crédits musique</p>
             </div>
-        </Card>
+        </CardApp>
         <div>
             <p>Exemples de bouton</p>
-            <Icon icon="bars"></Icon>
-            <Icon icon="arrow-right" color="#FAFF00"></Icon>
-            <Icon icon="arrow-right" color="#00FF75"></Icon>
-            <Icon icon="arrow-right" color="#FFF"></Icon>
-            <Icon icon="user-secret" color="#FAFF00" />
-            <Icon icon="play" color="#00FF75" />
-            <Button @click="handleClick">Cliquez ici</Button>
+            <IconApp icon="bars"></IconApp>
+            <IconApp icon="arrow-right" color="#FAFF00"></IconApp>
+            <IconApp icon="arrow-right" color="#00FF75"></IconApp>
+            <IconApp icon="arrow-right" color="#FFF"></IconApp>
+            <IconApp icon="user-secret" color="#FAFF00" />
+            <IconApp icon="play" color="#00FF75" />
+            <ButtonApp>Exemple</ButtonApp>
         </div>
     </div>
 </template>

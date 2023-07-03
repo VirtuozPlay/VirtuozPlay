@@ -11,6 +11,7 @@
     "noImplicitThis": true,
     "noImplicitOverride": true,
     "noImplicitReturns": true,
+    "verbatimModuleSyntax": false,
     "paths": {
       "@/*": ["./*"]
     },

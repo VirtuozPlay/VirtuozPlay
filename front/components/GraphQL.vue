@@ -4,12 +4,8 @@ import { ApolloQuery } from '@vue/apollo-components';
 import type { DocumentNode } from 'graphql/language';
 import type { QueryResult } from '@apollo/client';
 
-import type { gql } from 'graphql-tag';
-
-export type GQLTag = typeof gql.gql;
-
 defineProps<{
-    query: (gql: GQLTag) => DocumentNode;
+    query: DocumentNode;
 }>();
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -21,7 +17,7 @@ defineSlots<QueryResult & { default: any }>();
     ApolloQuery component with TypeScript.
 -->
 <template>
-    <ApolloQuery :query="$props.query">
+    <ApolloQuery :query="() => $props.query">
         <template #default="{ result }: { result: QueryResult }">
             <slot v-bind="result"></slot>
         </template>

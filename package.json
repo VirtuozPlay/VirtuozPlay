@@ -12,6 +12,7 @@
     "test:e2e:dev": "cd front && yarn run test:e2e:dev",
     "build-only": "cd front && yarn run build-only",
     "type-check": "cd front && yarn run type-check",
+    "codegen": "cd front && yarn run codegen",
     "lint": "cd front && yarn run lint",
     "format": "prettier --ignore-path .gitignore -w ."
   },

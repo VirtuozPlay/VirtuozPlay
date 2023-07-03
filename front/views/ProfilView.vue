@@ -12,7 +12,7 @@ defineComponent({
 </script>
 
 <template>
-    <div class="profil main items-center">
+    <div class="items-center mt-16 w-80vw flex justify-center">
         <CardApp>
             <div class="flex">
                 <div class="avatar">

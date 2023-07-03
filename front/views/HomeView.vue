@@ -24,7 +24,7 @@ defineComponent({
 </script>
 
 <template>
-    <div class="about main items-center flex-col">
+    <div class="about items-center flex-col mt-16 w-80vw flex justify-center">
         <div class="p-4">
             <div class="title flex">
                 <IconApp v-if="isHovering4" icon="arrow-right icon" color="#FAFF00" class="inline-block mr-2"></IconApp>

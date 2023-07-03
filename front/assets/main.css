@@ -4,33 +4,31 @@
 @tailwind components;
 @tailwind utilities;
 
-
 body {
-    background-color: #F8F6F3;
+    background-color: #f8f6f3;
     height: 100vh;
     color: var(--color-text);
     font-family: 'Public Sans', sans-serif;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-
 }
 
-h1, h2 {
+h1,
+h2 {
     font-size: 80px;
     font-weight: 800;
 }
 h3 {
     font-size: 30px;
     margin-bottom: 1rem;
-    }
+}
 
 .navbar {
     width: 100vw;
-    background-color: #FFF;
-    border-bottom: 4px #4C324D solid;
+    background-color: #fff;
+    border-bottom: 4px #4c324d solid;
     padding: 10px 16px;
-
 }
 
 .main {
@@ -50,6 +48,5 @@ a {
     a:hover {
         background-color: hsla(66, 100%, 55%, 0.6);
         border-radius: 100px;
-       
     }
 }

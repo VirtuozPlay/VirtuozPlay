@@ -6,18 +6,18 @@
     </div>
 </template>
 
-<script>
-export default {
-    name: 'Button',
-    methods: {
-        handleClick() {
-            console.log('hello world');
-        },
-    },
+<script setup lang="ts">
+import { defineComponent } from 'vue';
+defineComponent({
+    name: 'ButtonApp',
+});
+
+const handleClick = (): void => {
+    console.log('Hello world');
 };
 </script>
 
-<style lang="css" scoped>
+<style scoped>
 .button {
     color: #4c324d;
     background-color: #00ff75;

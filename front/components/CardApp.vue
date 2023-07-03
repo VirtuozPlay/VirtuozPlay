@@ -1,5 +1,3 @@
-<script></script>
-
 <template>
     <div class="card">
         <div class="card-content">

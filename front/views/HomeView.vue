@@ -1,28 +1,33 @@
-<script>
-import Card from '../components/Card.vue';
-import Icon from '../components/Icon.vue';
+<script setup lang="ts">
+import { defineComponent, ref } from 'vue';
+import IconApp from '../components/IconApp.vue';
 
-export default {
+const isHovering1 = ref(false);
+const isHovering2 = ref(false);
+const isHovering3 = ref(false);
+const isHovering4 = ref(false);
+
+defineComponent({
     components: {
-        Card,
-        Icon,
+        IconApp,
     },
-    data() {
+
+    setup() {
         return {
-            isHovering1: false,
-            isHovering2: false,
-            isHovering3: false,
-            isHovering4: false,
+            isHovering1,
+            isHovering2,
+            isHovering3,
+            isHovering4,
         };
     },
-};
+});
 </script>
 
 <template>
     <div class="about main items-center flex-col">
         <div class="p-4">
             <div class="title flex">
-                <Icon v-if="isHovering4" icon="arrow-right icon" color="#FAFF00" class="inline-block mr-2"></Icon>
+                <IconApp v-if="isHovering4" icon="arrow-right icon" color="#FAFF00" class="inline-block mr-2"></IconApp>
                 <h1 @mouseover="isHovering4 = true" @mouseout="isHovering4 = false">
                     <RouterLink to="/collection">Collection</RouterLink>
                 </h1>
@@ -31,7 +36,7 @@ export default {
         </div>
         <div class="p-4">
             <div class="title flex">
-                <Icon v-if="isHovering1" icon="arrow-right icon" color="#FAFF00" class="inline-block mr-2"></Icon>
+                <IconApp v-if="isHovering1" icon="arrow-right icon" color="#FAFF00" class="inline-block mr-2"></IconApp>
                 <h1 @mouseover="isHovering1 = true" @mouseout="isHovering1 = false">
                     <RouterLink to="/profil">Profil</RouterLink>
                 </h1>
@@ -40,7 +45,7 @@ export default {
         </div>
         <div class="p-4">
             <div class="title flex">
-                <Icon v-if="isHovering2" icon="arrow-right icon" color="#FAFF00" class="inline-block mr-2"></Icon>
+                <IconApp v-if="isHovering2" icon="arrow-right icon" color="#FAFF00" class="inline-block mr-2"></IconApp>
                 <h1 @mouseover="isHovering2 = true" @mouseout="isHovering2 = false">
                     <RouterLink to="/stats">Stats</RouterLink>
                 </h1>
@@ -49,7 +54,7 @@ export default {
         </div>
         <div class="p-4">
             <div class="title flex">
-                <Icon v-if="isHovering3" icon="arrow-right icon" color="#FAFF00" class="inline-block mr-2"></Icon>
+                <IconApp v-if="isHovering3" icon="arrow-right icon" color="#FAFF00" class="inline-block mr-2"></IconApp>
                 <h1 @mouseover="isHovering3 = true" @mouseout="isHovering3 = false">
                     <RouterLink to="/checkup">Checkup</RouterLink>
                 </h1>

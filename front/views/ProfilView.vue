@@ -1,24 +1,19 @@
-<script>
-import Card from '../components/Card.vue';
-import Button from '../components/Button.vue';
-import Icon from '../components/Icon.vue';
-const handleClick = () => {
-    console.log('Bouton cliqué !');
-};
+<script setup lang="ts">
+import { defineComponent } from 'vue';
+import CardApp from '../components/CardApp.vue';
+import ButtonApp from '../components/ButtonApp.vue';
 
-export default {
-    name: 'Profil',
+defineComponent({
     components: {
-        Card,
-        Button,
-        Icon,
+        CardApp,
+        ButtonApp,
     },
-};
+});
 </script>
 
 <template>
     <div class="profil main items-center">
-        <Card>
+        <CardApp>
             <div class="flex">
                 <div class="avatar">
                     <font-awesome-icon icon="fa-solid fa-user-secret" size="3x" />
@@ -26,9 +21,9 @@ export default {
                 <h1>toto</h1>
             </div>
             <div>
-                <Button @click="handleClick">Modifier mon profil</Button>
+                <ButtonApp>Modifier mon profil</ButtonApp>
             </div>
-        </Card>
+        </CardApp>
     </div>
 </template>
 

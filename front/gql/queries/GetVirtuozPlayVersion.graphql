@@ -1,0 +1,5 @@
+query GetVirtuozPlayVersion {
+  virtuozPlay {
+    version
+  }
+}

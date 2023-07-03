@@ -1,20 +1,11 @@
 <script setup lang="ts">
-import GraphQL from '@/GraphQL.vue';
+import GraphQL from '@/components/GraphQL.vue';
 import type { QueryResult } from '@apollo/client';
+import { GetVirtuozPlayVersionDocument } from '@/gql/queries/GetVirtuozPlayVersion';
 </script>
 
 <template>
-    <GraphQL
-        :query="
-            (gql) => gql`
-                {
-                    virtuozPlay {
-                        version
-                    }
-                }
-            `
-        "
-    >
+    <GraphQL :query="GetVirtuozPlayVersionDocument">
         <template #default="{ loading, error, data }: QueryResult<{ virtuozPlay: { version: string } }>">
             <!-- Loading -->
             <div v-if="loading" class="loading apollo">Loading...</div>

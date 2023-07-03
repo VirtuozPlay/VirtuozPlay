@@ -12,12 +12,15 @@
     "test:e2e:dev": "start-server-and-test 'vite dev --port 4173' http://localhost:4173 'cypress open --e2e'",
     "build-only": "vite build",
     "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
+    "codegen": "graphql-codegen --config codegen.ts",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path ../.gitignore",
     "format": "prettier --ignore-path .gitignore -w ."
   },
   "repository": "github.com/gobuffalo/buffalo",
   "dependencies": {
     "@apollo/client": "^3.7.16",
+    "@graphql-codegen/near-operation-file-preset": "^2.5.0",
+    "@graphql-typed-document-node/core": "^3.2.0",
     "@vue/apollo-components": "^4.0.0-beta.5",
     "@vue/apollo-option": "^4.0.0-beta.5",
     "graphql": "^16.7.1",
@@ -28,6 +31,14 @@
     "vue-template-compiler": "^2.7.14"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "4.0.1",
+    "@graphql-codegen/client-preset": "4.0.1",
+    "@graphql-codegen/introspection": "4.0.0",
+    "@graphql-codegen/typed-document-node": "^5.0.1",
+    "@graphql-codegen/typescript-document-nodes": "^4.0.1",
+    "@graphql-codegen/typescript-graphql-request": "^5.0.0",
+    "@graphql-codegen/typescript-react-apollo": "^3.3.7",
+    "@graphql-codegen/typescript-vue-apollo": "^3.3.7",
     "@rushstack/eslint-patch": "^1.2.0",
     "@tsconfig/node18": "^2.0.1",
     "@types/jsdom": "^21.1.1",

@@ -1,4 +1,5 @@
 # Documentation API GraphQL
+
 [🇬🇧 English Version](graphql.fr.md)
 
 ## Introduction
@@ -18,11 +19,11 @@ Voci un exemple de schéma qui expose un objet `virtuozPlay` à la racine de l'A
 
 ```graphql
 type Query {
-    virtuozPlay: VirtuozPlay!
+  virtuozPlay: VirtuozPlay!
 }
 
 type VirtuozPlay {
-    version: String!
+  version: String!
 }
 ```
 
@@ -92,9 +93,9 @@ Créez la requête suivante dans `front/gql/queries/GetVirtuozPlayVersion.graphq
 
 ```graphql
 query GetVirtuozPlayVersion {
-    virtuozPlay {
-        version
-    }
+  virtuozPlay {
+    version
+  }
 }
 ```
 
@@ -107,11 +108,11 @@ Il devrait y avoir un fichier `front/gql/queries/GetVirtuozPlayVersion.ts` avec 
 export declare const GetVirtuozPlayVersion: import('graphql').DocumentNode;
 
 export const GetVirtuozPlayVersionDocument = gql`
-    query GetVirtuozPlayVersion {
-        virtuozPlay {
-            version
-        }
+  query GetVirtuozPlayVersion {
+    virtuozPlay {
+      version
     }
+  }
 `;
 
 // ...
@@ -120,29 +121,29 @@ export const GetVirtuozPlayVersionDocument = gql`
 Maintenant, vous pouvez utiliser l'objet `DocumentNode` dans votre composant Vue :
 
 ```vue
-<script setup lang='ts'>
+<script setup lang="ts">
 import GraphQL from '@/components/GraphQL.vue';
 import type { QueryResult } from '@apollo/client';
 import { GetVirtuozPlayVersionDocument, GetVirtuozPlayVersionQuery } from '@/gql/queries/GetVirtuozPlayVersion';
 </script>
 
 <template>
-   <GraphQL :query='GetVirtuozPlayVersionDocument'>
-      <!-- The result of the query is available in the default slot, you should always put the correct type in QueryResult<...> -->
-      <template #default='{ loading, error, data }: QueryResult<GetVirtuozPlayVersionQuery>'>
-         <!-- Loading indicator, optional -->
-         <div v-if='loading' class='loading apollo'>Loading...</div>
+  <GraphQL :query="GetVirtuozPlayVersionDocument">
+    <!-- The result of the query is available in the default slot, you should always put the correct type in QueryResult<...> -->
+    <template #default="{ loading, error, data }: QueryResult<GetVirtuozPlayVersionQuery>">
+      <!-- Loading indicator, optional -->
+      <div v-if="loading" class="loading apollo">Loading...</div>
 
-         <!-- Error indicator, optional -->
-         <div v-else-if='error' class='error apollo'>An error occurred: {{ error }}</div>
+      <!-- Error indicator, optional -->
+      <div v-else-if="error" class="error apollo">An error occurred: {{ error }}</div>
 
-         <!-- Result -->
-         <div v-else-if='data' class='result apollo'>VirtuozPlay version {{ data.virtuozPlay.version }}</div>
+      <!-- Result -->
+      <div v-else-if="data" class="result apollo">VirtuozPlay version {{ data.virtuozPlay.version }}</div>
 
-         <!-- No result -->
-         <div v-else class='no-result apollo'>No result :(</div>
-      </template>
-   </GraphQL>
+      <!-- No result -->
+      <div v-else class="no-result apollo">No result :(</div>
+    </template>
+  </GraphQL>
 </template>
 ```
 

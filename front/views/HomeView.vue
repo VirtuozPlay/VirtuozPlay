@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import HelloWorld from '../components/HelloWorld.vue';
-import ExampleQuery from '@/components/ExampleQuery.vue';
+import VirtuozPlayVersion from '@/components/VirtuozPlayVersion.vue';
 </script>
 
 <template>
     <main>
         <HelloWorld msg="Hi, VirtuozPlay" />
-        <ExampleQuery />
+        <VirtuozPlayVersion />
     </main>
 </template>

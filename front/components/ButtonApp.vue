@@ -1,3 +1,9 @@
+<script setup lang="ts">
+const handleClick = (): void => {
+    console.log('Hello world');
+};
+</script>
+
 <template>
     <div>
         <button type="button" class="cursor-pointer button" @click="handleClick">
@@ -5,17 +11,6 @@
         </button>
     </div>
 </template>
-
-<script setup lang="ts">
-import { defineComponent } from 'vue';
-defineComponent({
-    name: 'ButtonApp',
-});
-
-const handleClick = (): void => {
-    console.log('Hello world');
-};
-</script>
 
 <style scoped>
 .button {
@@ -27,7 +22,6 @@ const handleClick = (): void => {
     font-weight: 700;
     border: 4px solid #4c324d;
     box-shadow: 8px 8px #4c324d;
-    border-radius: 4px;
     transition: background-color 0.3s ease;
 }
 

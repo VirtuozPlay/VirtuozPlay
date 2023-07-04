@@ -1,15 +1,6 @@
 <script setup lang="ts">
-import { defineComponent } from 'vue';
 import { RouterLink } from 'vue-router';
 import IconApp from './IconApp.vue';
-
-defineComponent({
-    name: 'NavBar',
-    components: {
-        RouterLink,
-        IconApp,
-    },
-});
 </script>
 
 <template>

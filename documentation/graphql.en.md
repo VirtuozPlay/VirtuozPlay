@@ -164,5 +164,3 @@ curl -X POST -H 'Content-Type: application/json' localhost:5173/graphql -d '{"qu
 
 You can access the GraphQL playground by opening the `graphql/playground` endpoint in your browser (e.g. `http://localhost:5173/graphql/playground)`.
 It gives you a nice interface to test your queries and mutations.
-
-

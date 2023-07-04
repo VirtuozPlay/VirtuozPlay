@@ -1,12 +1,5 @@
 <script setup lang="ts">
-import { defineComponent } from 'vue';
 import CardApp from '../components/CardApp.vue';
-
-defineComponent({
-    components: {
-        CardApp,
-    },
-});
 </script>
 
 <template>

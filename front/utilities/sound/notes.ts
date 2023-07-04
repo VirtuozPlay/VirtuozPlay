@@ -37,18 +37,18 @@ export const notes: Note[] = [
     //endregion
 
     //region Octave 2
-    { octave: 2, step: 'C',  frequency: 65.41, power: undefined },
+    { octave: 2, step: 'C', frequency: 65.41, power: undefined },
     { octave: 2, step: 'C#/Db', frequency: 69.3, power: undefined },
-    { octave: 2, step: 'D',  frequency: 73.42, power: undefined },
+    { octave: 2, step: 'D', frequency: 73.42, power: undefined },
     { octave: 2, step: 'D#/Eb', frequency: 77.78, power: undefined },
-    { octave: 2, step: 'E',  frequency: 82.41, power: undefined },
-    { octave: 2, step: 'F',  frequency: 87.31, power: undefined },
+    { octave: 2, step: 'E', frequency: 82.41, power: undefined },
+    { octave: 2, step: 'F', frequency: 87.31, power: undefined },
     { octave: 2, step: 'F#/Gb', frequency: 92.5, power: undefined },
-    { octave: 2, step: 'G',  frequency: 98, power: undefined },
+    { octave: 2, step: 'G', frequency: 98, power: undefined },
     { octave: 2, step: 'G#/Ab', frequency: 103.83, power: undefined },
-    { octave: 2, step: 'A',  frequency: 110, power: undefined },
+    { octave: 2, step: 'A', frequency: 110, power: undefined },
     { octave: 2, step: 'A#/Bb', frequency: 116.54, power: undefined },
-    { octave: 2, step: 'B',  frequency: 123.47, power: undefined },
+    { octave: 2, step: 'B', frequency: 123.47, power: undefined },
     //endregion
 
     //region Octave 3
@@ -92,7 +92,7 @@ export const notes: Note[] = [
     { octave: 5, step: 'G', frequency: 783.99, power: undefined },
     { octave: 5, step: 'G#/Ab', frequency: 830.61, power: undefined },
     { octave: 5, step: 'A', frequency: 880, power: undefined },
-    { octave: 5, step: 'A#/Bb',  frequency: 932.33, power: undefined },
+    { octave: 5, step: 'A#/Bb', frequency: 932.33, power: undefined },
     { octave: 5, step: 'B', frequency: 987.77, power: undefined },
     //endregion
 

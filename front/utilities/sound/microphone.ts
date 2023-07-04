@@ -2,7 +2,7 @@
  * This code is the retranscription in typescript based on https://github.com/aerik/aerik.github.io
  */
 
-import { notes } from './notes';
+import { notes, Note } from './notes';
 
 let analyser: AnalyserNode;
 
@@ -11,14 +11,14 @@ let hertzBinSize: number;
 let frequencyData: Uint8Array;
 let buflen: number;
 
-const maxValue: number = 256; //based on Uint8Array possible values
+const maxValue = 256; //based on Uint8Array possible values
 
-const InitMicrophone = (enableCanvas: boolean = false) => {
+const InitMicrophone = (enableCanvas = false) => {
     const audioCtx: AudioContext = new window.AudioContext();
 
     analyser = audioCtx.createAnalyser();
-    analyser.smoothingTimeConstant = 0.2; //default is 0.8, less is more responsive
-    analyser.minDecibels = -95; //-100 is default and is more sensitive (more noise)
+    analyser.smoothingTimeConstant = 0.1; //default is 0.8, less is more responsive
+    analyser.minDecibels = -60; //-100 is default and is more sensitive (more noise)
     analyser.fftSize = 8192 * 4; //need at least 8192 to detect differences in low notes
 
     const sampleRate: number = audioCtx.sampleRate;
@@ -44,18 +44,18 @@ const InitMicrophone = (enableCanvas: boolean = false) => {
 };
 
 //this basically lumps loud tones together and gets their avg frequency
-const getTones = (enableCanvas: boolean = false) => {
+const getTones = (enableCanvas = false) => {
     analyser.getByteFrequencyData(frequencyData);
-    let count: number = 0;
-    let total: number = 0;
-    let sum: number = 0;
-    const cutoff: number = 20; //redundant with decibels?
-    let nPtr: number = 0; //notePointer
+    let count = 0;
+    let total = 0;
+    let sum = 0;
+    const cutoff = 20; //redundant with decibels?
+    let nPtr = 0; //notePointer
     for (let i = 0; i < buflen; i++) {
         const fdat: number = frequencyData[i];
         const freq: number = i * hertzBinSize; //freq in hertz for this sample
-        const curNote = notes[nPtr];
-        const nextNote = notes[nPtr + 1];
+        const curNote: Note = notes[nPtr];
+        const nextNote: Note = notes[nPtr + 1];
         //cut off halfway into the next note
         const hzLimit: number = curNote.frequency + (nextNote.frequency - curNote.frequency) / 2;
         if (freq < hzLimit) {
@@ -91,14 +91,17 @@ const getTones = (enableCanvas: boolean = false) => {
     }
     if (enableCanvas) {
         const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById('visualizer');
-        const ctx: CanvasRenderingContext2D = canvas.getContext('2d')!;
+        const ctx: CanvasRenderingContext2D | null = canvas.getContext('2d');
+        if (ctx === null) {
+            throw new Error('Context of canvas not available');
+        }
 
         canvas.height = notes.length * 10;
         canvas.width = maxValue + 120;
         ctx.textAlign = 'left';
         //ctx.clearRect(0,0,canvas.width, canvas.height);
         for (let n = 0; n < notes.length; n++) {
-            ctx.fillText(notes[n].note, 65, n * 10);
+            ctx.fillText(notes[n].octave + ' ' + notes[n].step, 65, n * 10);
             ctx.save();
             ctx.textAlign = 'right';
             ctx.fillText(notes[n].frequency + ' Hz', 60, n * 10);
@@ -109,7 +112,7 @@ const getTones = (enableCanvas: boolean = false) => {
         for (let n = 0; n < notes.length; n++) {
             const colString = 'hsl(' + (360 * n) / notes.length + ',100%,80%)';
             ctx.fillStyle = colString;
-            ctx.fillRect(120, n * 10, notes[n].power!, -10);
+            ctx.fillRect(120, n * 10, notes[n].power ?? 0, -10);
         }
         ctx.restore();
     }

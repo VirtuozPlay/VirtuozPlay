@@ -144,4 +144,8 @@ yarn type-check
 
 ---
 
-**Congratulations!** You now have VirtuozPlay up and running.
+**Congratulations!** You now have VirtuozPlay up and running!
+
+## Documentation
+
+* [GraphQL API](/documentation/graphql.en.md)

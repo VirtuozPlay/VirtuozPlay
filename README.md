@@ -148,4 +148,4 @@ yarn type-check
 
 ## Documentation
 
-* [GraphQL API](/documentation/graphql.en.md)
+- [GraphQL API](/documentation/graphql.en.md)

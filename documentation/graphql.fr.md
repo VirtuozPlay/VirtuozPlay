@@ -148,3 +148,16 @@ import { GetVirtuozPlayVersionDocument, GetVirtuozPlayVersionQuery } from '@/gql
 ```
 
 Si vous lancez l'application avec `buffalo dev`, vous devriez voir `VirtuozPlay version 0.1.0` dans votre navigateur.
+
+## Tester l'API
+
+### Exemple avec CuRL
+
+```shell
+curl -X POST -H 'Content-Type: application/json' localhost:5173/graphql -d '{"query": "{virtuozPlay{version}}"}'
+```
+
+### GraphQL Playground
+
+Vous pouvez accéder au GraphQL playground en ouvrant l'endpoint `graphql/playground` dans votre navigateur (par exemple `http://localhost:5173/graphql/playground`).
+Il vous donne une interface sympa pour tester vos requêtes et mutations.

@@ -4,11 +4,11 @@
 
 ## Introduction
 
-Ce project utilise une API GraphQL pour communiquer avec le front.
-La différence entre une API REST et une API GraphQL est que cette dernière permet au frontend de demander uniquement les
-données dont il a besoin, et rien de plus.
-Nous n'avons besoin de définir le schéma de l'API qu'une seule fois, et le frontend peut demander les données dont il a
-besoin, sans avoir à créer un nouvel endpoint pour chaque requête.
+This project uses a GraphQL API to communicate with the frontend.
+The difference between a REST API and a GraphQL API is that the latter allows the frontend to request only the data it
+needs, and nothing more.
+We only need to define the API schema once, and the frontend can request the data it needs, without having to create a
+new endpoint for each request.
 
 The API is available at the `/graphql` endpoint.
 
@@ -151,3 +151,18 @@ import { GetVirtuozPlayVersionDocument, GetVirtuozPlayVersionQuery } from '@/gql
 ```
 
 If the backend is up and running, you should now see `VirtuozPlay version 0.1.0` in your browser.
+
+## Testing the API
+
+### CuRL Example
+
+```shell
+curl -X POST -H 'Content-Type: application/json' localhost:5173/graphql -d '{"query": "{virtuozPlay{version}}"}'
+```
+
+### GraphQL Playground
+
+You can access the GraphQL playground by opening the `graphql/playground` endpoint in your browser (e.g. `http://localhost:5173/graphql/playground)`.
+It gives you a nice interface to test your queries and mutations.
+
+

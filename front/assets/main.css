@@ -1,45 +1,19 @@
-@import './base.css';
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-    background-color: #f8f6f3;
-    height: 100vh;
-    color: var(--color-text);
-    font-family: 'Public Sans', sans-serif;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-}
+@layer base {
+    body {
+        @apply text-primary-text;
+        background-color: #f8f6f3;
+        height: 100vh;
+        font-family: 'Public Sans', sans-serif;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
 
-h1,
-h2 {
-    font-size: 80px;
-    font-weight: 800;
-}
-h3 {
-    font-size: 30px;
-    margin-bottom: 1rem;
-}
-
-.navbar {
-    width: 100vw;
-    background-color: #fff;
-    border-bottom: 4px #4c324d solid;
-    padding: 10px 16px;
-}
-
-a {
-    text-decoration: none;
-    transition: 0.4s;
-    font-weight: 800;
-}
-
-@media (hover: hover) {
-    a:hover {
-        background-color: hsla(66, 100%, 55%, 0.6);
-        border-radius: 100px;
+    #app {
+        @apply w-full h-full flex flex-col;
     }
 }

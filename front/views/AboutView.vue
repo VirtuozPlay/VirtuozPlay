@@ -7,7 +7,7 @@ import TextualButton from '@/components/inputs/TextualButton.vue';
 </script>
 
 <template>
-    <div class="about items-center mt-16 w-80vw flex justify-center">
+    <main aria-label="about section" class="about items-center mt-16 w-80vw flex justify-center">
         <CardApp class="font-bold">
             <VirtuozPlayVersion />
             <h3>Crédit musique</h3>
@@ -15,25 +15,25 @@ import TextualButton from '@/components/inputs/TextualButton.vue';
         </CardApp>
         <div class="flex flex-col gap-2">
             <p class="font-bold">Exemples de boutons</p>
-            <SimpleButton>
+            <SimpleButton aria-label="example button A">
                 <SquareIcon :icon="['fas', 'bars']" hover-color="#FAFF00" />
             </SimpleButton>
-            <SimpleButton>
+            <SimpleButton aria-label="example button B">
                 <SquareIcon :icon="['fas', 'arrow-right']" color="#FAFF00" hover-color="#FAFFCA" />
             </SimpleButton>
-            <SimpleButton>
+            <SimpleButton aria-label="example button C">
                 <SquareIcon :icon="['fas', 'arrow-right']" color="#00FF75" hover-color="#FAFF00" />
             </SimpleButton>
-            <SimpleButton>
+            <SimpleButton aria-label="example button D">
                 <SquareIcon :icon="['fas', 'arrow-right']" color="#FFF" hover-color="#DDD" />
             </SimpleButton>
-            <SimpleButton>
+            <SimpleButton aria-label="example button E">
                 <SquareIcon :icon="['fas', 'user-secret']" color="#FAFF00" hover-color="#FAFFCA" />
             </SimpleButton>
-            <SimpleButton>
+            <SimpleButton aria-label="example button F">
                 <SquareIcon :icon="['fas', 'play']" color="#00FF75" hover-color="#FAFF00" />
             </SimpleButton>
-            <TextualButton hover-color="#FAFF00">Exemple</TextualButton>
+            <TextualButton aria-label="example button G" hover-color="#FAFF00">Exemple</TextualButton>
         </div>
-    </div>
+    </main>
 </template>

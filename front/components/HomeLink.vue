@@ -1,34 +1,35 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import SquareIcon from '@/components/icons/SquareIcon.vue';
 
 export interface Props {
     to: string;
+    selected?: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    selected: false,
+});
 
-const isHovering = ref(false);
+const emit = defineEmits<{
+    select: [];
+}>();
 </script>
 
 <template>
-    <div class="relative">
+    <div @mouseover="emit('select')" @focusin="emit('select')" class="relative">
         <SquareIcon
-            v-show="isHovering"
+            v-show="props.selected"
             :icon="['fas', 'arrow-right']"
             color="#FAFF00"
             class="absolute left-[-100px]"
         ></SquareIcon>
-        <h1 class="text-7xl" @mouseover="isHovering = true" @mouseout="isHovering = false">
-            <RouterLink
-                :to="props.to"
-                class="font-extrabold hover:bg-link-selection rounded-full transition-colors duration-200 ease-in"
-            >
+        <RouterLink :to="props.to" class="hover:bg-link-selection focus:bg-link-selection outline-none">
+            <h2 class="font-extrabold text-7xl bg-inherit rounded-full transition-colors duration-200 ease-in">
                 <slot name="default" />
-            </RouterLink>
-        </h1>
-        <h3 class="text-3xl">
-            <slot name="subtitle" />
-        </h3>
+            </h2>
+            <h3 class="text-3xl">
+                <slot name="subtitle" />
+            </h3>
+        </RouterLink>
     </div>
 </template>

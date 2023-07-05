@@ -5,7 +5,7 @@ import TextualButton from '@/components/inputs/TextualButton.vue';
 </script>
 
 <template>
-    <div class="items-center mt-16 w-80vw flex justify-center">
+    <main aria-label="profile section" class="items-center mt-16 w-80vw flex justify-center">
         <CardApp>
             <div class="flex items-center gap-2">
                 <ProfileIcon />
@@ -13,5 +13,5 @@ import TextualButton from '@/components/inputs/TextualButton.vue';
             </div>
             <TextualButton hover-color="#FAFF00">Modifier mon profil</TextualButton>
         </CardApp>
-    </div>
+    </main>
 </template>

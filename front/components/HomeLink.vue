@@ -21,7 +21,7 @@ const emit = defineEmits<{
             v-show="props.selected"
             :icon="['fas', 'arrow-right']"
             color="#FAFF00"
-            class="absolute left-[-100px]"
+            class="absolute left-[-3em] text-2xl md:text-3xl"
         ></SquareIcon>
         <RouterLink :to="props.to" class="hover:bg-link-selection focus:bg-link-selection outline-none">
             <h2
@@ -29,7 +29,7 @@ const emit = defineEmits<{
             >
                 <slot name="default" />
             </h2>
-            <h3 class="text-2xl md:text-3xl">
+            <h3 class="text-xl md:text-3xl">
                 <slot name="subtitle" />
             </h3>
         </RouterLink>

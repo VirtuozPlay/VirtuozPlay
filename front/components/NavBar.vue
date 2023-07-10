@@ -1,22 +1,28 @@
 <script setup lang="ts">
-import { RouterLink } from 'vue-router';
-import SquareIcon from '@/components/icons/SquareIcon.vue';
-import SimpleButton from '@/components/inputs/SimpleButton.vue';
+import HeaderDrawer from '@/components/HeaderDrawer.vue';
+import HeaderLink from '@/components/HeaderLink.vue';
 </script>
 
 <template>
     <header
         class="flex flex-wrap items-center justify-between w-screen bg-white border-b-4 border-solid border-primary-text"
     >
-        <img alt="VirtuozPlay Logo" src="@/assets/logo-128.png" width="128" height="128" />
-        <nav aria-label="section navigation" class="m-8 flex items-center flex-wrap p-4 gap-8">
-            <RouterLink to="/about" class="text-xl font-bold">A Propos</RouterLink>
-            <RouterLink to="/profile" class="text-xl font-bold">Profil</RouterLink>
-            <RouterLink class="noeffect" to="/">
-                <SimpleButton>
-                    <SquareIcon :icon="['fas', 'bars']"></SquareIcon>
-                </SimpleButton>
-            </RouterLink>
+        <RouterLink :to="{ name: 'home' }">
+            <img
+                alt="VirtuozPlay Logo"
+                src="@/assets/logo-128.png"
+                class="h-[calc(48px+1rem)] md:h-[calc(48px+2rem)]"
+            />
+        </RouterLink>
+
+        <nav aria-label="section navigation" class="flex items-center flex-wrap p-4 md:p-8 gap-8">
+            <HeaderLink name="home" class="hidden md:inline">Acceuil</HeaderLink>
+            <HeaderLink name="profile" class="hidden md:inline">Profil</HeaderLink>
+            <HeaderDrawer>
+                <HeaderLink name="home">Acceuil</HeaderLink>
+                <HeaderLink name="profile">Profil</HeaderLink>
+                <HeaderLink name="about">A Propos de VirtuozPlay</HeaderLink>
+            </HeaderDrawer>
         </nav>
     </header>
 </template>

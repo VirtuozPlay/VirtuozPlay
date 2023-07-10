@@ -22,6 +22,6 @@ const bgColor = ref(props.color);
         @mouseover="bgColor = props.hoverColor || props.color"
         @mouseout="bgColor = props.color"
     >
-        <slot />
+        <slot></slot>
     </SimpleButton>
 </template>

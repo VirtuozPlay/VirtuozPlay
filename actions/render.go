@@ -53,7 +53,7 @@ func viteEntryPointTags(assetsFS fs.FS) func(entrypoint string, c plush.Context)
 	return func(entrypoint string, c plush.Context) (template.HTML, error) {
 		// When not in production, load entrypoint from Vite server
 		if ENV != "production" {
-			return jsm("http://localhost:5173/" + entrypoint), nil
+			return jsm("/" + entrypoint), nil
 		}
 
 		// When in production use the manifest to get the location of the entrypoint
@@ -84,7 +84,7 @@ func viteEntryPointTags(assetsFS fs.FS) func(entrypoint string, c plush.Context)
 func viteClientTag() func() template.HTML {
 	return func() template.HTML {
 		if ENV != "production" {
-			return jsm("http://localhost:5173/@vite/client")
+			return jsm("/@vite/client")
 		}
 		return ""
 	}

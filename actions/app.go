@@ -42,12 +42,17 @@ var (
 // declared after it to never be called.
 func App() *buffalo.App {
 	if app == nil {
-		app = buffalo.New(buffalo.Options{
+		options := buffalo.Options{
 			Env:         ENV,
 			SessionName: "_virtuozplay_session",
 			// Setup CORS to allow all localhost:* origins in dev mode
 			PreWares: []buffalo.PreWare{corsConfiguration().Handler},
-		})
+		}
+		if ENV != "production" {
+			// Allow incoming LAN connections
+			options.Addr = ":3000"
+		}
+		app = buffalo.New(options)
 
 		// Automatically redirect to SSL
 		app.Use(forceSSL())

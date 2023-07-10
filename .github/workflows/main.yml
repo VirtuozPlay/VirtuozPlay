@@ -231,8 +231,8 @@ jobs:
       - name: Check Frontend Formatting
         run: |
           echo 'The following files are not correctly formatted, please run `yarn format` to fix them:'
-          prettier --list-different --config .prettierrc --ignore-path .gitignore --no-error-on-unmatched-pattern . 2>&1 | tee /tmp/prettier.out
-          ! grep -q '[^[:space:]]' /tmp/prettier.out 2> /dev/null
+          prettier -w --config .prettierrc --ignore-path .gitignore --no-error-on-unmatched-pattern .
+          git diff --exit-code
 
       - name: Frontend Linting
         run: yarn lint

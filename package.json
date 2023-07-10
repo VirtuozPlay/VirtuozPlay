@@ -14,7 +14,7 @@
     "type-check": "cd front && yarn run type-check",
     "codegen": "cd front && yarn run codegen",
     "lint": "cd front && yarn run lint",
-    "format": "prettier --ignore-path .gitignore -w ."
+    "format": "prettier --ignore-path .gitignore --config .prettierrc -w ."
   },
   "repository": "github.com/VirtuozPlay/VirtuozPlay",
   "dependencies": {

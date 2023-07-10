@@ -37,6 +37,16 @@ const router = createRouter({
             name: 'collection',
             component: () => import('../views/CollectionView.vue'),
         },
+        {
+            path: '/cancan',
+            name: 'cancan',
+            component: () => import('../views/songs/CancanView.vue'),
+        },
+        {
+            path: '/sting',
+            name: 'sting',
+            component: () => import('../views/songs/StingView.vue'),
+        },
     ],
 });
 

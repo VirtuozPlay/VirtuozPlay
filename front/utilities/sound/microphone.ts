@@ -2,7 +2,6 @@
  * This code is the retranscription in typescript based on https://github.com/aerik/aerik.github.io
  */
 
-import showCanvas from './canvas';
 import { notes, Note, NotePlayed } from './notes';
 
 let analyser: AnalyserNode;
@@ -12,22 +11,26 @@ let hertzBinSize: number;
 let frequencyData: Uint8Array;
 let buflen: number;
 
-const notesPlayed: NotePlayed[] = [];
+let notesPlayed: NotePlayed[] = []; // notes played during the track
+let lastNotePlayed: NotePlayed = { octave: 0, step: '', timestamp: 0, duration: 0 };
 let maxBytePlayed = 0; // max gain of note played
 let startTimeStamp = 0;
+let continueTracking = true;
+// canvas
+const maxValue = 256; //based on Uint8Array possible values
 
 /**
  * Record played notes
  * @param enableCanvas  Enable Canvans
  * @param trackDuration Track duration (in seconds)
- * @param DecibelMin    Minimum decibel to track (between 0 and 255)
+ * @param decibelMin    Minimum decibel to track (between 0 and 255)
  */
-const initMicrophone = (enableCanvas = false, trackDuration = 10, DecibelMin = 35) => {
+const initMicrophone = (enableCanvas = false, trackDuration = 10, decibelMin = 35) => {
     const audioCtx: AudioContext = new window.AudioContext();
 
     analyser = audioCtx.createAnalyser();
     analyser.smoothingTimeConstant = 0.1; //default is 0.8, less is more responsive
-    analyser.minDecibels = -60; //-100 is default and is more sensitive (more noise)
+    analyser.minDecibels = -50; //-100 is default and is more sensitive (more noise)
     analyser.fftSize = 8192 * 4; //need at least 8192 to detect differences in low notes
 
     const sampleRate: number = audioCtx.sampleRate;
@@ -48,20 +51,23 @@ const initMicrophone = (enableCanvas = false, trackDuration = 10, DecibelMin = 3
             micSource.connect(analyser);
 
             startTimeStamp = Date.now();
-            getTones(enableCanvas, DecibelMin);
+            notesPlayed = [];
+            getTones(enableCanvas, decibelMin);
 
             setTimeout(() => {
                 // stop microphone recording
                 stream.getAudioTracks().forEach((track: MediaStreamTrack) => track.stop());
                 // display notes played
                 console.log(notesPlayed);
+
+                continueTracking = false;
             }, trackDuration * 1000);
         })
         .catch((err: Error) => console.error(err));
 };
 
 //this basically lumps loud tones together and gets their avg frequency
-const getTones = (enableCanvas = false, DecibelMin: number) => {
+const getTones = (enableCanvas = false, decibelMin: number) => {
     analyser.getByteFrequencyData(frequencyData);
     let count = 0;
     let total = 0;
@@ -94,15 +100,59 @@ const getTones = (enableCanvas = false, DecibelMin: number) => {
                 //notes[nPtr].power = power;
                 //seems like it rounds the values too much?
                 notes[nPtr].power = total / count;
-                // if note is powerful : count it
-                if ((notes[nPtr].power as number) > maxBytePlayed * 0.6 && (notes[nPtr].power as number) > DecibelMin) {
-                    maxBytePlayed = notes[nPtr].power as number;
-                    notesPlayed.push({
+                // if a note is detected
+                if (notes[nPtr].power > maxBytePlayed * 0.8 && notes[nPtr].power > decibelMin) {
+                    maxBytePlayed = notes[nPtr].power;
+                    const currentTimestamp = Date.now() - startTimeStamp;
+
+                    // check for note duration
+                    // if(notesPlayed.length === 0) {
+                    //     notesPlayed.push({
+                    //         octave: notes[nPtr].octave,
+                    //         step: notes[nPtr].step,
+                    //         timestamp: currentTimestamp - startTimeStamp,
+                    //         duration: 0,
+                    //     });
+                    // } else {
+                    //     notesPlayed.forEach((notePlayed: NotePlayed) => {
+                    //         if (
+                    //             notes[nPtr].octave === notePlayed.octave &&
+                    //             notes[nPtr].step === notePlayed.step &&
+                    //             (currentTimestamp - startTimeStamp - 500) <= notePlayed.timestamp // if the note has been played in 500 ms
+                    //         ) {
+                    //             notesPlayed.push({
+                    //                 octave: notes[nPtr].octave,
+                    //                 step: notes[nPtr].step,
+                    //                 timestamp: currentTimestamp - startTimeStamp,
+                    //                 duration: currentTimestamp - notePlayed.timestamp,
+                    //             });
+                    //         }
+                    //     });
+                    // }
+                    if (
+                        // if note is different
+                        notes[nPtr].octave !== lastNotePlayed.octave ||
+                        notes[nPtr].step !== lastNotePlayed.step ||
+                        // if the same note has been played after 500 ms
+                        (notes[nPtr].octave === lastNotePlayed.octave &&
+                            notes[nPtr].step === lastNotePlayed.step &&
+                            currentTimestamp - 500 >= lastNotePlayed.timestamp)
+                    ) {
+                        notesPlayed.push({
+                            octave: notes[nPtr].octave,
+                            step: notes[nPtr].step,
+                            timestamp: currentTimestamp,
+                            duration: 0,
+                        });
+
+                        console.log(notes[nPtr]);
+                    }
+                    lastNotePlayed = {
                         octave: notes[nPtr].octave,
                         step: notes[nPtr].step,
-                        timestamp: Date.now() - startTimeStamp,
-                    });
-                    console.log(notes[nPtr]);
+                        timestamp: currentTimestamp,
+                        duration: 0,
+                    };
                 }
 
                 sum = 0;
@@ -118,11 +168,36 @@ const getTones = (enableCanvas = false, DecibelMin: number) => {
         }
     }
     if (enableCanvas) {
-        showCanvas(notes);
+        const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById('visualizer');
+        const ctx: CanvasRenderingContext2D | null = canvas.getContext('2d');
+        if (ctx === null) {
+            throw new Error('Context of canvas not available');
+        }
+
+        canvas.height = notes.length * 10;
+        canvas.width = maxValue + 120;
+        ctx.textAlign = 'left';
+        //ctx.clearRect(0,0,canvas.width, canvas.height);
+        for (let n = 0; n < notes.length; n++) {
+            ctx.fillText(notes[n].octave + ' ' + notes[n].step, 65, n * 10);
+            ctx.save();
+            ctx.textAlign = 'right';
+            ctx.fillText(notes[n].frequency + ' Hz', 60, n * 10);
+            ctx.restore();
+        }
+        ctx.save();
+        //horizontal bars
+        for (let n = 0; n < notes.length; n++) {
+            const colString = 'hsl(' + (360 * n) / notes.length + ',100%,80%)';
+            ctx.fillStyle = colString;
+            ctx.fillRect(120, n * 10, notes[n].power ?? 0, -10);
+        }
+        ctx.restore();
     }
-    setTimeout(() => {
-        requestAnimationFrame(() => getTones(enableCanvas, DecibelMin));
-    }, 50);
+
+    if (continueTracking) {
+        requestAnimationFrame(() => getTones(enableCanvas, decibelMin));
+    }
 };
 
 export default initMicrophone;

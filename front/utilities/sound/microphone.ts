@@ -2,7 +2,8 @@
  * This code is the retranscription in typescript based on https://github.com/aerik/aerik.github.io
  */
 
-import { notes, Note } from './notes';
+import showCanvas from './canvas';
+import { notes, Note, NotePlayed } from './notes';
 
 let analyser: AnalyserNode;
 
@@ -11,9 +12,17 @@ let hertzBinSize: number;
 let frequencyData: Uint8Array;
 let buflen: number;
 
-const maxValue = 256; //based on Uint8Array possible values
+const notesPlayed: NotePlayed[] = [];
+let maxBytePlayed = 0; // max gain of note played
+let startTimeStamp = 0;
 
-const InitMicrophone = (enableCanvas = false) => {
+/**
+ * Record played notes
+ * @param enableCanvas  Enable Canvans
+ * @param trackDuration Track duration (in seconds)
+ * @param DecibelMin    Minimum decibel to track (between 0 and 255)
+ */
+const initMicrophone = (enableCanvas = false, trackDuration = 10, DecibelMin = 35) => {
     const audioCtx: AudioContext = new window.AudioContext();
 
     analyser = audioCtx.createAnalyser();
@@ -30,7 +39,7 @@ const InitMicrophone = (enableCanvas = false) => {
     frequencyData = new Uint8Array(analyser.frequencyBinCount);
     buflen = frequencyData.length;
 
-    // ask for mic permission
+    // ask for microphone permission
     navigator.mediaDevices
         .getUserMedia({ audio: true })
         .then((stream: MediaStream) => {
@@ -38,13 +47,21 @@ const InitMicrophone = (enableCanvas = false) => {
             micSource.connect(gainNode);
             micSource.connect(analyser);
 
-            getTones(enableCanvas);
+            startTimeStamp = Date.now();
+            getTones(enableCanvas, DecibelMin);
+
+            setTimeout(() => {
+                // stop microphone recording
+                stream.getAudioTracks().forEach((track: MediaStreamTrack) => track.stop());
+                // display notes played
+                console.log(notesPlayed);
+            }, trackDuration * 1000);
         })
-        .catch((err) => console.error(err)); // Disable error in console when blocking mic
+        .catch((err: Error) => console.error(err));
 };
 
 //this basically lumps loud tones together and gets their avg frequency
-const getTones = (enableCanvas = false) => {
+const getTones = (enableCanvas = false, DecibelMin: number) => {
     analyser.getByteFrequencyData(frequencyData);
     let count = 0;
     let total = 0;
@@ -77,6 +94,17 @@ const getTones = (enableCanvas = false) => {
                 //notes[nPtr].power = power;
                 //seems like it rounds the values too much?
                 notes[nPtr].power = total / count;
+                // if note is powerful : count it
+                if ((notes[nPtr].power as number) > maxBytePlayed * 0.6 && (notes[nPtr].power as number) > DecibelMin) {
+                    maxBytePlayed = notes[nPtr].power as number;
+                    notesPlayed.push({
+                        octave: notes[nPtr].octave,
+                        step: notes[nPtr].step,
+                        timestamp: Date.now() - startTimeStamp,
+                    });
+                    console.log(notes[nPtr]);
+                }
+
                 sum = 0;
                 count = 0;
                 total = 0;
@@ -93,8 +121,8 @@ const getTones = (enableCanvas = false) => {
         showCanvas(notes);
     }
     setTimeout(() => {
-        requestAnimationFrame(() => getTones(enableCanvas));
+        requestAnimationFrame(() => getTones(enableCanvas, DecibelMin));
     }, 50);
 };
 
-export default InitMicrophone;
+export default initMicrophone;

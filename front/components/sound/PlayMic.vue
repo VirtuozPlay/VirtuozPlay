@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import InitMicrophone from '@/utilities/sound/microphone';
+import initMicrophone from '@/utilities/sound/microphone';
 defineProps<{
     enableCanvas: boolean;
 }>();
@@ -7,7 +7,7 @@ defineProps<{
 
 <template>
     <div class="greetings">
-        <button id="startBtn" type="button" @click="InitMicrophone(enableCanvas)">Start</button>
+        <button id="startBtn" type="button" @click="initMicrophone(enableCanvas)">Start</button>
 
         <div v-if="enableCanvas">
             <span id="vOut"></span><br />

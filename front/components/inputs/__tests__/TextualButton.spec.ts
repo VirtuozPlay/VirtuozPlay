@@ -26,4 +26,30 @@ describe('TextualButton', () => {
         wrapper.findComponent(TextualButton).trigger('click');
         expect(clickCount).toBe(1);
     });
+
+    it('with base color only', () => {
+        const Button = {
+            components: { TextualButton },
+            template: '<TextualButton color="#ff0000">HERE</TextualButton>',
+        };
+        const wrapper = mount(Button);
+
+        const element = wrapper.findComponent(TextualButton).element as HTMLElement;
+        expect(element.style.backgroundColor).toBe('rgb(255, 0, 0)');
+        wrapper.findComponent(TextualButton).trigger('mouseover');
+        wrapper.findComponent(TextualButton).trigger('mouseout');
+    });
+
+    it('with hover color', () => {
+        const Button = {
+            components: { TextualButton },
+            template: '<TextualButton color="#ff0000" hover-color="#00ff00">HERE</TextualButton>',
+        };
+        const wrapper = mount(Button);
+
+        const element = wrapper.findComponent(TextualButton).element as HTMLElement;
+        expect(element.style.backgroundColor).toBe('rgb(255, 0, 0)');
+        wrapper.findComponent(TextualButton).trigger('mouseover');
+        wrapper.findComponent(TextualButton).trigger('mouseout');
+    });
 });

@@ -7,7 +7,7 @@ const selection = ref(0);
 </script>
 
 <template>
-    <main aria-label="home section" class="w-screen grow flex">
+    <main aria-label="home section" class="w-screen grow flex my-4">
         <nav
             aria-label="main menu"
             class="flex flex-col w-min h-1/2 m-auto gap-4 justify-evenly"

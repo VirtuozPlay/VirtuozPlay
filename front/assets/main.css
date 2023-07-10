@@ -3,10 +3,14 @@
 @tailwind utilities;
 
 @layer base {
+    html {
+        height: 100%;
+    }
+
     body {
         @apply text-primary-text;
         background-color: #f8f6f3;
-        height: 100vh;
+        height: 100%;
         font-family: 'Public Sans', sans-serif;
         text-rendering: optimizeLegibility;
         -webkit-font-smoothing: antialiased;

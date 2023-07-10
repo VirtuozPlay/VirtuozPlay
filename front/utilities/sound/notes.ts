@@ -5,6 +5,12 @@ export interface Note {
     power?: number;
 }
 
+export interface NotePlayed {
+    octave: number;
+    step: string;
+    timestamp: number;
+}
+
 export const notes: Note[] = [
     //region Octave 0
     { octave: 0, step: 'C', frequency: 16.35, power: undefined },

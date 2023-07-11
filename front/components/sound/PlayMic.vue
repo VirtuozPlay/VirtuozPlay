@@ -1,13 +1,38 @@
 <script setup lang="ts">
-import initMicrophone from '@/utilities/sound/microphone';
-defineProps<{
+import { initMicrophone, getTones } from '@/utilities/sound/microphone';
+import { notes as notesRegistered, Note } from '@/utilities/sound/notes';
+import { shallowRef, watch, watchEffect } from 'vue';
+
+const props = defineProps<{
     enableCanvas: boolean;
 }>();
+const notes: Note[] = notesRegistered;
+const stream = shallowRef<MediaStream | null>(null);
+
+watch(stream, () => {
+    const setTones = () => {
+        if (stream.value === null) return;
+        getTones(notes, props.enableCanvas, 35);
+        requestAnimationFrame(setTones);
+    };
+    watchEffect(() => {
+        requestAnimationFrame(setTones);
+    });
+});
+
+function onClick() {
+    if (stream.value === null) {
+        initMicrophone().then((s: MediaStream) => (stream.value = s));
+    } else {
+        stream.value.getAudioTracks().forEach((track: MediaStreamTrack) => track.stop());
+        stream.value = null;
+    }
+}
 </script>
 
 <template>
     <div class="greetings">
-        <button id="startBtn" type="button" @click="initMicrophone(enableCanvas)">Start</button>
+        <button id="startBtn" type="button" @click="onClick()">{{ stream === null ? 'Start' : 'Stop' }}</button>
 
         <div v-if="enableCanvas">
             <span id="vOut"></span><br />

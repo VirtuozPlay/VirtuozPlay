@@ -2,7 +2,7 @@
  * This code is the retranscription in typescript based on https://github.com/aerik/aerik.github.io
  */
 
-import { notes, Note, NotePlayed } from './notes';
+import { Note, NotePlayed } from './notes';
 
 let analyser: AnalyserNode;
 
@@ -15,22 +15,19 @@ let notesPlayed: NotePlayed[] = []; // notes played during the track
 let lastNotePlayed: NotePlayed = { octave: 0, step: '', timestamp: 0, duration: 0 };
 let maxBytePlayed = 0; // max gain of note played
 let startTimeStamp = 0;
-let continueTracking = true;
 // canvas
 const maxValue = 256; //based on Uint8Array possible values
 
 /**
- * Record played notes
- * @param enableCanvas  Enable Canvans
- * @param trackDuration Track duration (in seconds)
- * @param decibelMin    Minimum decibel to track (between 0 and 255)
+ * Initialise settings of the microphone
+ * @returns Audio stream
  */
-const initMicrophone = (enableCanvas = false, trackDuration = 10, decibelMin = 35) => {
+export const initMicrophone = async (): Promise<MediaStream> => {
     const audioCtx: AudioContext = new window.AudioContext();
 
     analyser = audioCtx.createAnalyser();
-    analyser.smoothingTimeConstant = 0.1; //default is 0.8, less is more responsive
-    analyser.minDecibels = -50; //-100 is default and is more sensitive (more noise)
+    analyser.smoothingTimeConstant = 0.8; //default is 0.8, less is more responsive
+    analyser.minDecibels = -45; //-100 is default and is more sensitive (more noise)
     analyser.fftSize = 8192 * 4; //need at least 8192 to detect differences in low notes
 
     const sampleRate: number = audioCtx.sampleRate;
@@ -38,40 +35,32 @@ const initMicrophone = (enableCanvas = false, trackDuration = 10, decibelMin = 3
     gainNode.connect(audioCtx.destination);
 
     hertzBinSize = sampleRate / analyser.fftSize;
-    console.log('bin size: ' + hertzBinSize);
     frequencyData = new Uint8Array(analyser.frequencyBinCount);
     buflen = frequencyData.length;
 
     // ask for microphone permission
-    navigator.mediaDevices
-        .getUserMedia({ audio: true })
-        .then((stream: MediaStream) => {
-            const micSource: MediaStreamAudioSourceNode = audioCtx.createMediaStreamSource(stream);
-            micSource.connect(gainNode);
-            micSource.connect(analyser);
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-            startTimeStamp = Date.now();
-            notesPlayed = [];
-            getTones(enableCanvas, decibelMin);
+    const micSource: MediaStreamAudioSourceNode = audioCtx.createMediaStreamSource(stream);
+    micSource.connect(gainNode);
+    micSource.connect(analyser);
 
-            setTimeout(() => {
-                // stop microphone recording
-                stream.getAudioTracks().forEach((track: MediaStreamTrack) => track.stop());
-                // display notes played
-                console.log(notesPlayed);
+    startTimeStamp = Date.now();
+    notesPlayed = [];
 
-                continueTracking = false;
-            }, trackDuration * 1000);
-        })
-        .catch((err: Error) => console.error(err));
+    return stream;
 };
 
-//this basically lumps loud tones together and gets their avg frequency
-const getTones = (enableCanvas = false, decibelMin: number) => {
+/**
+ * Record played notes
+ * @param notes         Array of notes associated with their frequencies
+ * @param enableCanvas  Enable canvans
+ * @param decibelMin    Minimum binary value of decibel to track (between 0 and 255)
+ */
+export const getTones = (notes: Note[], enableCanvas = false, decibelMin: number) => {
     analyser.getByteFrequencyData(frequencyData);
     let count = 0;
     let total = 0;
-    let sum = 0;
     const cutoff = 20; //redundant with decibels?
     let nPtr = 0; //notePointer
     for (let i = 0; i < buflen; i++) {
@@ -83,29 +72,18 @@ const getTones = (enableCanvas = false, decibelMin: number) => {
         const hzLimit: number = curNote.frequency + (nextNote.frequency - curNote.frequency) / 2;
         if (freq < hzLimit) {
             if (fdat > cutoff) {
-                sum += i; //bin numbers
                 count++;
                 total += fdat;
             }
         } else {
             if (count > 0) {
-                const binNum: number = sum / count;
-                //const bin = {};
-                //round up
-                let power: number = frequencyData[Math.ceil(binNum)];
-                if (binNum > 0) {
-                    //round down
-                    power = (power + frequencyData[Math.floor(binNum)]) / 2;
-                }
-                //notes[nPtr].power = power;
-                //seems like it rounds the values too much?
                 notes[nPtr].power = total / count;
                 // if a note is detected
                 if (notes[nPtr].power > maxBytePlayed * 0.8 && notes[nPtr].power > decibelMin) {
                     maxBytePlayed = notes[nPtr].power;
                     const currentTimestamp = Date.now() - startTimeStamp;
 
-                    // check for note duration
+                    // TODO check for note duration
                     // if(notesPlayed.length === 0) {
                     //     notesPlayed.push({
                     //         octave: notes[nPtr].octave,
@@ -145,8 +123,9 @@ const getTones = (enableCanvas = false, decibelMin: number) => {
                             duration: 0,
                         });
 
-                        console.log(notes[nPtr]);
+                        console.log(JSON.stringify(notes[nPtr]) + ' timestamp: ' + currentTimestamp);
                     }
+                    // save the note that has been detected
                     lastNotePlayed = {
                         octave: notes[nPtr].octave,
                         step: notes[nPtr].step,
@@ -155,7 +134,6 @@ const getTones = (enableCanvas = false, decibelMin: number) => {
                     };
                 }
 
-                sum = 0;
                 count = 0;
                 total = 0;
             } else {
@@ -173,7 +151,6 @@ const getTones = (enableCanvas = false, decibelMin: number) => {
         if (ctx === null) {
             throw new Error('Context of canvas not available');
         }
-
         canvas.height = notes.length * 10;
         canvas.width = maxValue + 120;
         ctx.textAlign = 'left';
@@ -190,14 +167,8 @@ const getTones = (enableCanvas = false, decibelMin: number) => {
         for (let n = 0; n < notes.length; n++) {
             const colString = 'hsl(' + (360 * n) / notes.length + ',100%,80%)';
             ctx.fillStyle = colString;
-            ctx.fillRect(120, n * 10, notes[n].power ?? 0, -10);
+            ctx.fillRect(120, n * 10, notes[n].power, -10);
         }
         ctx.restore();
     }
-
-    if (continueTracking) {
-        requestAnimationFrame(() => getTones(enableCanvas, decibelMin));
-    }
 };
-
-export default initMicrophone;

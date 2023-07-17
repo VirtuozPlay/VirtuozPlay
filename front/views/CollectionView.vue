@@ -6,6 +6,7 @@ interface Item {
     imageUrl: string;
     title: string;
     song: string;
+    music: string;
 }
 
 defineProps({
@@ -13,12 +14,12 @@ defineProps({
         type: Array as () => Item[],
         default: () => [
             {
-                imageUrl: 'https://placehold.co/600x400?text=Hello+World1',
+                imageUrl: '../../images/jacques_offenbach.jpg',
                 title: 'Can Can',
                 song: 'cancan',
             },
             {
-                imageUrl: 'https://placehold.co/600x400?text=Hello+World3',
+                imageUrl: '../../images/sting.jpg',
                 title: 'Sting',
                 song: 'sting',
             },

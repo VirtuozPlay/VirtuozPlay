@@ -40,12 +40,12 @@ const router = createRouter({
         {
             path: '/collection/cancan',
             name: 'cancan',
-            component: () => import('../views/songs/CancanView.vue'),
+            component: () => import('../views/SongView.vue'),
         },
         {
             path: '/collection/sting',
             name: 'sting',
-            component: () => import('../views/songs/StingView.vue'),
+            component: () => import('../views/SongView.vue'),
         },
     ],
 });

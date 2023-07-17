@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import CardApp from '../components/CardApp.vue';
+import AllTheNotes from '@/components/AllTheNotes.vue';
 </script>
 
 <template>
@@ -8,6 +9,7 @@ import CardApp from '../components/CardApp.vue';
             <div>
                 <h1>Stats</h1>
             </div>
+            <AllTheNotes />
         </CardApp>
     </main>
 </template>

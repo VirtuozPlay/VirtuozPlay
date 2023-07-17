@@ -1,9 +1,9 @@
 <template>
-    <div v-for="row in 6" :key="row" class="flex-container">
-        <div v-for="column in 14" :key="column" class="flex-item">
-            <!-- r {{ row }}- c{{ column }} -->
+    <div v-for="string in 6" :key="string" class="flex flex-row flex-wrap w-full justify-around">
+        <div v-for="fret in 14" :key="fret" class="text-white text-sm text-center place">
+            <!-- r {{ string }}- c{{ fret }} -->
             <svg
-                v-if="isPosition(row, column)"
+                v-if="isPosition(string, fret)"
                 id="la_note"
                 xmlns="http://www.w3.org/2000/svg"
                 width="100"
@@ -22,17 +22,7 @@ const props = defineProps(['isPosition']);
 </script>
 
 <style>
-.flex-container {
-    display: flex;
-    flex-flow: row wrap;
-    width: 100%;
-    justify-content: space-around;
-}
-
-.flex-item {
-    color: white;
-    font-size: 0.5em;
-    text-align: center;
+.place {
     height: 52px;
     width: 100px;
     margin-top: -26px;

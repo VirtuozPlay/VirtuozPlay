@@ -8,6 +8,7 @@ const props = defineProps<{
 }>();
 const notes: Note[] = notesRegistered;
 const stream = shallowRef<MediaStream | null>(null);
+const sensitivity = shallowRef<number>(50);
 
 watch(stream, () => {
     const setTones = () => {
@@ -19,10 +20,11 @@ watch(stream, () => {
         requestAnimationFrame(setTones);
     });
 });
+watch(sensitivity, () => null); // Required for displaying sensitivity in real time
 
 function onClick() {
     if (stream.value === null) {
-        initMicrophone().then((s: MediaStream) => (stream.value = s));
+        initMicrophone(sensitivity.value).then((s: MediaStream) => (stream.value = s));
     } else {
         stream.value.getAudioTracks().forEach((track: MediaStreamTrack) => track.stop());
         stream.value = null;
@@ -32,6 +34,11 @@ function onClick() {
 
 <template>
     <div class="greetings">
+        <div>
+            <input v-model="sensitivity" type="range" min="40" max="100"><span v-text="-sensitivity" /> Db
+        </div>
+        
+
         <button id="startBtn" type="button" @click="onClick()">{{ stream === null ? 'Start' : 'Stop' }}</button>
 
         <div v-if="enableCanvas">

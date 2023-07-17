@@ -39,7 +39,12 @@ export const initMicrophone = async (sensitivity: number): Promise<MediaStream> 
     buflen = frequencyData.length;
 
     // ask for microphone permission
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+            noiseSuppression: true,
+            echoCancellation: true,
+        },
+    });
 
     const micSource: MediaStreamAudioSourceNode = audioCtx.createMediaStreamSource(stream);
     micSource.connect(gainNode);

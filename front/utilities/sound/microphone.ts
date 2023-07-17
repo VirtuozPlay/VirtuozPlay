@@ -2,7 +2,7 @@
  * This code is the retranscription in typescript based on https://github.com/aerik/aerik.github.io
  */
 
-import { Note, NotePlayed } from './notes';
+import { Note, NotePlayed, notesPhaseOpposition } from './notes';
 
 let analyser: AnalyserNode;
 
@@ -11,7 +11,6 @@ let hertzBinSize: number;
 let frequencyData: Uint8Array;
 let buflen: number;
 
-let notesPlayed: NotePlayed[] = []; // notes played during the track
 let lastNotePlayed: NotePlayed = { octave: 0, step: '', timestamp: 0, duration: 0 };
 let maxBytePlayed = 0; // max gain of note played
 let startTimeStamp = 0;
@@ -50,8 +49,8 @@ export const initMicrophone = async (sensitivity: number): Promise<MediaStream> 
     micSource.connect(gainNode);
     micSource.connect(analyser);
 
+    // recording starts
     startTimeStamp = Date.now();
-    notesPlayed = [];
 
     return stream;
 };
@@ -82,7 +81,7 @@ export const getTones = (notes: Note[], enableCanvas = false, decibelMin: number
             }
         } else {
             if (count > 0) {
-                notes[nPtr].power = total / count;
+                notes[nPtr].power = total / count - notesPhaseOpposition[nPtr].power;
                 // if a note is detected
                 if (notes[nPtr].power > maxBytePlayed * 0.8 && notes[nPtr].power > decibelMin) {
                     maxBytePlayed = notes[nPtr].power;
@@ -112,6 +111,7 @@ export const getTones = (notes: Note[], enableCanvas = false, decibelMin: number
                     //         }
                     //     });
                     // }
+                    // this condition aims to not log too much notes
                     if (
                         // if note is different
                         notes[nPtr].octave !== lastNotePlayed.octave ||
@@ -121,13 +121,7 @@ export const getTones = (notes: Note[], enableCanvas = false, decibelMin: number
                             notes[nPtr].step === lastNotePlayed.step &&
                             currentTimestamp - 500 >= lastNotePlayed.timestamp)
                     ) {
-                        notesPlayed.push({
-                            octave: notes[nPtr].octave,
-                            step: notes[nPtr].step,
-                            timestamp: currentTimestamp,
-                            duration: 0,
-                        });
-
+                        // TODO a note is detected !
                         console.log(JSON.stringify(notes[nPtr]) + ' timestamp: ' + currentTimestamp);
                     }
                     // save the note that has been detected
@@ -177,3 +171,35 @@ export const getTones = (notes: Note[], enableCanvas = false, decibelMin: number
         ctx.restore();
     }
 };
+
+export const getNoise = () => {
+    analyser.getByteFrequencyData(frequencyData);
+    let count = 0;
+    let total = 0;
+    const cutoff = 20; //redundant with decibels?
+    let nPtr = 0; //notePointer
+    for (let i = 0; i < buflen; i++) {
+        const fdat: number = frequencyData[i];
+        const freq: number = i * hertzBinSize; //freq in hertz for this sample
+        const curNote: Note = notesPhaseOpposition[nPtr];
+        const nextNote: Note = notesPhaseOpposition[nPtr + 1];
+        //cut off halfway into the next note
+        const hzLimit: number = curNote.frequency + (nextNote.frequency - curNote.frequency) / 2;
+        if (freq < hzLimit) {
+            if (fdat > cutoff) {
+                count++;
+                total += fdat;
+            }
+        } else {
+            if (count > 0 && (total / count) > notesPhaseOpposition[nPtr].power) {
+                notesPhaseOpposition[nPtr].power = total / count;
+                count = 0;
+                total = 0;
+            }
+            //next note
+            if (nPtr < notesPhaseOpposition.length - 2) {
+                nPtr++;
+            }
+        }
+    }
+}

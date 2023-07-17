@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { initMicrophone, getTones } from '@/utilities/sound/microphone';
+import { initMicrophone, getTones, getNoise } from '@/utilities/sound/microphone';
 import { notes as notesRegistered, Note } from '@/utilities/sound/notes';
 import { shallowRef, watch, watchEffect } from 'vue';
 
@@ -9,21 +9,33 @@ const props = defineProps<{
 const notes: Note[] = notesRegistered;
 const stream = shallowRef<MediaStream | null>(null);
 const sensitivity = shallowRef<number>(50);
+let isRecordingNoise = true;
 
 watch(stream, () => {
     const setTones = () => {
         if (stream.value === null) return;
-        getTones(notes, props.enableCanvas, 35);
+        
+        if(isRecordingNoise) {
+            getNoise();
+        } else {
+            getTones(notes, props.enableCanvas, 35);
+        }
+
         requestAnimationFrame(setTones);
     };
     watchEffect(() => {
         requestAnimationFrame(setTones);
     });
 });
-watch(sensitivity, () => null); // Required for displaying sensitivity in real time
+watch(sensitivity, () => null); // Required to display sensitivity in real time
 
 function onClick() {
     if (stream.value === null) {
+        // start by recording noise for 500 ms
+        setTimeout(() => {
+            isRecordingNoise = false;
+        }, 500);
+
         initMicrophone(sensitivity.value).then((s: MediaStream) => (stream.value = s));
     } else {
         stream.value.getAudioTracks().forEach((track: MediaStreamTrack) => track.stop());

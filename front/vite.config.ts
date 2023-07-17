@@ -9,6 +9,8 @@ export default defineConfig({
     server: {
         proxy: {
             '^/$': 'http://127.0.0.1:3000',
+            '^/manifest.webmanifest$': 'http://127.0.0.1:3000',
+            '^/serviceWorker.js$': 'http://127.0.0.1:3000',
             '^/about$': 'http://127.0.0.1:3000',
             '^/checkup$': 'http://127.0.0.1:3000',
             '^/collection$': 'http://127.0.0.1:3000',

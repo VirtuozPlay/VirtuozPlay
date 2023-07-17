@@ -22,12 +22,12 @@ const maxValue = 256; //based on Uint8Array possible values
  * Initialise settings of the microphone
  * @returns Audio stream
  */
-export const initMicrophone = async (): Promise<MediaStream> => {
+export const initMicrophone = async (sensitivity: number): Promise<MediaStream> => {
     const audioCtx: AudioContext = new window.AudioContext();
 
     analyser = audioCtx.createAnalyser();
     analyser.smoothingTimeConstant = 0.8; //default is 0.8, less is more responsive
-    analyser.minDecibels = -45; //-100 is default and is more sensitive (more noise)
+    analyser.minDecibels = -sensitivity; //-100 is default and is more sensitive (more noise)
     analyser.fftSize = 8192 * 4; //need at least 8192 to detect differences in low notes
 
     const sampleRate: number = audioCtx.sampleRate;

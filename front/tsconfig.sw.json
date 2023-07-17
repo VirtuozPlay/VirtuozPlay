@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "lib": ["ESNext", "WebWorker"],
+    "noEmit": false,
+    "outDir": "../dist",
+    "target": "ESNext"
+  },
+  "exclude": ["src/**/__tests__/*"],
+  "files": ["sw/serviceWorker.ts"],
+  "include": ["sw/serviceWorker.ts"]
+}

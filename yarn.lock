@@ -2728,6 +2728,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/serviceworker@npm:^0.0.69":
+  version: 0.0.69
+  resolution: "@types/serviceworker@npm:0.0.69"
+  checksum: 462a816d7b7892c6a576efea4c5076eec8fec3f790613dbb353dd7a97763ede00247fdeb1fee123a363543c3d827d8fac87cfaf7b82dc530808aeacc2afd2825
+  languageName: node
+  linkType: hard
+
 "@types/sinonjs__fake-timers@npm:8.1.1":
   version: 8.1.1
   resolution: "@types/sinonjs__fake-timers@npm:8.1.1"
@@ -10667,6 +10674,7 @@ __metadata:
     "@tsconfig/node18": ^2.0.1
     "@types/jsdom": ^21.1.1
     "@types/node": ^18.16.17
+    "@types/serviceworker": ^0.0.69
     "@vitejs/plugin-vue": ^4.2.3
     "@vitejs/plugin-vue-jsx": ^3.0.1
     "@vitest/coverage-istanbul": ^0.32.2

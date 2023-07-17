@@ -9,10 +9,10 @@ import App from './App.vue';
 import router from './router';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faUserSecret, faCoffee, faArrowRight, faBars, faPlay, faPause, faHeadphones} from '@fortawesome/free-solid-svg-icons';
+import { faUserSecret, faCoffee, faArrowRight, faBars, faPlay, faPause, faHeadphones, faStop} from '@fortawesome/free-solid-svg-icons';
 import apolloProvider from './apollo';
 
-library.add(faUserSecret, faCoffee, faArrowRight, faBars, faPlay, faPause, faHeadphones);
+library.add(faUserSecret, faCoffee, faArrowRight, faBars, faPlay, faPause, faHeadphones, faStop);
 
 const app = createApp(App);
 app.use(createPinia());

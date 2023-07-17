@@ -38,12 +38,12 @@ const router = createRouter({
             component: () => import('../views/CollectionView.vue'),
         },
         {
-            path: '/cancan',
+            path: '/collection/cancan',
             name: 'cancan',
             component: () => import('../views/songs/CancanView.vue'),
         },
         {
-            path: '/sting',
+            path: '/collection/sting',
             name: 'sting',
             component: () => import('../views/songs/StingView.vue'),
         },

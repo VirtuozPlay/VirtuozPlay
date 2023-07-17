@@ -41,7 +41,7 @@ defineProps({
                 <img :src="item.imageUrl" :alt="item.title" class="w-full" />
             </div>
             <div class="col-span-1">
-                <RouterLink :to="`/${item.song}`">
+                <RouterLink :to="`/collection/${item.song}`">
                     <TextualButton aria-label="example button G" hover-color="#FAFF00">
                         Lancer {{ item.title }}
                     </TextualButton>

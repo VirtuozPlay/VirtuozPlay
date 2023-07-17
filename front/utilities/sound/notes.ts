@@ -148,3 +148,9 @@ export const notes: Note[] = [
     { octave: 8, step: 'B', frequency: 7902.13, power: 0 },
     //endregion
 ];
+
+/**
+ * This variable stores noise's amplitude
+ * for phase opposition purpose.
+ */
+export const notesPhaseOpposition: Note[] = notes;

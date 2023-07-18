@@ -13,7 +13,6 @@ let buflen: number;
 
 let lastNotePlayed: NotePlayed = { octave: 0, step: '', timestamp: 0, duration: 0 };
 let maxBytePlayed = 0; // max gain of note played
-let startTimeStamp = 0;
 // canvas
 const maxValue = 256; //based on Uint8Array possible values
 
@@ -49,19 +48,17 @@ export const initMicrophone = async (sensitivity: number): Promise<MediaStream> 
     micSource.connect(gainNode);
     micSource.connect(analyser);
 
-    // recording starts
-    startTimeStamp = Date.now();
-
     return stream;
 };
 
 /**
  * Record played notes
- * @param notes         Array of notes associated with their frequencies
- * @param enableCanvas  Enable canvans
- * @param decibelMin    Minimum binary value of decibel to track (between 0 and 255)
+ * @param notes             Array of notes associated with their frequencies
+ * @param startTimeStamp    Timestamp of the start of the track
+ * @param enableCanvas      Enable canvans
+ * @param decibelMin        Minimum binary value of decibel to track (between 0 and 255)
  */
-export const getTones = (notes: Note[], enableCanvas = false, decibelMin: number) => {
+export const getTones = (notes: Note[], startTimeStamp: number, enableCanvas = false, decibelMin: number) => {
     analyser.getByteFrequencyData(frequencyData);
     let count = 0;
     let total = 0;
@@ -81,7 +78,8 @@ export const getTones = (notes: Note[], enableCanvas = false, decibelMin: number
             }
         } else {
             if (count > 0) {
-                notes[nPtr].power = total / count - notesPhaseOpposition[nPtr].power;
+                const power = total / count - notesPhaseOpposition[nPtr].power;
+                notes[nPtr].power = power > 0 ? power : 0; // this check is only done to not display aberrations in canvas
                 // if a note is detected
                 if (notes[nPtr].power > maxBytePlayed * 0.8 && notes[nPtr].power > decibelMin) {
                     maxBytePlayed = notes[nPtr].power;
@@ -172,6 +170,9 @@ export const getTones = (notes: Note[], enableCanvas = false, decibelMin: number
     }
 };
 
+/**
+ * Record noise for phase opposition purpose
+ */
 export const getNoise = () => {
     analyser.getByteFrequencyData(frequencyData);
     let count = 0;
@@ -191,8 +192,10 @@ export const getNoise = () => {
                 total += fdat;
             }
         } else {
-            if (count > 0 && (total / count) > notesPhaseOpposition[nPtr].power) {
-                notesPhaseOpposition[nPtr].power = total / count;
+            if (count > 0) {
+                if (total / count > notesPhaseOpposition[nPtr].power) {
+                    notesPhaseOpposition[nPtr].power = total / count;
+                }
                 count = 0;
                 total = 0;
             }
@@ -202,4 +205,4 @@ export const getNoise = () => {
             }
         }
     }
-}
+};

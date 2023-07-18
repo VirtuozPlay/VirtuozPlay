@@ -20,12 +20,12 @@ const drawerStyle = computed(() => ({
         <SquareIcon :icon="['fas', 'bars']" size="lg"></SquareIcon>
     </SimpleButton>
     <div
+        v-show="open"
         id="drawer-background"
         aria-hidden="true"
-        v-show="open"
-        @click="open = false"
         :style="backgroundStyle"
         class="inset-0 z-10 fixed"
+        @click="open = false"
     ></div>
     <div
         aria-label="drawer"

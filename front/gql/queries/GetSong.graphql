@@ -1,0 +1,14 @@
+query GetSong {
+  songs {
+    title
+    notes {
+      measure
+      note
+      fret
+      string
+      octave
+      start
+      end
+    }
+  }
+}

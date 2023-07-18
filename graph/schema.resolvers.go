@@ -6,9 +6,10 @@ package graph
 
 import (
 	"context"
-	"github.com/vektah/gqlparser/v2/gqlerror"
 	"virtuozplay/graph/model"
 	db "virtuozplay/models"
+
+	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 // StartPerformance is the resolver for the startPerformance field.
@@ -18,7 +19,7 @@ func (r *mutationResolver) StartPerformance(ctx context.Context) (*model.Perform
 }
 
 // AddNotesToPerformance is the resolver for the addNotesToPerformance field.
-func (r *mutationResolver) AddNotesToPerformance(ctx context.Context, id string, notes []*model.NoteInput) (*model.Performance, error) {
+func (r *mutationResolver) AddNotesToPerformance(ctx context.Context, id string, notes []*model.InputNote) (*model.Performance, error) {
 	_ = ctx
 	perf, err := r.Performances.FindInProgressByNanoID(db.NanoID(id))
 	if err != nil {
@@ -72,6 +73,27 @@ func (r *queryResolver) VirtuozPlay(ctx context.Context) (*model.VirtuozPlay, er
 func (r *queryResolver) Performance(ctx context.Context, id string) (*model.Performance, error) {
 	_ = ctx
 	return ToGraphQLPerformance(r.Performances.FindByNanoID(db.NanoID(id)))
+}
+
+// Songs is the resolver for the songs field.
+func (r *queryResolver) Songs(ctx context.Context) ([]*model.Song, error) {
+	song := &model.Song{
+		ID:    "h8rHA-Q0dD5dBbY1L2Fzf",
+		Title: "Cancan",
+		Notes: []*model.SongNote{
+			{Measure: 1, Note: "C", Fret: 10, String: 2, Start: 0, End: 1000},
+			{Measure: 2, Note: "C", Fret: 11, String: 2, Start: 1000, End: 2000},
+			{Measure: 3, Note: "C", Fret: 10, String: 2, Start: 2000, End: 3000},
+			{Measure: 4, Note: "C", Fret: 11, String: 2, Start: 3000, End: 4000},
+			{Measure: 5, Note: "C", Fret: 17, String: 2, Start: 4000, End: 5000},
+			{Measure: 6, Note: "C", Fret: 18, String: 2, Start: 5000, End: 6000},
+			{Measure: 7, Note: "C", Fret: 17, String: 2, Start: 6000, End: 7000},
+			{Measure: 7, Note: "C", Fret: 18, String: 2, Start: 7000, End: 8000},
+		},
+	}
+	songs := []*model.Song{song}
+
+	return songs, nil
 }
 
 // Mutation returns MutationResolver implementation.

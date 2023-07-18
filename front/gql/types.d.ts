@@ -17,11 +17,30 @@ export type Scalars = {
     Boolean: { input: boolean; output: boolean };
     Int: { input: number; output: number };
     Float: { input: number; output: number };
+    Timestamp: { input: any; output: any };
+};
+
+export type Note = {
+    readonly __typename?: 'Note';
+    readonly end: Scalars['Timestamp']['output'];
+    readonly fret: Scalars['Int']['output'];
+    readonly measure: Scalars['Int']['output'];
+    readonly note: Scalars['String']['output'];
+    readonly octave: Scalars['Int']['output'];
+    readonly start: Scalars['Timestamp']['output'];
+    readonly string: Scalars['Int']['output'];
 };
 
 export type Query = {
     readonly __typename?: 'Query';
+    readonly songs: ReadonlyArray<Maybe<Song>>;
     readonly virtuozPlay: VirtuozPlay;
+};
+
+export type Song = {
+    readonly __typename?: 'Song';
+    readonly notes: ReadonlyArray<Maybe<Note>>;
+    readonly title: Scalars['String']['output'];
 };
 
 export type VirtuozPlay = {

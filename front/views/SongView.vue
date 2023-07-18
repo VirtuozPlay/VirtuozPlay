@@ -51,10 +51,10 @@ const data = () => {
 
 const audio = new Audio(data().music);
 
-let currentIndex = ref(0);
+const currentIndex = ref(0);
 let timer: ReturnType<typeof setTimeout> | null = null;
-let animationRunning = ref(false);
-let animationPaused = ref(false);
+const animationRunning = ref(false);
+const animationPaused = ref(false);
 
 const handleListenCanCan = () => {
     if (!isPlaying.value) {
@@ -125,16 +125,16 @@ const isCurrentFret = (fret: number) => {
             </div>
             <div class="relative">
                 <div class="absolute top-0 left-0 w-full h-full" style="margin-top: 26px">
-                    <StringsFrets :isPosition="isPosition" ref="stringsFretsRef" />
+                    <StringsFrets ref="stringsFretsRef" :is-position="isPosition" />
                 </div>
                 <img alt="le manche" src="@/assets/lemanche.svg" />
             </div>
             <ListenPlayPause
-                :onListen="handleListenCanCan"
-                :onPlay="startAnimation"
-                :onPause="pauseAnimation"
-                :onStop="stopAnimation"
-                :animationRunning="animationRunning"
+                :on-listen="handleListenCanCan"
+                :on-play="startAnimation"
+                :on-pause="pauseAnimation"
+                :on-stop="stopAnimation"
+                :animation-running="animationRunning"
             />
         </div>
     </main>

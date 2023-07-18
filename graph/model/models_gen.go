@@ -2,16 +2,7 @@
 
 package model
 
-type Note struct {
-	// The offset of the note's start from the beginning of the performance, in milliseconds.
-	At int `json:"at"`
-	// The duration of the note, in milliseconds.
-	Duration int `json:"duration"`
-	// Human-readable representation of the note (e.g. 'C#', 'D', 'Fb', etc.)
-	Value string `json:"value"`
-}
-
-type NoteInput struct {
+type InputNote struct {
 	// The offset of the note's start from the beginning of the performance, in milliseconds.
 	At int `json:"at"`
 	// The duration of the note, in milliseconds.
@@ -27,7 +18,33 @@ type Performance struct {
 	// The total duration of the performance, in milliseconds.
 	Duration int `json:"duration"`
 	// An array of *all* notes in the performance, sorted by their start time.
-	Notes []*Note `json:"notes"`
+	Notes []*PerformanceNote `json:"notes"`
+}
+
+type PerformanceNote struct {
+	// The offset of the note's start from the beginning of the performance, in milliseconds.
+	At int `json:"at"`
+	// The duration of the note, in milliseconds.
+	Duration int `json:"duration"`
+	// Human-readable representation of the note (e.g. 'C#', 'D', 'Fb', etc.)
+	Value string `json:"value"`
+}
+
+type Song struct {
+	ID    string      `json:"id"`
+	Title string      `json:"title"`
+	Notes []*SongNote `json:"notes"`
+}
+
+// This is a separate type from PerformanceNote for now
+type SongNote struct {
+	Measure int    `json:"measure"`
+	Note    string `json:"note"`
+	Fret    int    `json:"fret"`
+	String  int    `json:"string"`
+	Octave  int    `json:"octave"`
+	Start   int    `json:"start"`
+	End     int    `json:"end"`
 }
 
 type VirtuozPlay struct {

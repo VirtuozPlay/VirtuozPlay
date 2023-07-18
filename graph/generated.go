@@ -47,15 +47,9 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
-		AddNotesToPerformance func(childComplexity int, id string, notes []*model.NoteInput) int
+		AddNotesToPerformance func(childComplexity int, id string, notes []*model.InputNote) int
 		FinishPerformance     func(childComplexity int, id string) int
 		StartPerformance      func(childComplexity int) int
-	}
-
-	Note struct {
-		At       func(childComplexity int) int
-		Duration func(childComplexity int) int
-		Value    func(childComplexity int) int
 	}
 
 	Performance struct {
@@ -66,9 +60,32 @@ type ComplexityRoot struct {
 		Notes     func(childComplexity int) int
 	}
 
+	PerformanceNote struct {
+		At       func(childComplexity int) int
+		Duration func(childComplexity int) int
+		Value    func(childComplexity int) int
+	}
+
 	Query struct {
 		Performance func(childComplexity int, id string) int
+		Songs       func(childComplexity int) int
 		VirtuozPlay func(childComplexity int) int
+	}
+
+	Song struct {
+		ID    func(childComplexity int) int
+		Notes func(childComplexity int) int
+		Title func(childComplexity int) int
+	}
+
+	SongNote struct {
+		End     func(childComplexity int) int
+		Fret    func(childComplexity int) int
+		Measure func(childComplexity int) int
+		Note    func(childComplexity int) int
+		Octave  func(childComplexity int) int
+		Start   func(childComplexity int) int
+		String  func(childComplexity int) int
 	}
 
 	VirtuozPlay struct {
@@ -78,12 +95,13 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	StartPerformance(ctx context.Context) (*model.Performance, error)
-	AddNotesToPerformance(ctx context.Context, id string, notes []*model.NoteInput) (*model.Performance, error)
+	AddNotesToPerformance(ctx context.Context, id string, notes []*model.InputNote) (*model.Performance, error)
 	FinishPerformance(ctx context.Context, id string) (*model.Performance, error)
 }
 type QueryResolver interface {
 	VirtuozPlay(ctx context.Context) (*model.VirtuozPlay, error)
 	Performance(ctx context.Context, id string) (*model.Performance, error)
+	Songs(ctx context.Context) ([]*model.Song, error)
 }
 
 type executableSchema struct {
@@ -111,7 +129,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.AddNotesToPerformance(childComplexity, args["id"].(string), args["notes"].([]*model.NoteInput)), true
+		return e.complexity.Mutation.AddNotesToPerformance(childComplexity, args["id"].(string), args["notes"].([]*model.InputNote)), true
 
 	case "Mutation.finishPerformance":
 		if e.complexity.Mutation.FinishPerformance == nil {
@@ -131,27 +149,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.StartPerformance(childComplexity), true
-
-	case "Note.at":
-		if e.complexity.Note.At == nil {
-			break
-		}
-
-		return e.complexity.Note.At(childComplexity), true
-
-	case "Note.duration":
-		if e.complexity.Note.Duration == nil {
-			break
-		}
-
-		return e.complexity.Note.Duration(childComplexity), true
-
-	case "Note.value":
-		if e.complexity.Note.Value == nil {
-			break
-		}
-
-		return e.complexity.Note.Value(childComplexity), true
 
 	case "Performance.author":
 		if e.complexity.Performance.Author == nil {
@@ -188,6 +185,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Performance.Notes(childComplexity), true
 
+	case "PerformanceNote.at":
+		if e.complexity.PerformanceNote.At == nil {
+			break
+		}
+
+		return e.complexity.PerformanceNote.At(childComplexity), true
+
+	case "PerformanceNote.duration":
+		if e.complexity.PerformanceNote.Duration == nil {
+			break
+		}
+
+		return e.complexity.PerformanceNote.Duration(childComplexity), true
+
+	case "PerformanceNote.value":
+		if e.complexity.PerformanceNote.Value == nil {
+			break
+		}
+
+		return e.complexity.PerformanceNote.Value(childComplexity), true
+
 	case "Query.performance":
 		if e.complexity.Query.Performance == nil {
 			break
@@ -200,12 +218,89 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Performance(childComplexity, args["id"].(string)), true
 
+	case "Query.songs":
+		if e.complexity.Query.Songs == nil {
+			break
+		}
+
+		return e.complexity.Query.Songs(childComplexity), true
+
 	case "Query.virtuozPlay":
 		if e.complexity.Query.VirtuozPlay == nil {
 			break
 		}
 
 		return e.complexity.Query.VirtuozPlay(childComplexity), true
+
+	case "Song.id":
+		if e.complexity.Song.ID == nil {
+			break
+		}
+
+		return e.complexity.Song.ID(childComplexity), true
+
+	case "Song.notes":
+		if e.complexity.Song.Notes == nil {
+			break
+		}
+
+		return e.complexity.Song.Notes(childComplexity), true
+
+	case "Song.title":
+		if e.complexity.Song.Title == nil {
+			break
+		}
+
+		return e.complexity.Song.Title(childComplexity), true
+
+	case "SongNote.end":
+		if e.complexity.SongNote.End == nil {
+			break
+		}
+
+		return e.complexity.SongNote.End(childComplexity), true
+
+	case "SongNote.fret":
+		if e.complexity.SongNote.Fret == nil {
+			break
+		}
+
+		return e.complexity.SongNote.Fret(childComplexity), true
+
+	case "SongNote.measure":
+		if e.complexity.SongNote.Measure == nil {
+			break
+		}
+
+		return e.complexity.SongNote.Measure(childComplexity), true
+
+	case "SongNote.note":
+		if e.complexity.SongNote.Note == nil {
+			break
+		}
+
+		return e.complexity.SongNote.Note(childComplexity), true
+
+	case "SongNote.octave":
+		if e.complexity.SongNote.Octave == nil {
+			break
+		}
+
+		return e.complexity.SongNote.Octave(childComplexity), true
+
+	case "SongNote.start":
+		if e.complexity.SongNote.Start == nil {
+			break
+		}
+
+		return e.complexity.SongNote.Start(childComplexity), true
+
+	case "SongNote.string":
+		if e.complexity.SongNote.String == nil {
+			break
+		}
+
+		return e.complexity.SongNote.String(childComplexity), true
 
 	case "VirtuozPlay.version":
 		if e.complexity.VirtuozPlay.Version == nil {
@@ -222,7 +317,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
-		ec.unmarshalInputNoteInput,
+		ec.unmarshalInputInputNote,
 	)
 	first := true
 
@@ -375,10 +470,10 @@ func (ec *executionContext) field_Mutation_addNotesToPerformance_args(ctx contex
 		}
 	}
 	args["id"] = arg0
-	var arg1 []*model.NoteInput
+	var arg1 []*model.InputNote
 	if tmp, ok := rawArgs["notes"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("notes"))
-		arg1, err = ec.unmarshalNNoteInput2ᚕᚖvirtuozplayᚋgraphᚋmodelᚐNoteInputᚄ(ctx, tmp)
+		arg1, err = ec.unmarshalNInputNote2ᚕᚖvirtuozplayᚋgraphᚋmodelᚐInputNoteᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -540,7 +635,7 @@ func (ec *executionContext) _Mutation_addNotesToPerformance(ctx context.Context,
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddNotesToPerformance(rctx, fc.Args["id"].(string), fc.Args["notes"].([]*model.NoteInput))
+		return ec.resolvers.Mutation().AddNotesToPerformance(rctx, fc.Args["id"].(string), fc.Args["notes"].([]*model.InputNote))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -656,138 +751,6 @@ func (ec *executionContext) fieldContext_Mutation_finishPerformance(ctx context.
 	if fc.Args, err = ec.field_Mutation_finishPerformance_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Note_at(ctx context.Context, field graphql.CollectedField, obj *model.Note) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Note_at(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.At, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Note_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Note",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Note_duration(ctx context.Context, field graphql.CollectedField, obj *model.Note) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Note_duration(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Duration, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Note_duration(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Note",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Note_value(ctx context.Context, field graphql.CollectedField, obj *model.Note) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Note_value(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Value, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Note_value(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Note",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
 	}
 	return fc, nil
 }
@@ -988,9 +951,9 @@ func (ec *executionContext) _Performance_notes(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Note)
+	res := resTmp.([]*model.PerformanceNote)
 	fc.Result = res
-	return ec.marshalNNote2ᚕᚖvirtuozplayᚋgraphᚋmodelᚐNoteᚄ(ctx, field.Selections, res)
+	return ec.marshalNPerformanceNote2ᚕᚖvirtuozplayᚋgraphᚋmodelᚐPerformanceNoteᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Performance_notes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1002,13 +965,145 @@ func (ec *executionContext) fieldContext_Performance_notes(ctx context.Context, 
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "at":
-				return ec.fieldContext_Note_at(ctx, field)
+				return ec.fieldContext_PerformanceNote_at(ctx, field)
 			case "duration":
-				return ec.fieldContext_Note_duration(ctx, field)
+				return ec.fieldContext_PerformanceNote_duration(ctx, field)
 			case "value":
-				return ec.fieldContext_Note_value(ctx, field)
+				return ec.fieldContext_PerformanceNote_value(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Note", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type PerformanceNote", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PerformanceNote_at(ctx context.Context, field graphql.CollectedField, obj *model.PerformanceNote) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PerformanceNote_at(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.At, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PerformanceNote_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PerformanceNote",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PerformanceNote_duration(ctx context.Context, field graphql.CollectedField, obj *model.PerformanceNote) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PerformanceNote_duration(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Duration, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PerformanceNote_duration(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PerformanceNote",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PerformanceNote_value(ctx context.Context, field graphql.CollectedField, obj *model.PerformanceNote) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PerformanceNote_value(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Value, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PerformanceNote_value(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PerformanceNote",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1122,6 +1217,58 @@ func (ec *executionContext) fieldContext_Query_performance(ctx context.Context, 
 	if fc.Args, err = ec.field_Query_performance_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_songs(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_songs(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Songs(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Song)
+	fc.Result = res
+	return ec.marshalNSong2ᚕᚖvirtuozplayᚋgraphᚋmodelᚐSong(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_songs(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Song_id(ctx, field)
+			case "title":
+				return ec.fieldContext_Song_title(ctx, field)
+			case "notes":
+				return ec.fieldContext_Song_notes(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Song", field.Name)
+		},
 	}
 	return fc, nil
 }
@@ -1250,6 +1397,462 @@ func (ec *executionContext) fieldContext_Query___schema(ctx context.Context, fie
 				return ec.fieldContext___Schema_directives(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Schema", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Song_id(ctx context.Context, field graphql.CollectedField, obj *model.Song) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Song_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Song_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Song",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Song_title(ctx context.Context, field graphql.CollectedField, obj *model.Song) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Song_title(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Song_title(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Song",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Song_notes(ctx context.Context, field graphql.CollectedField, obj *model.Song) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Song_notes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Notes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.SongNote)
+	fc.Result = res
+	return ec.marshalNSongNote2ᚕᚖvirtuozplayᚋgraphᚋmodelᚐSongNote(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Song_notes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Song",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "measure":
+				return ec.fieldContext_SongNote_measure(ctx, field)
+			case "note":
+				return ec.fieldContext_SongNote_note(ctx, field)
+			case "fret":
+				return ec.fieldContext_SongNote_fret(ctx, field)
+			case "string":
+				return ec.fieldContext_SongNote_string(ctx, field)
+			case "octave":
+				return ec.fieldContext_SongNote_octave(ctx, field)
+			case "start":
+				return ec.fieldContext_SongNote_start(ctx, field)
+			case "end":
+				return ec.fieldContext_SongNote_end(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type SongNote", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SongNote_measure(ctx context.Context, field graphql.CollectedField, obj *model.SongNote) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SongNote_measure(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Measure, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SongNote_measure(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SongNote",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SongNote_note(ctx context.Context, field graphql.CollectedField, obj *model.SongNote) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SongNote_note(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Note, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SongNote_note(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SongNote",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SongNote_fret(ctx context.Context, field graphql.CollectedField, obj *model.SongNote) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SongNote_fret(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Fret, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SongNote_fret(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SongNote",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SongNote_string(ctx context.Context, field graphql.CollectedField, obj *model.SongNote) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SongNote_string(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.String, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SongNote_string(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SongNote",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SongNote_octave(ctx context.Context, field graphql.CollectedField, obj *model.SongNote) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SongNote_octave(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Octave, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SongNote_octave(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SongNote",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SongNote_start(ctx context.Context, field graphql.CollectedField, obj *model.SongNote) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SongNote_start(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Start, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SongNote_start(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SongNote",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SongNote_end(ctx context.Context, field graphql.CollectedField, obj *model.SongNote) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SongNote_end(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.End, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SongNote_end(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SongNote",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3072,8 +3675,8 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputNoteInput(ctx context.Context, obj interface{}) (model.NoteInput, error) {
-	var it model.NoteInput
+func (ec *executionContext) unmarshalInputInputNote(ctx context.Context, obj interface{}) (model.InputNote, error) {
+	var it model.InputNote
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -3190,55 +3793,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
-var noteImplementors = []string{"Note"}
-
-func (ec *executionContext) _Note(ctx context.Context, sel ast.SelectionSet, obj *model.Note) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, noteImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Note")
-		case "at":
-			out.Values[i] = ec._Note_at(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "duration":
-			out.Values[i] = ec._Note_duration(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "value":
-			out.Values[i] = ec._Note_value(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
 var performanceImplementors = []string{"Performance"}
 
 func (ec *executionContext) _Performance(ctx context.Context, sel ast.SelectionSet, obj *model.Performance) graphql.Marshaler {
@@ -3266,6 +3820,55 @@ func (ec *executionContext) _Performance(ctx context.Context, sel ast.SelectionS
 			}
 		case "notes":
 			out.Values[i] = ec._Performance_notes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var performanceNoteImplementors = []string{"PerformanceNote"}
+
+func (ec *executionContext) _PerformanceNote(ctx context.Context, sel ast.SelectionSet, obj *model.PerformanceNote) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, performanceNoteImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PerformanceNote")
+		case "at":
+			out.Values[i] = ec._PerformanceNote_at(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "duration":
+			out.Values[i] = ec._PerformanceNote_duration(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "value":
+			out.Values[i] = ec._PerformanceNote_value(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -3352,6 +3955,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "songs":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_songs(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -3360,6 +3985,124 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___schema(ctx, field)
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var songImplementors = []string{"Song"}
+
+func (ec *executionContext) _Song(ctx context.Context, sel ast.SelectionSet, obj *model.Song) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, songImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Song")
+		case "id":
+			out.Values[i] = ec._Song_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "title":
+			out.Values[i] = ec._Song_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "notes":
+			out.Values[i] = ec._Song_notes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var songNoteImplementors = []string{"SongNote"}
+
+func (ec *executionContext) _SongNote(ctx context.Context, sel ast.SelectionSet, obj *model.SongNote) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, songNoteImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SongNote")
+		case "measure":
+			out.Values[i] = ec._SongNote_measure(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "note":
+			out.Values[i] = ec._SongNote_note(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "fret":
+			out.Values[i] = ec._SongNote_fret(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "string":
+			out.Values[i] = ec._SongNote_string(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "octave":
+			out.Values[i] = ec._SongNote_octave(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "start":
+			out.Values[i] = ec._SongNote_start(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "end":
+			out.Values[i] = ec._SongNote_end(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3778,6 +4521,28 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
+func (ec *executionContext) unmarshalNInputNote2ᚕᚖvirtuozplayᚋgraphᚋmodelᚐInputNoteᚄ(ctx context.Context, v interface{}) ([]*model.InputNote, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.InputNote, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNInputNote2ᚖvirtuozplayᚋgraphᚋmodelᚐInputNote(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNInputNote2ᚖvirtuozplayᚋgraphᚋmodelᚐInputNote(ctx context.Context, v interface{}) (*model.InputNote, error) {
+	res, err := ec.unmarshalInputInputNote(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
 	res, err := graphql.UnmarshalInt(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3793,7 +4558,21 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) marshalNNote2ᚕᚖvirtuozplayᚋgraphᚋmodelᚐNoteᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Note) graphql.Marshaler {
+func (ec *executionContext) marshalNPerformance2virtuozplayᚋgraphᚋmodelᚐPerformance(ctx context.Context, sel ast.SelectionSet, v model.Performance) graphql.Marshaler {
+	return ec._Performance(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNPerformance2ᚖvirtuozplayᚋgraphᚋmodelᚐPerformance(ctx context.Context, sel ast.SelectionSet, v *model.Performance) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Performance(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNPerformanceNote2ᚕᚖvirtuozplayᚋgraphᚋmodelᚐPerformanceNoteᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.PerformanceNote) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -3817,7 +4596,7 @@ func (ec *executionContext) marshalNNote2ᚕᚖvirtuozplayᚋgraphᚋmodelᚐNot
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNNote2ᚖvirtuozplayᚋgraphᚋmodelᚐNote(ctx, sel, v[i])
+			ret[i] = ec.marshalNPerformanceNote2ᚖvirtuozplayᚋgraphᚋmodelᚐPerformanceNote(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -3837,50 +4616,90 @@ func (ec *executionContext) marshalNNote2ᚕᚖvirtuozplayᚋgraphᚋmodelᚐNot
 	return ret
 }
 
-func (ec *executionContext) marshalNNote2ᚖvirtuozplayᚋgraphᚋmodelᚐNote(ctx context.Context, sel ast.SelectionSet, v *model.Note) graphql.Marshaler {
+func (ec *executionContext) marshalNPerformanceNote2ᚖvirtuozplayᚋgraphᚋmodelᚐPerformanceNote(ctx context.Context, sel ast.SelectionSet, v *model.PerformanceNote) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 		return graphql.Null
 	}
-	return ec._Note(ctx, sel, v)
+	return ec._PerformanceNote(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNNoteInput2ᚕᚖvirtuozplayᚋgraphᚋmodelᚐNoteInputᚄ(ctx context.Context, v interface{}) ([]*model.NoteInput, error) {
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
+func (ec *executionContext) marshalNSong2ᚕᚖvirtuozplayᚋgraphᚋmodelᚐSong(ctx context.Context, sel ast.SelectionSet, v []*model.Song) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
 	}
-	var err error
-	res := make([]*model.NoteInput, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNNoteInput2ᚖvirtuozplayᚋgraphᚋmodelᚐNoteInput(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
 		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) unmarshalNNoteInput2ᚖvirtuozplayᚋgraphᚋmodelᚐNoteInput(ctx context.Context, v interface{}) (*model.NoteInput, error) {
-	res, err := ec.unmarshalInputNoteInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNPerformance2virtuozplayᚋgraphᚋmodelᚐPerformance(ctx context.Context, sel ast.SelectionSet, v model.Performance) graphql.Marshaler {
-	return ec._Performance(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNPerformance2ᚖvirtuozplayᚋgraphᚋmodelᚐPerformance(ctx context.Context, sel ast.SelectionSet, v *model.Performance) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOSong2ᚖvirtuozplayᚋgraphᚋmodelᚐSong(ctx, sel, v[i])
 		}
-		return graphql.Null
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
 	}
-	return ec._Performance(ctx, sel, v)
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalNSongNote2ᚕᚖvirtuozplayᚋgraphᚋmodelᚐSongNote(ctx context.Context, sel ast.SelectionSet, v []*model.SongNote) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOSongNote2ᚖvirtuozplayᚋgraphᚋmodelᚐSongNote(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -4212,6 +5031,20 @@ func (ec *executionContext) marshalOPerformance2ᚖvirtuozplayᚋgraphᚋmodel�
 		return graphql.Null
 	}
 	return ec._Performance(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOSong2ᚖvirtuozplayᚋgraphᚋmodelᚐSong(ctx context.Context, sel ast.SelectionSet, v *model.Song) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Song(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOSongNote2ᚖvirtuozplayᚋgraphᚋmodelᚐSongNote(ctx context.Context, sel ast.SelectionSet, v *model.SongNote) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._SongNote(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

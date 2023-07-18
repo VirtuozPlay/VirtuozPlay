@@ -18,6 +18,6 @@ const handlePauseSting = () => {
     <main aria-label="checkup section" class="items-center mt-16 w-80vw flex justify-center">
         <h1>Hello</h1>
         <img alt="VirtuozPlay Logo" src="@/assets/lemanche.svg" width="128" height="128" />
-        <ListenPlayPause :onListen="handleListenSting" :onPlay="handlePlaySting" :onPause="handlePauseSting" />
+        <ListenPlayPause :on-listen="handleListenSting" :on-play="handlePlaySting" :on-pause="handlePauseSting" />
     </main>
 </template>

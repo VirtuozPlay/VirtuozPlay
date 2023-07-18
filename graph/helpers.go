@@ -44,10 +44,10 @@ func ToGraphQLPerformance(performance *db.Performance, err error) (*model.Perfor
 		panic("performance is nil")
 	}
 
-	notes := make([]*model.Note, len(performance.Notes))
+	notes := make([]*model.PerformanceNote, len(performance.Notes))
 
 	for i, note := range performance.Notes {
-		notes[i] = &model.Note{
+		notes[i] = &model.PerformanceNote{
 			At:       int(note.At),
 			Duration: int(note.Duration),
 			Value:    note.Value,

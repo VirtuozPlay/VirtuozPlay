@@ -15,6 +15,24 @@ type Query {
   virtuozPlay: VirtuozPlay!
   "Retrieve a performance by its ID."
   performance(id: ID!): Performance
+  songs: [Song]!
+}
+
+type Song {
+  id: ID!
+  title: String!
+  notes: [SongNote]!
+}
+
+"This is a separate type from PerformanceNote for now"
+type SongNote {
+  measure: Int!
+  note: String!
+  fret: Int!
+  string: Int!
+  octave: Int!
+  start: Int!
+  end: Int!
 }
 
 type VirtuozPlay {
@@ -28,10 +46,10 @@ type Performance {
   "The total duration of the performance, in milliseconds."
   duration: Int!
   "An array of *all* notes in the performance, sorted by their start time."
-  notes: [Note!]!
+  notes: [PerformanceNote!]!
 }
 
-type Note {
+type PerformanceNote {
   "The offset of the note's start from the beginning of the performance, in milliseconds."
   at: Int!
   "The duration of the note, in milliseconds."
@@ -45,11 +63,11 @@ type Mutation {
   "Begin a new performance."
   startPerformance: Performance!
   "Add notes to a performance, each new note must have a 'at' value greater than any existing note's 'at' value in the performance."
-  addNotesToPerformance(id: ID!, notes: [NoteInput!]!): Performance!
+  addNotesToPerformance(id: ID!, notes: [InputNote!]!): Performance!
   finishPerformance(id: ID!): Performance!
 }
 
-input NoteInput {
+input InputNote {
   "The offset of the note's start from the beginning of the performance, in milliseconds."
   at: Int!
   "The duration of the note, in milliseconds."

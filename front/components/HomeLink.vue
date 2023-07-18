@@ -16,7 +16,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-    <div @mouseover="emit('select')" @focusin="emit('select')" class="relative">
+    <div class="relative" @mouseover="emit('select')" @focusin="emit('select')">
         <SquareIcon
             v-show="props.selected"
             :icon="['fas', 'arrow-right']"

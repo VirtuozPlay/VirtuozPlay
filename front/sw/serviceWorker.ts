@@ -15,7 +15,7 @@ sw.addEventListener('install', (event: ExtendableEvent) => {
 });
 
 // Claim control instantly.
-sw.addEventListener('activate', (_evt: ExtendableEvent) => sw.clients.claim());
+sw.addEventListener('activate', () => sw.clients.claim());
 
 // Load from cache first, then fallback to network if not found.
 sw.addEventListener('fetch', (event: FetchEvent) => {

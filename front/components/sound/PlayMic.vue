@@ -2,15 +2,16 @@
 import { initMicrophone, getTones, getNoise } from '@/utilities/sound/microphone';
 import { notes as notesRegistered, Note, notesPhaseOpposition } from '@/utilities/sound/notes';
 import { shallowRef, watch, watchEffect } from 'vue';
-import { getCookie, setCookie } from 'typescript-cookie'
+import { getCookie, setCookie } from 'typescript-cookie';
 
 const props = defineProps<{
     enableCanvas: boolean;
 }>();
 const notes: Note[] = notesRegistered;
 const stream = shallowRef<MediaStream | null>(null);
-const sensitivity = shallowRef<number>(getCookie("mic_sensivity") ? Number(getCookie("mic_sensivity")) : 50);
+const sensitivity = shallowRef<number>(getCookie('mic_sensivity') ? Number(getCookie('mic_sensivity')) : 50);
 let isRecordingNoise = true;
+let startTimeStamp = 0;
 
 watch(stream, () => {
     const setTones = () => {
@@ -19,7 +20,7 @@ watch(stream, () => {
         if (isRecordingNoise) {
             getNoise();
         } else {
-            getTones(notes, props.enableCanvas, 35);
+            getTones(notes, startTimeStamp, props.enableCanvas, 35);
         }
 
         requestAnimationFrame(setTones);
@@ -36,21 +37,28 @@ function onClick() {
         isRecordingNoise = true;
         setTimeout(() => {
             isRecordingNoise = false;
+            // recording starts
+            startTimeStamp = Date.now();
+            console.log(notesPhaseOpposition);
         }, 5000);
-        setCookie("mic_sensivity", sensitivity.value);
+        setCookie('mic_sensivity', sensitivity.value);
         initMicrophone(sensitivity.value).then((s: MediaStream) => (stream.value = s));
     } else {
         // stop
         stream.value.getAudioTracks().forEach((track: MediaStreamTrack) => track.stop());
         stream.value = null;
     }
-    console.log(notesPhaseOpposition);
 }
 </script>
 
 <template>
     <div class="greetings">
-        <div>Réglage de la sensibilité : <input v-model="sensitivity" type="range" min="40" max="100" /><span v-text="-sensitivity" /> Db</div>
+        <div>
+            Réglage de la sensibilité : <input v-model="sensitivity" type="range" min="40" max="100" /><span
+                v-text="-sensitivity"
+            />
+            Db
+        </div>
 
         <button id="startBtn" type="button" @click="onClick()">{{ stream === null ? 'Start' : 'Stop' }}</button>
 

@@ -153,4 +153,4 @@ export const notes: Note[] = [
  * This variable stores noise's amplitude
  * for phase opposition purpose.
  */
-export const notesPhaseOpposition: Note[] = notes;
+export const notesPhaseOpposition: Note[] = structuredClone<Note[]>(notes);

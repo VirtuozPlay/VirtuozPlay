@@ -1,0 +1,6 @@
+create_table("performance") {
+	t.Column("id", "bigint", {primary: true})
+	t.Column("notes_count", "integer", {null: false})
+	t.Column("notes_encoding", "smallint", {null: false, default: 0})
+	t.Column("notes", "bytea", {null: false})
+}

@@ -93,7 +93,9 @@
 
           # Run `install-buffalo` in your shell to install the Buffalo CLI
           scripts.install-buffalo.exec = ''
-            go install -tags sqlite github.com/gobuffalo/cli/cmd/buffalo@v${buffalo-version}
+            go install -tags sqlite github.com/gobuffalo/cli/cmd/buffalo@latest
+            go install -tags sqlite github.com/gobuffalo/pop/v6/soda@latest
+            buffalo plugins install
           '';
 
           enterShell = ''

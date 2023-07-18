@@ -1,0 +1,30 @@
+[[scenario]]
+# A sequence of all possible notes that can be played
+name = "performance_all_possible_notes"
+
+[[scenario.table]]
+name = "performance"
+
+[[scenario.table.row]]
+id = "1"
+created_at = "<%= now() %>"
+updated_at = "<%= now() %>"
+notes_count = 21
+notes_encoding = 1 # Base64 encoding
+# Notes are encoded as base64 because TOML does not support binary data
+notes = "AO8XAAD3GggAoCUQAN8GAQDtEAkAqAcRAMIkAgDAFgoAlUASAJE2AwDtFgsAkwkTAJMkBADSGAwArkIUAPQjBQDPPA0Avy0VAOYWBgC5IA4Ar0AW"
+
+[[scenario]]
+# Purposly badly encoded performance
+name = "performance_bad_encoding"
+
+[[scenario.table]]
+name = "performance"
+
+[[scenario.table.row]]
+id = "2"
+created_at = "<%= now() %>"
+updated_at = "<%= now() %>"
+notes_count = 5
+notes_encoding = 1
+notes = "rbhvbçbg;?????  W????AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"

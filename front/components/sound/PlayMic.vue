@@ -2,15 +2,17 @@
 import { initMicrophone, getTones, getNoise } from '@/utilities/sound/microphone';
 import { notes as notesRegistered, Note, notesPhaseOpposition } from '@/utilities/sound/notes';
 import { shallowRef, watch, watchEffect } from 'vue';
-import { getCookie, setCookie } from 'typescript-cookie';
 
 const props = defineProps<{
     enableCanvas: boolean;
 }>();
 const notes: Note[] = notesRegistered;
 const stream = shallowRef<MediaStream | null>(null);
-const sensitivity = shallowRef<number>(getCookie('mic_sensivity') ? Number(getCookie('mic_sensivity')) : 50);
-let isRecordingNoise = true;
+const sensitivity = shallowRef<number>(
+    localStorage.getItem('mic_sensivity') ? Number(localStorage.getItem('mic_sensivity')) : 50
+);
+let isRecordingNoise = true,
+    isLocalStorageAcessible = false;
 let startTimeStamp = 0;
 
 watch(stream, () => {
@@ -41,13 +43,23 @@ function onClick() {
             startTimeStamp = Date.now();
             console.log(notesPhaseOpposition);
         }, 5000);
-        setCookie('mic_sensivity', sensitivity.value);
+        if (isLocalStorageAcessible) localStorage.setItem('mic_sensivity', String(sensitivity.value));
+
         initMicrophone(sensitivity.value).then((s: MediaStream) => (stream.value = s));
     } else {
         // stop
         stream.value.getAudioTracks().forEach((track: MediaStreamTrack) => track.stop());
         stream.value = null;
     }
+}
+
+// check if Local Storage is available
+try {
+    localStorage.setItem('testing local storage', 'test');
+    localStorage.removeItem('testing local storage');
+    isLocalStorageAcessible = true;
+} catch (e) {
+    console.log('Local storage is not available');
 }
 </script>
 

@@ -26,6 +26,7 @@ SET default_table_access_method = heap;
 
 CREATE TABLE public.performance (
     id bigint NOT NULL,
+    nano_id character varying(21),
     notes_count integer,
     notes_encoding smallint DEFAULT '0'::smallint,
     notes bytea,

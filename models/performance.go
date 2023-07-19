@@ -20,26 +20,28 @@ const (
 // It is used to store and retrieve Performances from the database.
 // Use the Encode and Decode methods to convert between RawPerformance and Performance.
 type RawPerformance struct {
-	ID            int64         `db:"id"`
-	CreatedAt     time.Time     `db:"created_at"`
-	UpdatedAt     time.Time     `db:"updated_at"`
-	NotesCount    int           `db:"notes_count"`
-	NotesEncoding NotesEncoding `db:"notes_encoding"`
-	Notes         []byte        `db:"notes"`
+	ID            int64         `db:"id"`             // The database ID of the performance (do not expose to users!).
+	NanoID        string        `db:"nano_id"`        // NanoID is the user-facing ID of the performance, generated using Go Nanoid.
+	CreatedAt     time.Time     `db:"created_at"`     //
+	UpdatedAt     time.Time     `db:"updated_at"`     //
+	NotesCount    int           `db:"notes_count"`    // NotesCount is the number of notes in the performance.
+	NotesEncoding NotesEncoding `db:"notes_encoding"` // NotesEncoding is the encoding used for the Notes field.
+	Notes         []byte        `db:"notes"`          // Notes is the encoded notes, see the documentation of Decode for more details.
 }
 
 // Performance is the full representation of a player's stats and notes played during a play session.
 type Performance struct {
-	ID        int64     `json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Notes     []Note    `json:"notes"`
+	ID        int64     `json:"-"`          // The database ID of the performance (do not expose to users!).
+	NanoID    string    `json:"id"`         // NanoID is the user-facing ID of the performance, generated using Go Nanoid.
+	CreatedAt time.Time `json:"created_at"` //
+	UpdatedAt time.Time `json:"updated_at"` //
+	Notes     []Note    `json:"notes"`      // Notes is the list of notes played during the performance.
 }
 
 type Note struct {
-	At       int32  `json:"at"`
-	Duration int32  `json:"duration"`
-	Value    string `json:"value"`
+	At       int32  `json:"at"`       // At is the offset of the note's start from the beginning of the performance, in milliseconds.
+	Duration int32  `json:"duration"` // Duration is the duration of the note, in milliseconds.
+	Value    string `json:"value"`    // Human-readable representation of the note (e.g. "C#", "D", "Fb", etc.)
 }
 
 func (p RawPerformance) TableName() string {

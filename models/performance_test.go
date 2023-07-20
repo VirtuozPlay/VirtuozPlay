@@ -10,6 +10,7 @@ func (ms *ModelSuite) Test_decodeEncodeAllNotes() {
 	ms.NoError(err)
 
 	ms.Assert().Equal(int64(1), perf.ID)
+	ms.Assert().Equal("test-1", perf.NanoID)
 	ms.Assert().Equal(rawPerf.CreatedAt, perf.CreatedAt)
 	ms.Assert().Equal(rawPerf.UpdatedAt, perf.UpdatedAt)
 	ms.Assert().Equal(Base64Notes, rawPerf.NotesEncoding)
@@ -37,11 +38,13 @@ func (ms *ModelSuite) Test_decodeEncodeAllNotes() {
 		{At: 0, Duration: 4153, Value: "G#"},
 		{At: 0, Duration: 8239, Value: "Gb"},
 	}, perf.Notes)
+	ms.Assert().Emptyf(perf.Validate(), "Performance 'test-1' should be valid")
 
 	reEncoded := perf.Encode()
 
 	ms.Assert().NotEqualf(&rawPerf.Notes, &reEncoded.Notes, "Notes should have been re-encoded")
 	ms.Assert().Equal(rawPerf.ID, reEncoded.ID)
+	ms.Assert().Equal(rawPerf.NanoID, reEncoded.NanoID)
 	ms.Assert().Equal(rawPerf.CreatedAt, reEncoded.CreatedAt)
 	ms.Assert().Equal(rawPerf.UpdatedAt, reEncoded.UpdatedAt)
 	ms.Assert().Equal(BinaryNotes, reEncoded.NotesEncoding)
@@ -119,4 +122,71 @@ func (ms *ModelSuite) Test_decodeNotesWrongCount() {
 
 	ms.Error(tooMuchData)
 	ms.NoError(notEnoughData) // This is a warning and not an error
+}
+
+func (ms *ModelSuite) Test_validatePerformance() {
+	perf := Performance{
+		ID:     42,
+		NanoID: "test-42",
+		Notes: []Note{
+			{At: 0, Duration: 128, Value: "A"},      // valid
+			{At: -42, Duration: 128, Value: "A"},    // invalid, negative `At`
+			{At: 0, Duration: 128, Value: "A"},      // valid
+			{At: 0, Duration: -128, Value: "A"},     // invalid, negative `Duration`
+			{At: 0, Duration: 128, Value: "A"},      // valid
+			{At: 0, Duration: 128, Value: ""},       // invalid, empty `Value`
+			{At: 0, Duration: 128, Value: "Abb"},    // invalid, value too long
+			{At: 0, Duration: 128, Value: "Csharp"}, // invalid, value too long again
+			{At: 0, Duration: 128, Value: "@"},      // invalid, letter before 'A'
+			{At: 0, Duration: 128, Value: "H"},      // invalid, letter after 'G'
+			{At: 0, Duration: 128, Value: "Ab"},     // valid
+			{At: 0, Duration: 128, Value: "D#"},     // valid
+			{At: 0, Duration: 128, Value: "D!"},     // invalid, bad modifier
+		},
+	}
+
+	ms.Assert().Len(perf.Validate(), 8, "Performance should have exactly 8 validation errors")
+}
+
+func (ms *ModelSuite) Test_validatePerformanceTooManyErrors() {
+	badNote := Note{At: -42, Duration: -128, Value: "..."}
+	notes := make([]Note, 100)
+
+	for i := range notes {
+		notes[i] = badNote
+	}
+	perf := Performance{
+		ID:     84,
+		NanoID: "test-84",
+		Notes:  notes,
+	}
+	ms.Assert().Len(perf.Validate(), NoteValidationLimit+1)
+}
+
+func (ms *ModelSuite) Test_normalizePerformance() {
+	perf := Performance{
+		ID:     21,
+		NanoID: "test-21",
+		Notes: []Note{
+			{At: 999, Duration: 128, Value: "A"},
+			{At: 10, Duration: 32, Value: "A"},
+			{At: 10, Duration: 128, Value: "D"},
+			{At: 10, Duration: 64, Value: "C"},
+			{At: 10, Duration: 128, Value: "Db"},
+			{At: 10, Duration: 128, Value: "B"},
+		},
+	}
+
+	ms.Assert().Emptyf(perf.Validate(), "Performance 'test-21' should be valid before normalizing")
+	perf.Normalize()
+	ms.Assert().Emptyf(perf.Validate(), "Performance 'test-21' should be valid after normalizing")
+
+	ms.Assert().Equal([]Note{
+		{At: 10, Duration: 32, Value: "A"},
+		{At: 10, Duration: 64, Value: "C"},
+		{At: 10, Duration: 128, Value: "B"},
+		{At: 10, Duration: 128, Value: "D"},
+		{At: 10, Duration: 128, Value: "Db"},
+		{At: 999, Duration: 128, Value: "A"},
+	}, perf.Notes)
 }

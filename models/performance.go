@@ -3,9 +3,12 @@ package models
 import (
 	"bytes"
 	"encoding/base64"
+	"fmt"
 	"github.com/go-interpreter/wagon/wasm/leb128"
 	log "github.com/sirupsen/logrus"
 	"io"
+	"sort"
+	"strings"
 	"time"
 )
 
@@ -31,17 +34,17 @@ type RawPerformance struct {
 
 // Performance is the full representation of a player's stats and notes played during a play session.
 type Performance struct {
-	ID        int64     `json:"-"`          // The database ID of the performance (do not expose to users!).
-	NanoID    string    `json:"id"`         // NanoID is the user-facing ID of the performance, generated using Go Nanoid.
-	CreatedAt time.Time `json:"created_at"` //
-	UpdatedAt time.Time `json:"updated_at"` //
-	Notes     []Note    `json:"notes"`      // Notes is the list of notes played during the performance.
+	ID        int64     // The database ID of the performance (do not expose to users!).
+	NanoID    string    // NanoID is the user-facing ID of the performance, generated using Go Nanoid.
+	CreatedAt time.Time //
+	UpdatedAt time.Time //
+	Notes     []Note    // Notes is the list of notes played during the performance.
 }
 
 type Note struct {
-	At       int32  `json:"at"`       // At is the offset of the note's start from the beginning of the performance, in milliseconds.
-	Duration int32  `json:"duration"` // Duration is the duration of the note, in milliseconds.
-	Value    string `json:"value"`    // Human-readable representation of the note (e.g. "C#", "D", "Fb", etc.)
+	At       int32  // At is the offset of the note's start from the beginning of the performance, in milliseconds.
+	Duration int32  // Duration is the duration of the note, in milliseconds.
+	Value    string // Human-readable representation of the note (e.g. "C#", "D", "Fb", etc.)
 }
 
 func (p RawPerformance) TableName() string {
@@ -61,6 +64,7 @@ func (p *RawPerformance) Decode() (*Performance, error) {
 	}
 	return &Performance{
 		ID:        p.ID,
+		NanoID:    p.NanoID,
 		CreatedAt: p.CreatedAt,
 		UpdatedAt: p.UpdatedAt,
 		Notes:     notes,
@@ -68,10 +72,11 @@ func (p *RawPerformance) Decode() (*Performance, error) {
 }
 
 // Encode converts a Performance into a RawPerformance.
-func (p *Performance) Encode() RawPerformance {
+func (p *Performance) Encode() *RawPerformance {
 	encoding := BinaryNotes
-	return RawPerformance{
+	return &RawPerformance{
 		ID:            p.ID,
+		NanoID:        p.NanoID,
 		CreatedAt:     p.CreatedAt,
 		UpdatedAt:     p.UpdatedAt,
 		NotesCount:    len(p.Notes),
@@ -231,4 +236,70 @@ func (encoding NotesEncoding) encodeBytes(from []byte) []byte {
 	default:
 		return from
 	}
+}
+
+// NoteValidationLimit is the maximum number of errors returned by the Normalize function.
+const NoteValidationLimit int = 20
+
+// Validate checks for invalid notes (notes with negative duration or start time, invalid values, etc.)
+// The function returns a slice of errors, where each error corresponds to a single invalid note.
+// If the number of errors exceeds the NoteValidationLimit,
+// the validation stops and the function appends an error indicating the limit has been reached.
+func (p *Performance) Validate() []error {
+	errors := make([]error, 0)
+	for i, note := range p.Notes {
+		if err := note.validate(i); err != nil {
+			errors = append(errors, err)
+		}
+		if len(errors) >= NoteValidationLimit {
+			errors = append(errors, fmt.Errorf("too many errors, aborting"))
+			break
+		}
+	}
+	return errors
+}
+
+func (n *Note) validate(i int) error {
+	if n.At < 0 {
+		return fmt.Errorf("invalid note at index %v: negative start time (%v)", i, n.At)
+	}
+	if n.Duration < 0 {
+		return fmt.Errorf("invalid note at index %v: negative duration (%v)", i, n.Duration)
+	}
+	if len(n.Value) == 0 {
+		return fmt.Errorf("invalid note at index %v: empty value", i)
+	}
+	if len(n.Value) > 2 {
+		return fmt.Errorf("invalid note at index %v: invalid value (%v)", i, n.Value)
+	}
+	if n.Value[0] < 'A' || n.Value[0] > 'G' {
+		return fmt.Errorf("invalid note at index %v: invalid note letter (%v)", i, n.Value)
+	}
+	if len(n.Value) == 2 {
+		if n.Value[1] != '#' && n.Value[1] != 'b' {
+			return fmt.Errorf("invalid note at index %v: invalid note modifier (%v)", i, n.Value)
+		}
+	}
+	return nil
+}
+
+// Normalize attempts to normalize the performance's data by sorting the notes by their start time.
+func (p *Performance) Normalize() {
+	// Sort notes in ascending order according to the compareNotes function.
+	sort.Slice(p.Notes, func(i, j int) bool {
+		return compareNotes(p.Notes[i], p.Notes[j]) < 0
+	})
+}
+
+func compareNotes(a, b Note) int {
+	// 1. compare start time
+	if a.At != b.At {
+		return int(a.At - b.At)
+	}
+	// 2. compare duration
+	if a.Duration != b.Duration {
+		return int(a.Duration - b.Duration)
+	}
+	// 3. compare value
+	return strings.Compare(a.Value, b.Value)
 }

@@ -13,7 +13,7 @@ updated_at = "<%= now() %>"
 notes_count = 21
 notes_encoding = 1 # Base64 encoding
 # Notes are encoded as base64 because TOML does not support binary data
-notes = "AO8XAAD3GggAoCUQAN8GAQDtEAkAqAcRAMIkAgDAFgoAlUASAJE2AwDtFgsAkwkTAJMkBADSGAwArkIUAPQjBQDPPA0Avy0VAOYWBgC5IA4Ar0AW"
+notes = "AN8GAQCoBxEAkwkTAO0QCQDAFgoA5hYGAO0WCwDvFwAA0hgMAPcaCAC5IA4A9CMFAJMkBADCJAIAoCUQAL8tFQCRNgMAzzwNAJVAEgCvQBYArkIU"
 
 [[scenario]]
 # Purposly badly encoded performance

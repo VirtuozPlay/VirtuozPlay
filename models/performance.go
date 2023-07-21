@@ -5,6 +5,9 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/go-interpreter/wagon/wasm/leb128"
+	"github.com/gobuffalo/pop/v6"
+	"github.com/gobuffalo/validate/v3"
+	"github.com/gobuffalo/validate/v3/validators"
 	log "github.com/sirupsen/logrus"
 	"io"
 	"sort"
@@ -19,74 +22,96 @@ const (
 	Base64Notes NotesEncoding = iota
 )
 
-// RawPerformance is the compact representation of a Performance.
+// Performance is the compact representation of a Performance.
 // It is used to store and retrieve Performances from the database.
-// Use the Encode and Decode methods to convert between RawPerformance and Performance.
-type RawPerformance struct {
+// Use the Encode and Decode methods to convert between Performance and Performance.
+type Performance struct {
 	ID            int64         `db:"id"`             // The database ID of the performance (do not expose to users!).
 	NanoID        string        `db:"nano_id"`        // NanoID is the user-facing ID of the performance, generated using Go Nanoid.
 	CreatedAt     time.Time     `db:"created_at"`     //
 	UpdatedAt     time.Time     `db:"updated_at"`     //
+	Notes         []Note        `db:"-"`              // Notes is the list of notes played during the performance.
 	NotesCount    int           `db:"notes_count"`    // NotesCount is the number of notes in the performance.
-	NotesEncoding NotesEncoding `db:"notes_encoding"` // NotesEncoding is the encoding used for the Notes field.
-	Notes         []byte        `db:"notes"`          // Notes is the encoded notes, see the documentation of Decode for more details.
-}
-
-// Performance is the full representation of a player's stats and notes played during a play session.
-type Performance struct {
-	ID        int64     // The database ID of the performance (do not expose to users!).
-	NanoID    string    // NanoID is the user-facing ID of the performance, generated using Go Nanoid.
-	CreatedAt time.Time //
-	UpdatedAt time.Time //
-	Notes     []Note    // Notes is the list of notes played during the performance.
+	NotesEncoding NotesEncoding `db:"notes_encoding"` // NotesEncoding is the encoding used for the EncodedNotes field.
+	EncodedNotes  []byte        `db:"notes"`          // EncodedNotes is the encoded notes, see the documentation of Decode for more details.
 }
 
 type Note struct {
-	At       int32  // At is the offset of the note's start from the beginning of the performance, in milliseconds.
+	At       int32  // At is the offset of th:wre note's start from the beginning of the performance, in milliseconds.
 	Duration int32  // Duration is the duration of the note, in milliseconds.
 	Value    string // Human-readable representation of the note (e.g. "C#", "D", "Fb", etc.)
 }
 
-func (p RawPerformance) TableName() string {
+func (p Performance) TableName() string {
 	return "performance"
 }
 
-// Decode converts a RawPerformance into a Performance.
+const performanceNotesValidatorName = "performance_notes"
+
+func (p *Performance) Validate(*pop.Connection) (*validate.Errors, error) {
+	return validate.Validate(
+		&validators.StringIsPresent{Name: "performance_id", Field: p.NanoID, Message: "performance ID is required"},
+		&NotesAreValid{Name: performanceNotesValidatorName, Field: p.Notes},
+	), nil
+}
+
+func (p *Performance) BeforeSave(*pop.Connection) error {
+	p.encode()
+	return nil
+}
+
+func (p *Performance) AfterCreate(*pop.Connection) error {
+	return p.decode()
+}
+
+func (p *Performance) AfterUpdate(*pop.Connection) error {
+	return p.decode()
+}
+
+func (p *Performance) AfterFind(*pop.Connection) error {
+	return p.decode()
+}
+
+func (p *Performance) encode() {
+	p.NotesCount = len(p.Notes)
+	p.NotesEncoding = BinaryNotes
+	sort.Slice(p.Notes, func(i, j int) bool {
+		return compareNotes(p.Notes[i], p.Notes[j]) < 0
+	})
+	p.EncodedNotes = encodeNotes(p.Notes, p.NotesEncoding)
+}
+
+func compareNotes(a, b Note) int {
+	// 1. compare start time
+	if a.At != b.At {
+		return int(a.At - b.At)
+	}
+	// 2. compare duration
+	if a.Duration != b.Duration {
+		return int(a.Duration - b.Duration)
+	}
+	// 3. compare value
+	return strings.Compare(a.Value, b.Value)
+}
+
+func (p *Performance) decode() error {
+	notes, err := decodeNotes(p.EncodedNotes, p.NotesCount, p.NotesEncoding)
+	if err != nil {
+		return err
+	}
+	sort.Slice(notes, func(i, j int) bool {
+		return compareNotes(notes[i], notes[j]) < 0
+	})
+	p.Notes = notes
+	return nil
+}
+
+// decodeNotes converts a Performance into a Performance.
 //
-// Notes are encoded as a slice of bytes, where each note is encoded as follows:
+// EncodedNotes are encoded as a slice of bytes, where each note is encoded as follows:
 // - The `at` field is encoded as a LEB128 unsigned integer.
 // - The `duration` field is encoded as a LEB128 unsigned integer.
 // - The `value` is a single byte, the low 3 bits of which are the letter, and the high 2 bits are the modifier (see decodeNote()).
-func (p *RawPerformance) Decode() (*Performance, error) {
-	notes, err := decodeNotes(p.Notes, p.NotesCount, p.NotesEncoding)
-	if err != nil {
-		return nil, err
-	}
-	return &Performance{
-		ID:        p.ID,
-		NanoID:    p.NanoID,
-		CreatedAt: p.CreatedAt,
-		UpdatedAt: p.UpdatedAt,
-		Notes:     notes,
-	}, nil
-}
-
-// Encode converts a Performance into a RawPerformance.
-func (p *Performance) Encode() *RawPerformance {
-	encoding := BinaryNotes
-	return &RawPerformance{
-		ID:            p.ID,
-		NanoID:        p.NanoID,
-		CreatedAt:     p.CreatedAt,
-		UpdatedAt:     p.UpdatedAt,
-		NotesCount:    len(p.Notes),
-		NotesEncoding: encoding,
-		Notes:         encodeNotes(p.Notes, encoding),
-	}
-}
-
-// decodeNotes decodes a slice of bytes into a slice of `count` notes.
-// The encoding parameter specifies the representation of the notes in the bytes slice.
 func decodeNotes(notes []byte, count int, encoding NotesEncoding) ([]Note, error) {
 	n, err := encoding.decodeBytes(notes)
 
@@ -238,68 +263,60 @@ func (encoding NotesEncoding) encodeBytes(from []byte) []byte {
 	}
 }
 
-// NoteValidationLimit is the maximum number of errors returned by the Normalize function.
-const NoteValidationLimit int = 20
+// NotesAreValid is a validator that can be passed to the `validate.Validate` function.
+// It checks that all the notes are valid (i.e. that they have a positive duration, start time, etc.)
+type NotesAreValid struct {
+	Name  string
+	Field []Note
+	Limit uint
+}
 
-// Validate checks for invalid notes (notes with negative duration or start time, invalid values, etc.)
+// NoteValidationLimit is the maximum number of errors returned by the Normalize function.
+const NoteValidationLimit uint = 20
+
+// IsValid checks for invalid notes (notes with negative duration or start time, invalid values, etc.)
 // The function returns a slice of errors, where each error corresponds to a single invalid note.
-// If the number of errors exceeds the NoteValidationLimit,
+// If the number of errors exceeds Limit (by default: NoteValidationLimit),
 // the validation stops and the function appends an error indicating the limit has been reached.
-func (p *Performance) Validate() []error {
-	errors := make([]error, 0)
-	for i, note := range p.Notes {
-		if err := note.validate(i); err != nil {
-			errors = append(errors, err)
+func (v *NotesAreValid) IsValid(errors *validate.Errors) {
+	if v.Limit == 0 {
+		v.Limit = NoteValidationLimit
+	}
+
+	count := uint(0)
+	errorKey := validators.GenerateKey(v.Name)
+	for i, note := range v.Field {
+		if msg := note.validate(i); msg != "" {
+			errors.Add(errorKey, msg)
+			count++
 		}
-		if len(errors) >= NoteValidationLimit {
-			errors = append(errors, fmt.Errorf("too many errors, aborting"))
+		if count >= v.Limit {
+			errors.Add(errorKey, fmt.Sprintf("too many errors, aborting"))
 			break
 		}
 	}
-	return errors
 }
 
-func (n *Note) validate(i int) error {
+func (n *Note) validate(i int) string {
 	if n.At < 0 {
-		return fmt.Errorf("invalid note at index %v: negative start time (%v)", i, n.At)
+		return fmt.Sprintf("invalid note at index %v: negative start time (%v)", i, n.At)
 	}
 	if n.Duration < 0 {
-		return fmt.Errorf("invalid note at index %v: negative duration (%v)", i, n.Duration)
+		return fmt.Sprintf("invalid note at index %v: negative duration (%v)", i, n.Duration)
 	}
 	if len(n.Value) == 0 {
-		return fmt.Errorf("invalid note at index %v: empty value", i)
+		return fmt.Sprintf("invalid note at index %v: empty value", i)
 	}
 	if len(n.Value) > 2 {
-		return fmt.Errorf("invalid note at index %v: invalid value (%v)", i, n.Value)
+		return fmt.Sprintf("invalid note at index %v: invalid value (%v)", i, n.Value)
 	}
 	if n.Value[0] < 'A' || n.Value[0] > 'G' {
-		return fmt.Errorf("invalid note at index %v: invalid note letter (%v)", i, n.Value)
+		return fmt.Sprintf("invalid note at index %v: invalid note letter (%v)", i, n.Value)
 	}
 	if len(n.Value) == 2 {
 		if n.Value[1] != '#' && n.Value[1] != 'b' {
-			return fmt.Errorf("invalid note at index %v: invalid note modifier (%v)", i, n.Value)
+			return fmt.Sprintf("invalid note at index %v: invalid note modifier (%v)", i, n.Value)
 		}
 	}
-	return nil
-}
-
-// Normalize attempts to normalize the performance's data by sorting the notes by their start time.
-func (p *Performance) Normalize() {
-	// Sort notes in ascending order according to the compareNotes function.
-	sort.Slice(p.Notes, func(i, j int) bool {
-		return compareNotes(p.Notes[i], p.Notes[j]) < 0
-	})
-}
-
-func compareNotes(a, b Note) int {
-	// 1. compare start time
-	if a.At != b.At {
-		return int(a.At - b.At)
-	}
-	// 2. compare duration
-	if a.Duration != b.Duration {
-		return int(a.Duration - b.Duration)
-	}
-	// 3. compare value
-	return strings.Compare(a.Value, b.Value)
+	return ""
 }

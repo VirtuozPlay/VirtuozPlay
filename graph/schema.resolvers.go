@@ -6,15 +6,68 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"virtuozplay/graph/model"
+	db "virtuozplay/models"
+
+	gonanoid "github.com/matoous/go-nanoid/v2"
 )
+
+// CreatePerformance is the resolver for the createPerformance field.
+func (r *mutationResolver) CreatePerformance(ctx context.Context, author *string, notes []*model.NoteInput) (*model.Performance, error) {
+	notesValues := make([]db.Note, len(notes))
+
+	for i, note := range notes {
+		notesValues[i] = db.Note{
+			At:       int32(note.At),
+			Duration: int32(note.Duration),
+			Value:    note.Value,
+		}
+	}
+
+	var err error
+	var nanoId string
+
+	if nanoId, err = gonanoid.New(); err != nil {
+		panic(fmt.Errorf("failed to generate nanoid: %w", err))
+	}
+
+	performance := &db.Performance{
+		NanoID: nanoId,
+		Notes:  notesValues,
+	}
+	if err = WrapValidationErrors(r.DB.ValidateAndCreate(performance)); err != nil {
+		return nil, err
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return ToGraphQLPerformance(performance)
+}
 
 // VirtuozPlay is the resolver for the virtuozPlay field.
 func (r *queryResolver) VirtuozPlay(ctx context.Context) (*model.VirtuozPlay, error) {
 	return &model.VirtuozPlay{Version: "0.1.0"}, nil
 }
 
+// Performance is the resolver for the performance field.
+func (r *queryResolver) Performance(ctx context.Context, id string) (*model.Performance, error) {
+	var err error
+	performance := &db.Performance{}
+
+	query := r.DB.Where("nano_id = ?", id)
+	if err = query.First(performance); err != nil {
+		return nil, fmt.Errorf("performance %v not found", id)
+	}
+	return ToGraphQLPerformance(performance)
+}
+
+// Mutation returns MutationResolver implementation.
+func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
+
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

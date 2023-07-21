@@ -4,4 +4,10 @@ package graph
 //
 // It serves as dependency injection for your app, add any dependencies you require here.
 
-type Resolver struct{}
+import (
+	"github.com/gobuffalo/pop/v6"
+)
+
+type Resolver struct {
+	DB *pop.Connection
+}

@@ -4,15 +4,53 @@
 
 schema {
   query: Query
+  mutation: Mutation
 }
 
 "The @defer directive may be specified on a fragment spread to imply de-prioritization, that causes the fragment to be omitted in the initial response, and delivered as a subsequent response afterward. A query with @defer directive will cause the request to potentially return multiple responses, where non-deferred data is delivered in the initial response and data deferred delivered in a subsequent response. @include and @skip take precedence over @defer."
 directive @defer(if: Boolean = true, label: String) on FRAGMENT_SPREAD | INLINE_FRAGMENT
 
+"The root query type."
 type Query {
   virtuozPlay: VirtuozPlay!
+  "Retrieve a performance by its ID."
+  performance(id: ID!): Performance
 }
 
 type VirtuozPlay {
   version: String!
+}
+
+type Performance {
+  id: ID!
+  author: ID
+  createdAt: String
+  "The total duration of the performance, in milliseconds."
+  duration: Int!
+  "An array of *all* notes in the performance, sorted by their start time."
+  notes: [Note!]!
+}
+
+type Note {
+  "The offset of the note's start from the beginning of the performance, in milliseconds."
+  at: Int!
+  "The duration of the note, in milliseconds."
+  duration: Int!
+  "Human-readable representation of the note (e.g. 'C#', 'D', 'Fb', etc.)"
+  value: String!
+}
+
+"The root mutation type."
+type Mutation {
+  "Create a new performance."
+  createPerformance(author: ID, notes: [NoteInput!]!): Performance!
+}
+
+input NoteInput {
+  "The offset of the note's start from the beginning of the performance, in milliseconds."
+  at: Int!
+  "The duration of the note, in milliseconds."
+  duration: Int!
+  "Human-readable representation of the note (e.g. 'C#', 'D', 'Fb', etc.)"
+  value: String!
 }

@@ -19,6 +19,7 @@ require (
 	github.com/gobuffalo/pop/v6 v6.1.1
 	github.com/gobuffalo/suite/v4 v4.0.4
 	github.com/gobuffalo/tags/v3 v3.1.4
+	github.com/matoous/go-nanoid/v2 v2.0.0
 	github.com/rs/cors v1.9.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/unrolled/secure v1.13.0

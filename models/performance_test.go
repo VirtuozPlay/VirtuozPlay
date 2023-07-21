@@ -1,64 +1,85 @@
 package models
 
+import "github.com/gobuffalo/pop/v6"
+
+// Tests that Performance implements the required interfaces
+func (ms *ModelSuite) Test_performanceInterfaceImplementations() {
+	ms.Implements((*pop.TableNameAble)(nil), &Performance{})
+	ms.Implements((*pop.BeforeSaveable)(nil), &Performance{})
+	ms.Implements((*pop.AfterCreateable)(nil), &Performance{})
+	ms.Implements((*pop.AfterUpdateable)(nil), &Performance{})
+	ms.Implements((*pop.AfterFindable)(nil), &Performance{})
+}
+
 func (ms *ModelSuite) Test_decodeEncodeAllNotes() {
 	ms.LoadFixture("performance_all_possible_notes")
 
-	var rawPerf RawPerformance
-	ms.NoError(ms.Model.DB.First(&rawPerf))
+	var perf Performance
+	ms.NoError(ms.Model.DB.First(&perf))
 
-	perf, err := rawPerf.Decode()
-	ms.NoError(err)
+	ms.Equal(int64(1), perf.ID)
+	ms.Equal("test-1", perf.NanoID)
+	ms.Equal(Base64Notes, perf.NotesEncoding)
+	ms.Equal(21, len(perf.Notes))
 
-	ms.Assert().Equal(int64(1), perf.ID)
-	ms.Assert().Equal("test-1", perf.NanoID)
-	ms.Assert().Equal(rawPerf.CreatedAt, perf.CreatedAt)
-	ms.Assert().Equal(rawPerf.UpdatedAt, perf.UpdatedAt)
-	ms.Assert().Equal(Base64Notes, rawPerf.NotesEncoding)
-	ms.Assert().Equal(21, len(perf.Notes))
-	ms.Assert().Equal([]Note{
-		{At: 0, Duration: 3055, Value: "A"},
-		{At: 0, Duration: 3447, Value: "A#"},
-		{At: 0, Duration: 4768, Value: "Ab"},
+	expectedNotes := []Note{
 		{At: 0, Duration: 863, Value: "B"},
-		{At: 0, Duration: 2157, Value: "B#"},
 		{At: 0, Duration: 936, Value: "Bb"},
-		{At: 0, Duration: 4674, Value: "C"},
-		{At: 0, Duration: 2880, Value: "C#"},
-		{At: 0, Duration: 8213, Value: "Cb"},
-		{At: 0, Duration: 6929, Value: "D"},
-		{At: 0, Duration: 2925, Value: "D#"},
 		{At: 0, Duration: 1171, Value: "Db"},
-		{At: 0, Duration: 4627, Value: "E"},
-		{At: 0, Duration: 3154, Value: "E#"},
-		{At: 0, Duration: 8494, Value: "Eb"},
-		{At: 0, Duration: 4596, Value: "F"},
-		{At: 0, Duration: 7759, Value: "F#"},
-		{At: 0, Duration: 5823, Value: "Fb"},
+		{At: 0, Duration: 2157, Value: "B#"},
+		{At: 0, Duration: 2880, Value: "C#"},
 		{At: 0, Duration: 2918, Value: "G"},
+		{At: 0, Duration: 2925, Value: "D#"},
+		{At: 0, Duration: 3055, Value: "A"},
+		{At: 0, Duration: 3154, Value: "E#"},
+		{At: 0, Duration: 3447, Value: "A#"},
 		{At: 0, Duration: 4153, Value: "G#"},
+		{At: 0, Duration: 4596, Value: "F"},
+		{At: 0, Duration: 4627, Value: "E"},
+		{At: 0, Duration: 4674, Value: "C"},
+		{At: 0, Duration: 4768, Value: "Ab"},
+		{At: 0, Duration: 5823, Value: "Fb"},
+		{At: 0, Duration: 6929, Value: "D"},
+		{At: 0, Duration: 7759, Value: "F#"},
+		{At: 0, Duration: 8213, Value: "Cb"},
 		{At: 0, Duration: 8239, Value: "Gb"},
-	}, perf.Notes)
-	ms.Assert().Emptyf(perf.Validate(), "Performance 'test-1' should be valid")
+		{At: 0, Duration: 8494, Value: "Eb"},
+	}
 
-	reEncoded := perf.Encode()
+	ms.Equal(expectedNotes, perf.Notes)
+	validationErrs, err := perf.Validate(ms.Model.DB)
+	ms.NoErrorf(err, "Performance 'test-1' should be valid")
+	ms.Falsef(validationErrs.HasAny(), "Performance 'test-1' should be valid, got errors: %v", validationErrs.Error())
 
-	ms.Assert().NotEqualf(&rawPerf.Notes, &reEncoded.Notes, "Notes should have been re-encoded")
-	ms.Assert().Equal(rawPerf.ID, reEncoded.ID)
-	ms.Assert().Equal(rawPerf.NanoID, reEncoded.NanoID)
-	ms.Assert().Equal(rawPerf.CreatedAt, reEncoded.CreatedAt)
-	ms.Assert().Equal(rawPerf.UpdatedAt, reEncoded.UpdatedAt)
-	ms.Assert().Equal(BinaryNotes, reEncoded.NotesEncoding)
-	ms.Assert().Equal(rawPerf.Notes, Base64Notes.encodeBytes(reEncoded.Notes))
+	base64EncodedNotes := perf.EncodedNotes
+	perf.encode()
+
+	ms.NotEqualf(perf.EncodedNotes, base64EncodedNotes, "EncodedNotes should have been re-encoded")
+	ms.Equal(BinaryNotes, perf.NotesEncoding)
+	ms.Equal(base64EncodedNotes, Base64Notes.encodeBytes(perf.EncodedNotes))
 }
 
 func (ms *ModelSuite) Test_badPerfEncoding() {
 	ms.LoadFixture("performance_bad_encoding")
+	var perf Performance
+	ms.Error(ms.Model.DB.First(&perf))
+}
 
-	var rawPerf RawPerformance
-	ms.NoError(ms.Model.DB.First(&rawPerf))
+func (ms *ModelSuite) Test_createPerformance() {
+	perf := Performance{
+		ID:     12,
+		NanoID: "test-12",
+		Notes:  []Note{{At: 0, Duration: 128, Value: "A"}},
+	}
+	validationErrs, err := ms.DB.ValidateAndCreate(&perf)
+	ms.NoError(err)
+	ms.False(validationErrs.HasAny())
 
-	_, err := rawPerf.Decode()
-	ms.Error(err)
+	perf.NanoID = "test-12-updated"
+
+	validationErrs, err = ms.DB.ValidateAndUpdate(&perf)
+	ms.NoError(err)
+	ms.False(validationErrs.HasAny())
 }
 
 func (ms *ModelSuite) Test_decodeBinaryNotes() {
@@ -70,9 +91,9 @@ func (ms *ModelSuite) Test_decodeBinaryNotes() {
 	ms.NoError(err2, "'Db' note decoding failed")
 	ms.NoError(err3, "'C#' note decoding failed")
 
-	ms.Assert().Equal([]Note{{At: 0, Duration: 128, Value: "A"}}, noteA)
-	ms.Assert().Equal([]Note{{At: 173, Duration: 87123, Value: "Db"}}, noteDb)
-	ms.Assert().Equal([]Note{{At: 200, Duration: 15, Value: "C#"}}, noteCs)
+	ms.Equal([]Note{{At: 0, Duration: 128, Value: "A"}}, noteA)
+	ms.Equal([]Note{{At: 173, Duration: 87123, Value: "Db"}}, noteDb)
+	ms.Equal([]Note{{At: 200, Duration: 15, Value: "C#"}}, noteCs)
 }
 
 // Tests the base64 decoding of notes
@@ -86,9 +107,9 @@ func (ms *ModelSuite) Test_decodeBase64Notes() {
 	ms.NoError(err2, "'Db' note decoding failed")
 	ms.NoError(err3, "'C#' note decoding failed")
 
-	ms.Assert().Equal([]Note{{At: 0, Duration: 128, Value: "A"}}, noteA)
-	ms.Assert().Equal([]Note{{At: 173, Duration: 87123, Value: "Db"}}, noteDb)
-	ms.Assert().Equal([]Note{{At: 200, Duration: 15, Value: "C#"}}, noteCs)
+	ms.Equal([]Note{{At: 0, Duration: 128, Value: "A"}}, noteA)
+	ms.Equal([]Note{{At: 173, Duration: 87123, Value: "Db"}}, noteDb)
+	ms.Equal([]Note{{At: 200, Duration: 15, Value: "C#"}}, noteCs)
 
 	ms.Error(notBase64)
 }
@@ -98,9 +119,9 @@ func (ms *ModelSuite) Test_encodeBase64Notes() {
 	noteDb := string(encodeNotes([]Note{{At: 173, Duration: 87123, Value: "Db"}}, Base64Notes))
 	noteCs := string(encodeNotes([]Note{{At: 200, Duration: 15, Value: "C#"}}, Base64Notes))
 
-	ms.Assert().Equal("AIABAA==", noteA)
-	ms.Assert().Equal("rQHTqAUT", noteDb)
-	ms.Assert().Equal("yAEPCg==", noteCs)
+	ms.Equal("AIABAA==", noteA)
+	ms.Equal("rQHTqAUT", noteDb)
+	ms.Equal("yAEPCg==", noteCs)
 }
 
 // Tests that the decoder returns an error when the notes are truncated
@@ -145,7 +166,11 @@ func (ms *ModelSuite) Test_validatePerformance() {
 		},
 	}
 
-	ms.Assert().Len(perf.Validate(), 8, "Performance should have exactly 8 validation errors")
+	validationErrs, err := perf.Validate(ms.Model.DB)
+
+	ms.NoError(err)
+	ms.Equal(1, validationErrs.Count())
+	ms.Len(validationErrs.Get(performanceNotesValidatorName), 8, "Performance should have exactly 8 validation errors, got %v", validationErrs.Error())
 }
 
 func (ms *ModelSuite) Test_validatePerformanceTooManyErrors() {
@@ -160,7 +185,12 @@ func (ms *ModelSuite) Test_validatePerformanceTooManyErrors() {
 		NanoID: "test-84",
 		Notes:  notes,
 	}
-	ms.Assert().Len(perf.Validate(), NoteValidationLimit+1)
+
+	validationErrs, err := perf.Validate(ms.Model.DB)
+
+	ms.NoError(err)
+	ms.Equal(validationErrs.Count(), 1)
+	ms.Len(validationErrs.Get(performanceNotesValidatorName), int(NoteValidationLimit+1))
 }
 
 func (ms *ModelSuite) Test_normalizePerformance() {
@@ -177,11 +207,18 @@ func (ms *ModelSuite) Test_normalizePerformance() {
 		},
 	}
 
-	ms.Assert().Emptyf(perf.Validate(), "Performance 'test-21' should be valid before normalizing")
-	perf.Normalize()
-	ms.Assert().Emptyf(perf.Validate(), "Performance 'test-21' should be valid after normalizing")
+	validationErrs, err := perf.Validate(ms.Model.DB)
+	ms.NoError(err, "Performance 'test-21' should be valid before normalizing")
+	ms.False(validationErrs.HasAny(), "Performance 'test-21' should be valid before normalizing")
 
-	ms.Assert().Equal([]Note{
+	perf.encode()
+	ms.NoError(perf.decode())
+
+	validationErrs, err = perf.Validate(ms.Model.DB)
+	ms.NoError(err, "Performance 'test-21' should be valid after normalizing")
+	ms.False(validationErrs.HasAny(), "Performance 'test-21' should be valid after normalizing")
+
+	ms.Equal([]Note{
 		{At: 10, Duration: 32, Value: "A"},
 		{At: 10, Duration: 64, Value: "C"},
 		{At: 10, Duration: 128, Value: "B"},

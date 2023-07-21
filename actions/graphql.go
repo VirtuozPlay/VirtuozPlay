@@ -8,13 +8,16 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gobuffalo/buffalo"
 	"virtuozplay/graph"
+	"virtuozplay/models"
 )
 
 var srv *handler.Server
 
 func init() {
 	// Initialize the GraphQL server
-	srv = handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	srv = handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
+		DB: models.DB,
+	}}))
 
 	// Supported ways to submit queries
 	srv.AddTransport(transport.GRAPHQL{})

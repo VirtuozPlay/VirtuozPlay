@@ -25,6 +25,7 @@ func init() {
 	srv.AddTransport(transport.GET{})
 	srv.AddTransport(transport.POST{})
 	srv.AddTransport(transport.MultipartForm{})
+	srv.AddTransport(transport.Websocket{})
 
 	srv.SetQueryCache(lru.New(1000))
 

@@ -17,6 +17,7 @@ export default defineConfig({
             '^/profile$': 'http://127.0.0.1:3000',
             '^/stats$': 'http://127.0.0.1:3000',
             '^/graphql': {
+                ws: true,
                 target: 'http://127.0.0.1:3000',
                 changeOrigin: true,
             },

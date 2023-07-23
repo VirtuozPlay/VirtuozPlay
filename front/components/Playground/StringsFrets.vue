@@ -30,13 +30,13 @@ const props = defineProps(['isPosition']);
 
 .anim {
     animation-duration: 1s;
-    animation-name: tidou;
+    animation-name: changecolor;
     transform-origin: 50px 26px;
     animation-iteration-count: 1;
     fill: #33ff8c;
 }
 
-@keyframes tidou {
+@keyframes changecolor {
     0% {
         transform-origin: 40px 62px;
         fill: #f4a11a;

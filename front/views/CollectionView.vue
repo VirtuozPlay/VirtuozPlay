@@ -1,53 +1,41 @@
 <script setup lang="ts">
 import TextualButton from '@/components/inputs/TextualButton.vue';
 import { RouterLink } from 'vue-router';
+import GraphQL from '@/components/GraphQL.vue';
+import { GetSongDocument, GetSongQuery } from '@/gql/queries/GetSong';
+import type { QueryResult } from '@apollo/client';
+import { useRouter } from 'vue-router';
+import { useSongStore } from '@/store';
 
-interface Item {
-    imageUrl: string;
-    title: string;
-    song: string;
-    music: string;
-}
+const router = useRouter();
+const songstore = useSongStore();
 
-defineProps({
-    items: {
-        type: Array as () => Item[],
-        default: () => [
-            {
-                imageUrl: '../../images/jacques_offenbach.jpg',
-                title: 'Can Can',
-                song: 'cancan',
-            },
-            {
-                imageUrl: '../../images/sting.jpg',
-                title: 'Sting',
-                song: 'sting',
-            },
-            {
-                imageUrl: 'https://placehold.co/600x400?text=Hello+World2',
-                title: 'Alabama',
-                song: 'alabama',
-            },
-        ],
-    },
-});
+const handleClick = (song: any) => {
+    songstore.setCurrentSong(song);
+
+    router.push({
+        path: `/collection/${song?.title}`,
+    });
+};
 </script>
 
 <template>
-    <main title="collection section" class="mt-16 w-80vw mx-auto">
-        <div class="w-full text-center"><h1>Collection</h1></div>
-        <div v-for="(item, index) in items" :key="index" class="mx-auto grid grid-cols-2 gap-4">
-            <div class="col-span-1">
-                <h2 class="text-center mt-2">{{ item.title }}</h2>
-                <img :src="item.imageUrl" :alt="item.title" class="w-full" />
-            </div>
-            <div class="col-span-1">
-                <RouterLink :to="`/collection/${item.song}`">
-                    <TextualButton aria-label="example button G" hover-color="#FAFF00">
-                        Lancer {{ item.title }}
-                    </TextualButton>
-                </RouterLink>
-            </div>
-        </div>
-    </main>
+    <GraphQL :query="GetSongDocument">
+        <template #default="{ data }: QueryResult<GetSongQuery>">
+            <main v-if="data" title="collection section" class="mt-16 w-80vw mx-auto">
+                <div class="w-full text-center"><h1>Collection</h1></div>
+                <div v-for="(item, index) in data.songs" :key="index" class="mx-auto grid grid-cols-2 gap-4">
+                    <div class="col-span-1">
+                        <h2 class="text-center mt-2">{{ item?.title }}</h2>
+                        <img src="https://placehold.co/600x400?text=Hello+World2" :alt="item?.title" class="w-full" />
+                    </div>
+                    <div class="col-span-1">
+                        <TextualButton @click="handleClick(item)" aria-label="example button G" hover-color="#FAFF00">
+                            Lancer {{ item?.title }}
+                        </TextualButton>
+                    </div>
+                </div>
+            </main>
+        </template>
+    </GraphQL>
 </template>

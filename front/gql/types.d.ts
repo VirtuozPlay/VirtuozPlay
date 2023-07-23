@@ -17,17 +17,16 @@ export type Scalars = {
     Boolean: { input: boolean; output: boolean };
     Int: { input: number; output: number };
     Float: { input: number; output: number };
-    Timestamp: { input: any; output: any };
 };
 
 export type Note = {
     readonly __typename?: 'Note';
-    readonly end: Scalars['Timestamp']['output'];
+    readonly end: Scalars['Int']['output'];
     readonly fret: Scalars['Int']['output'];
     readonly measure: Scalars['Int']['output'];
     readonly note: Scalars['String']['output'];
     readonly octave: Scalars['Int']['output'];
-    readonly start: Scalars['Timestamp']['output'];
+    readonly start: Scalars['Int']['output'];
     readonly string: Scalars['Int']['output'];
 };
 

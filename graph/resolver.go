@@ -5,9 +5,9 @@ package graph
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 import (
-	"github.com/gobuffalo/pop/v6"
+	"virtuozplay/models/repository"
 )
 
 type Resolver struct {
-	DB *pop.Connection
+	Performances repository.Performances
 }

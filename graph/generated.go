@@ -47,7 +47,9 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
-		CreatePerformance func(childComplexity int, author *string, notes []*model.NoteInput) int
+		AddNotesToPerformance func(childComplexity int, id string, notes []*model.NoteInput) int
+		FinishPerformance     func(childComplexity int, id string) int
+		StartPerformance      func(childComplexity int) int
 	}
 
 	Note struct {
@@ -75,7 +77,9 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreatePerformance(ctx context.Context, author *string, notes []*model.NoteInput) (*model.Performance, error)
+	StartPerformance(ctx context.Context) (*model.Performance, error)
+	AddNotesToPerformance(ctx context.Context, id string, notes []*model.NoteInput) (*model.Performance, error)
+	FinishPerformance(ctx context.Context, id string) (*model.Performance, error)
 }
 type QueryResolver interface {
 	VirtuozPlay(ctx context.Context) (*model.VirtuozPlay, error)
@@ -97,17 +101,36 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Mutation.createPerformance":
-		if e.complexity.Mutation.CreatePerformance == nil {
+	case "Mutation.addNotesToPerformance":
+		if e.complexity.Mutation.AddNotesToPerformance == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_createPerformance_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_addNotesToPerformance_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreatePerformance(childComplexity, args["author"].(*string), args["notes"].([]*model.NoteInput)), true
+		return e.complexity.Mutation.AddNotesToPerformance(childComplexity, args["id"].(string), args["notes"].([]*model.NoteInput)), true
+
+	case "Mutation.finishPerformance":
+		if e.complexity.Mutation.FinishPerformance == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_finishPerformance_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.FinishPerformance(childComplexity, args["id"].(string)), true
+
+	case "Mutation.startPerformance":
+		if e.complexity.Mutation.StartPerformance == nil {
+			break
+		}
+
+		return e.complexity.Mutation.StartPerformance(childComplexity), true
 
 	case "Note.at":
 		if e.complexity.Note.At == nil {
@@ -340,18 +363,18 @@ func (ec *executionContext) dir_defer_args(ctx context.Context, rawArgs map[stri
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_createPerformance_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_addNotesToPerformance_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *string
-	if tmp, ok := rawArgs["author"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("author"))
-		arg0, err = ec.unmarshalOID2ᚖstring(ctx, tmp)
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["author"] = arg0
+	args["id"] = arg0
 	var arg1 []*model.NoteInput
 	if tmp, ok := rawArgs["notes"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("notes"))
@@ -361,6 +384,21 @@ func (ec *executionContext) field_Mutation_createPerformance_args(ctx context.Co
 		}
 	}
 	args["notes"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_finishPerformance_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -432,8 +470,8 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Mutation_createPerformance(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createPerformance(ctx, field)
+func (ec *executionContext) _Mutation_startPerformance(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_startPerformance(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -446,7 +484,7 @@ func (ec *executionContext) _Mutation_createPerformance(ctx context.Context, fie
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreatePerformance(rctx, fc.Args["author"].(*string), fc.Args["notes"].([]*model.NoteInput))
+		return ec.resolvers.Mutation().StartPerformance(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -463,7 +501,63 @@ func (ec *executionContext) _Mutation_createPerformance(ctx context.Context, fie
 	return ec.marshalNPerformance2ᚖvirtuozplayᚋgraphᚋmodelᚐPerformance(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_createPerformance(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_startPerformance(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Performance_id(ctx, field)
+			case "author":
+				return ec.fieldContext_Performance_author(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Performance_createdAt(ctx, field)
+			case "duration":
+				return ec.fieldContext_Performance_duration(ctx, field)
+			case "notes":
+				return ec.fieldContext_Performance_notes(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Performance", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_addNotesToPerformance(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_addNotesToPerformance(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddNotesToPerformance(rctx, fc.Args["id"].(string), fc.Args["notes"].([]*model.NoteInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Performance)
+	fc.Result = res
+	return ec.marshalNPerformance2ᚖvirtuozplayᚋgraphᚋmodelᚐPerformance(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_addNotesToPerformance(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -492,7 +586,74 @@ func (ec *executionContext) fieldContext_Mutation_createPerformance(ctx context.
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createPerformance_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_addNotesToPerformance_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_finishPerformance(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_finishPerformance(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().FinishPerformance(rctx, fc.Args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Performance)
+	fc.Result = res
+	return ec.marshalNPerformance2ᚖvirtuozplayᚋgraphᚋmodelᚐPerformance(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_finishPerformance(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Performance_id(ctx, field)
+			case "author":
+				return ec.fieldContext_Performance_author(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Performance_createdAt(ctx, field)
+			case "duration":
+				return ec.fieldContext_Performance_duration(ctx, field)
+			case "notes":
+				return ec.fieldContext_Performance_notes(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Performance", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_finishPerformance_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -2985,9 +3146,23 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "createPerformance":
+		case "startPerformance":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createPerformance(ctx, field)
+				return ec._Mutation_startPerformance(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "addNotesToPerformance":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addNotesToPerformance(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "finishPerformance":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_finishPerformance(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++

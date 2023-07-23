@@ -1,6 +1,7 @@
 package graph
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gobuffalo/validate/v3"
 	"github.com/gobuffalo/validate/v3/validators"
@@ -8,6 +9,8 @@ import (
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"sort"
 	"testing"
+	"time"
+	"virtuozplay/models"
 )
 
 // This file will not be regenerated automatically.
@@ -16,45 +19,70 @@ type HelpersSuite struct {
 	suite.Suite
 }
 
-func (suite *HelpersSuite) Test_WrapValidationErrorsNoErrors() {
-	noErrors := validate.NewErrors()
-	suite.NoError(WrapValidationErrors(nil, nil))
-	suite.NoError(WrapValidationErrors(noErrors, nil))
+func (hs *HelpersSuite) Test_WrapValidationErrorsNoErrors() {
+	noErrors := models.WrapValidation(validate.NewErrors(), nil)
+	hs.NoError(wrapError(nil))
+	hs.NoError(wrapError(noErrors))
 }
 
-func (suite *HelpersSuite) Test_WrapValidationErrorsPassThrough() {
+func (hs *HelpersSuite) Test_WrapValidationErrorsPassThrough() {
 	err := fmt.Errorf("some error")
-	suite.Equal(err, WrapValidationErrors(nil, err))
+	hs.Equal(err, wrapError(err))
 }
 
-func (suite *HelpersSuite) Test_WrapValidationErrorSingle() {
-	err := WrapValidationErrors(validate.Validate(&validators.StringIsPresent{Name: "str", Field: "", Message: "str is required"}), nil)
-	suite.Len(err, 1)
+func (hs *HelpersSuite) Test_WrapValidationErrorSingle() {
+	err := wrapError(models.WrapValidation(validate.Validate(&validators.StringIsPresent{Name: "str", Field: "", Message: "str is required"}), nil))
+	hs.Len(err, 1)
 
-	if errors, ok := err.(gqlerror.List); ok {
-		suite.EqualError(errors[0], "input: str is required")
+	if errs, ok := err.(gqlerror.List); ok {
+		hs.EqualError(errs[0], "input: str is required")
 		return
 	}
-	suite.Fail("expected gqlerror.List")
+	hs.Fail("expected gqlerror.List")
 }
 
-func (suite *HelpersSuite) Test_WrapValidationErrorMultiple() {
-	err := WrapValidationErrors(validate.Validate(
+func (hs *HelpersSuite) Test_WrapValidationErrorMultiple() {
+	err := wrapError(models.WrapValidation(validate.Validate(
 		&validators.StringIsPresent{Name: "str", Field: "", Message: "str is required"},
 		&validators.StringsMatch{Name: "str", Field: "", Field2: "toMatch", Message: "no match"},
-		&validators.IntIsGreaterThan{Name: "int_test", Field: 21, Compared: 42, Message: "21 is indeed not greater than 42"}), nil)
+		&validators.IntIsGreaterThan{Name: "int_test", Field: 21, Compared: 42, Message: "21 is indeed not greater than 42"}), nil))
 
-	suite.Len(err, 3)
-	if errors, ok := err.(gqlerror.List); ok {
-		sort.Slice(errors, func(i, j int) bool {
-			return errors[i].Error() < errors[j].Error()
+	hs.Len(err, 3)
+	if errs, ok := err.(gqlerror.List); ok {
+		sort.Slice(errs, func(i, j int) bool {
+			return errs[i].Error() < errs[j].Error()
 		})
-		suite.EqualError(errors[0], "input: 21 is indeed not greater than 42")
-		suite.EqualError(errors[1], "input: no match")
-		suite.EqualError(errors[2], "input: str is required")
+		hs.EqualError(errs[0], "input: 21 is indeed not greater than 42")
+		hs.EqualError(errs[1], "input: no match")
+		hs.EqualError(errs[2], "input: str is required")
 		return
 	}
-	suite.Fail("expected gqlerror.List")
+	hs.Fail("expected gqlerror.List")
+}
+
+func (hs *HelpersSuite) Test_ToGraphQLPerformance() {
+	// both performance and error should not be nil
+	hs.Panics(func() { _, _ = ToGraphQLPerformance(nil, nil) })
+
+	perf, err := ToGraphQLPerformance(nil, errors.New("some error"))
+	hs.Nil(perf)
+	hs.EqualError(err, "some error")
+
+	now := time.Now()
+
+	perf, err = ToGraphQLPerformance(&models.Performance{NanoID: "nano", CreatedAt: now, Notes: []models.Note{{
+		At:       91,
+		Duration: 7121,
+		Value:    "Bb",
+	}}}, nil)
+
+	hs.NoError(err)
+	hs.Equal("nano", perf.ID)
+	hs.Equal(now.String(), *perf.CreatedAt)
+	hs.Len(perf.Notes, 1)
+	hs.Equal(91, perf.Notes[0].At)
+	hs.Equal(7121, perf.Notes[0].Duration)
+	hs.Equal("Bb", perf.Notes[0].Value)
 }
 
 func Test_Helpers(t *testing.T) {

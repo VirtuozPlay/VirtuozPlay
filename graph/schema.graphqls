@@ -42,8 +42,11 @@ type Note {
 
 "The root mutation type."
 type Mutation {
-  "Create a new performance."
-  createPerformance(author: ID, notes: [NoteInput!]!): Performance!
+  "Begin a new performance."
+  startPerformance: Performance!
+  "Add notes to a performance, each new note must have a 'at' value greater than any existing note's 'at' value in the performance."
+  addNotesToPerformance(id: ID!, notes: [NoteInput!]!): Performance!
+  finishPerformance(id: ID!): Performance!
 }
 
 input NoteInput {

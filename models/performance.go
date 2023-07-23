@@ -3,6 +3,7 @@ package models
 import (
 	"bytes"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"github.com/go-interpreter/wagon/wasm/leb128"
 	"github.com/gobuffalo/pop/v6"
@@ -27,7 +28,7 @@ const (
 // Use the Encode and Decode methods to convert between Performance and Performance.
 type Performance struct {
 	ID            int64         `db:"id"`             // The database ID of the performance (do not expose to users!).
-	NanoID        string        `db:"nano_id"`        // NanoID is the user-facing ID of the performance, generated using Go Nanoid.
+	NanoID        NanoID        `db:"nano_id"`        // NanoID is the user-facing ID of the performance, generated using Go Nanoid.
 	CreatedAt     time.Time     `db:"created_at"`     //
 	UpdatedAt     time.Time     `db:"updated_at"`     //
 	Notes         []Note        `db:"-"`              // Notes is the list of notes played during the performance.
@@ -50,7 +51,7 @@ const performanceNotesValidatorName = "performance_notes"
 
 func (p *Performance) Validate(*pop.Connection) (*validate.Errors, error) {
 	return validate.Validate(
-		&validators.StringIsPresent{Name: "performance_id", Field: p.NanoID, Message: "performance ID is required"},
+		&validators.StringIsPresent{Name: "performance_id", Field: string(p.NanoID), Message: "performance ID is required"},
 		&NotesAreValid{Name: performanceNotesValidatorName, Field: p.Notes},
 	), nil
 }
@@ -70,6 +71,36 @@ func (p *Performance) AfterUpdate(*pop.Connection) error {
 
 func (p *Performance) AfterFind(*pop.Connection) error {
 	return p.decode()
+}
+
+// AppendNote adds a new note to the performance.
+// The function returns an error if the note is invalid or its timestamp occurs before the latest note in the performance.
+func (p *Performance) AppendNote(index int, at int, duration int, value string) error {
+	note := Note{
+		At:       int32(at),
+		Duration: int32(duration),
+		Value:    value,
+	}
+
+	errMsg := note.validate(index)
+	if errMsg != "" {
+		return errors.New(errMsg)
+	}
+	if len(p.Notes) > 0 {
+		lastNote := p.Notes[len(p.Notes)-1]
+
+		// if the note is identical to the last note, we can ignore it
+		if lastNote.At == note.At && lastNote.Duration == note.Duration && lastNote.Value == note.Value {
+			return nil
+		}
+
+		if lastNote.At > note.At {
+			return fmt.Errorf("invalid note at index %v: occurs before the latest note in the performance", index)
+		}
+	}
+	p.Notes = append(p.Notes, note)
+
+	return nil
 }
 
 func (p *Performance) encode() {
@@ -277,7 +308,7 @@ const NoteValidationLimit uint = 20
 // IsValid checks for invalid notes (notes with negative duration or start time, invalid values, etc.)
 // The function returns a slice of errors, where each error corresponds to a single invalid note.
 // If the number of errors exceeds Limit (by default: NoteValidationLimit),
-// the validation stops and the function appends an error indicating the limit has been reached.
+// the Validation stops and the function appends an error indicating the limit has been reached.
 func (v *NotesAreValid) IsValid(errors *validate.Errors) {
 	if v.Limit == 0 {
 		v.Limit = NoteValidationLimit

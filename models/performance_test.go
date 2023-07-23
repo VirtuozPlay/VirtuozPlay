@@ -18,7 +18,7 @@ func (ms *ModelSuite) Test_decodeEncodeAllNotes() {
 	ms.NoError(ms.Model.DB.First(&perf))
 
 	ms.Equal(int64(1), perf.ID)
-	ms.Equal("test-1", perf.NanoID)
+	ms.Equal(NanoID("test-1"), perf.NanoID)
 	ms.Equal(Base64Notes, perf.NotesEncoding)
 	ms.Equal(21, len(perf.Notes))
 
@@ -170,7 +170,7 @@ func (ms *ModelSuite) Test_validatePerformance() {
 
 	ms.NoError(err)
 	ms.Equal(1, validationErrs.Count())
-	ms.Len(validationErrs.Get(performanceNotesValidatorName), 8, "Performance should have exactly 8 validation errors, got %v", validationErrs.Error())
+	ms.Len(validationErrs.Get(performanceNotesValidatorName), 8, "Performance should have exactly 8 Validation errors, got %v", validationErrs.Error())
 }
 
 func (ms *ModelSuite) Test_validatePerformanceTooManyErrors() {
@@ -226,4 +226,29 @@ func (ms *ModelSuite) Test_normalizePerformance() {
 		{At: 10, Duration: 128, Value: "Db"},
 		{At: 999, Duration: 128, Value: "A"},
 	}, perf.Notes)
+}
+
+func (ms *ModelSuite) Test_appendNote() {
+	ms.LoadFixture("performance_all_possible_notes")
+
+	var perf Performance
+	ms.NoError(ms.Model.DB.First(&perf))
+
+	notesLen := len(perf.Notes)
+
+	// Should not fail
+	ms.NoError(perf.AppendNote(0, 10999, 67, "E"))
+	ms.Equal(Note{At: 10999, Duration: 67, Value: "E"}, perf.Notes[notesLen])
+	ms.Len(perf.Notes, notesLen+1)
+
+	// Should not add same note twice
+	ms.NoError(perf.AppendNote(0, 10999, 67, "E"))
+	ms.Equal(Note{At: 10999, Duration: 67, Value: "E"}, perf.Notes[notesLen])
+	ms.Len(perf.Notes, notesLen+1)
+
+	// Same note, but with invalid start
+	ms.Error(perf.AppendNote(0, 10, 67, "E"))
+
+	// Same note, but with invalid value
+	ms.Error(perf.AppendNote(0, 20999, 67, "Ez"))
 }

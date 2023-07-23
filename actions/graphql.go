@@ -9,14 +9,13 @@ import (
 	"github.com/gobuffalo/buffalo"
 	"virtuozplay/graph"
 	"virtuozplay/models"
+	"virtuozplay/models/repository"
 )
-
-var srv *handler.Server
 
 func init() {
 	// Initialize the GraphQL server
-	srv = handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
-		DB: models.DB,
+	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
+		Performances: repository.NewPerformancesRepository(models.DB),
 	}}))
 
 	// Supported ways to submit queries
@@ -33,14 +32,13 @@ func init() {
 	srv.Use(extension.AutomaticPersistedQuery{
 		Cache: lru.New(100),
 	})
+
+	GraphQLHandler = buffalo.WrapHandler(srv)
+	GraphQLPlaygroundHandler = buffalo.WrapHandler(playground.Handler("GraphQL playground", "/graphql"))
 }
 
 // GraphQLHandler Manages the GraphQL endpoint of VirtuozPlay
-func GraphQLHandler() buffalo.Handler {
-	return buffalo.WrapHandler(srv)
-}
+var GraphQLHandler buffalo.Handler
 
 // GraphQLPlaygroundHandler gives access to an interactive GraphQL playground in the browser
-func GraphQLPlaygroundHandler() buffalo.Handler {
-	return buffalo.WrapHandler(playground.Handler("GraphQL playground", "/graphql"))
-}
+var GraphQLPlaygroundHandler buffalo.Handler

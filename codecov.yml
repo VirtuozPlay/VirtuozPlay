@@ -1,0 +1,3 @@
+ignore:
+  - 'graph/generated.go'
+  - 'graph/models_gen.go'

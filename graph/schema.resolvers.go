@@ -6,61 +6,72 @@ package graph
 
 import (
 	"context"
-	"fmt"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 	"virtuozplay/graph/model"
 	db "virtuozplay/models"
-
-	gonanoid "github.com/matoous/go-nanoid/v2"
 )
 
-// CreatePerformance is the resolver for the createPerformance field.
-func (r *mutationResolver) CreatePerformance(ctx context.Context, author *string, notes []*model.NoteInput) (*model.Performance, error) {
-	notesValues := make([]db.Note, len(notes))
+// StartPerformance is the resolver for the startPerformance field.
+func (r *mutationResolver) StartPerformance(ctx context.Context) (*model.Performance, error) {
+	_ = ctx
+	return ToGraphQLPerformance(r.Performances.New())
+}
 
-	for i, note := range notes {
-		notesValues[i] = db.Note{
-			At:       int32(note.At),
-			Duration: int32(note.Duration),
-			Value:    note.Value,
-		}
-	}
-
-	var err error
-	var nanoId string
-
-	if nanoId, err = gonanoid.New(); err != nil {
-		panic(fmt.Errorf("failed to generate nanoid: %w", err))
-	}
-
-	performance := &db.Performance{
-		NanoID: nanoId,
-		Notes:  notesValues,
-	}
-	if err = WrapValidationErrors(r.DB.ValidateAndCreate(performance)); err != nil {
-		return nil, err
-	}
+// AddNotesToPerformance is the resolver for the addNotesToPerformance field.
+func (r *mutationResolver) AddNotesToPerformance(ctx context.Context, id string, notes []*model.NoteInput) (*model.Performance, error) {
+	_ = ctx
+	perf, err := r.Performances.FindInProgressByNanoID(db.NanoID(id))
 	if err != nil {
 		return nil, err
 	}
 
-	return ToGraphQLPerformance(performance)
+	errors := make(gqlerror.List, 0)
+
+	for i, note := range notes {
+		err = perf.AppendNote(i,
+			note.At,
+			note.Duration,
+			note.Value,
+		)
+		// Append the invalid notes to the errors list, but only if we haven't reached the limit (to avoid spamming the user)
+		if err != nil && uint(len(errors)) < db.NoteValidationLimit {
+			errors = append(errors, gqlerror.Wrap(err))
+		}
+	}
+	// Append the notes that are not invalid
+	gqlPerf, gqlErr := ToGraphQLPerformance(perf, r.Performances.Update(perf))
+
+	if gqlErr != nil {
+		return nil, gqlErr
+	}
+	if len(errors) > 0 {
+		// Return invalid note errors, note that the valid ones are still saved
+		return gqlPerf, errors
+	}
+	return gqlPerf, nil
+}
+
+// FinishPerformance is the resolver for the finishPerformance field.
+func (r *mutationResolver) FinishPerformance(ctx context.Context, id string) (*model.Performance, error) {
+	_ = ctx
+	perf, err := r.Performances.FindByNanoID(db.NanoID(id))
+	if err != nil {
+		return nil, err
+	}
+
+	return ToGraphQLPerformance(perf, r.Performances.MarkAsFinished(perf))
 }
 
 // VirtuozPlay is the resolver for the virtuozPlay field.
 func (r *queryResolver) VirtuozPlay(ctx context.Context) (*model.VirtuozPlay, error) {
+	_ = ctx
 	return &model.VirtuozPlay{Version: "0.1.0"}, nil
 }
 
 // Performance is the resolver for the performance field.
 func (r *queryResolver) Performance(ctx context.Context, id string) (*model.Performance, error) {
-	var err error
-	performance := &db.Performance{}
-
-	query := r.DB.Where("nano_id = ?", id)
-	if err = query.First(performance); err != nil {
-		return nil, fmt.Errorf("performance %v not found", id)
-	}
-	return ToGraphQLPerformance(performance)
+	_ = ctx
+	return ToGraphQLPerformance(r.Performances.FindByNanoID(db.NanoID(id)))
 }
 
 // Mutation returns MutationResolver implementation.

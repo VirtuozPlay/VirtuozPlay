@@ -77,9 +77,9 @@ func App() *buffalo.App {
 
 		// GraphQL endpoints
 		// TODO add CSRF protection
-		app.ANY("/graphql", GraphQLHandler())
+		app.ANY("/graphql", GraphQLHandler)
 		if ENV != "production" {
-			app.ANY("/graphql/playground", GraphQLPlaygroundHandler())
+			app.ANY("/graphql/playground", GraphQLPlaygroundHandler)
 		}
 
 		app.ServeFiles("/", http.FS(DistFS())) // serve files from the public directory

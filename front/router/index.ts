@@ -43,8 +43,8 @@ const router = createRouter({
             component: () => import('../views/SongView.vue'),
         },
         {
-            path: '/collection/sting',
-            name: 'sting',
+            path: '/collection/corinna',
+            name: 'corinna',
             component: () => import('../views/SongView.vue'),
         },
     ],

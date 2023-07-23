@@ -7,19 +7,17 @@ import * as Types from '../types.d';
 
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 import gql from 'graphql-tag';
-export type GetVirtuozPlayVersionQueryVariables = Types.Exact<{ [key: string]: never }>;
+export type GetVirtuozPlayVersionQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
-export type GetVirtuozPlayVersionQuery = {
-    __typename?: 'Query';
-    virtuozPlay: { __typename?: 'VirtuozPlay'; version: string };
-};
 
-export declare const GetVirtuozPlayVersion: import('graphql').DocumentNode;
+export type GetVirtuozPlayVersionQuery = { __typename?: 'Query', virtuozPlay: { __typename?: 'VirtuozPlay', version: string } };
+
+export declare const GetVirtuozPlayVersion: import("graphql").DocumentNode;
 
 export const GetVirtuozPlayVersionDocument = /*#__PURE__*/ gql`
     query GetVirtuozPlayVersion {
-        virtuozPlay {
-            version
-        }
-    }
-` as unknown as DocumentNode<GetVirtuozPlayVersionQuery, GetVirtuozPlayVersionQueryVariables>;
+  virtuozPlay {
+    version
+  }
+}
+    ` as unknown as DocumentNode<GetVirtuozPlayVersionQuery, GetVirtuozPlayVersionQueryVariables>;

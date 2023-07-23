@@ -77,23 +77,49 @@ func (r *queryResolver) Performance(ctx context.Context, id string) (*model.Perf
 
 // Songs is the resolver for the songs field.
 func (r *queryResolver) Songs(ctx context.Context) ([]*model.Song, error) {
-	song := &model.Song{
-		ID:    "h8rHA-Q0dD5dBbY1L2Fzf",
-		Title: "Cancan",
-		Notes: []*model.SongNote{
-			{Measure: 1, Note: "C", Fret: 10, String: 2, Start: 0, End: 1000},
-			{Measure: 2, Note: "C", Fret: 11, String: 2, Start: 1000, End: 2000},
-			{Measure: 3, Note: "C", Fret: 10, String: 2, Start: 2000, End: 3000},
-			{Measure: 4, Note: "C", Fret: 11, String: 2, Start: 3000, End: 4000},
-			{Measure: 5, Note: "C", Fret: 17, String: 2, Start: 4000, End: 5000},
-			{Measure: 6, Note: "C", Fret: 18, String: 2, Start: 5000, End: 6000},
-			{Measure: 7, Note: "C", Fret: 17, String: 2, Start: 6000, End: 7000},
-			{Measure: 7, Note: "C", Fret: 18, String: 2, Start: 7000, End: 8000},
+	return []*model.Song{
+		{
+			ID:    "h8rHA-Q0dD5dBbY1L2Fzf",
+			Title: "Cancan",
+			Notes: []*model.SongNote{
+				{Measure: 1, Note: "C", Fret: 10, String: 2, Start: 0, End: 1000},
+				{Measure: 2, Note: "C", Fret: 11, String: 2, Start: 1000, End: 2000},
+				{Measure: 3, Note: "C", Fret: 10, String: 2, Start: 2000, End: 3000},
+				{Measure: 4, Note: "C", Fret: 11, String: 2, Start: 3000, End: 4000},
+				{Measure: 5, Note: "C", Fret: 17, String: 2, Start: 4000, End: 5000},
+				{Measure: 6, Note: "C", Fret: 18, String: 2, Start: 5000, End: 6000},
+				{Measure: 7, Note: "C", Fret: 17, String: 2, Start: 6000, End: 7000},
+				{Measure: 7, Note: "C", Fret: 18, String: 2, Start: 7000, End: 8000},
+			},
 		},
-	}
-	songs := []*model.Song{song}
-
-	return songs, nil
+		{
+			ID:    "",
+			Title: "Cancan",
+			Notes: []*model.SongNote{
+				{Measure: 1, Note: "C", Fret: 10, String: 4, Octave: 4, Start: 0, End: 1000},
+				{Measure: 2, Note: "D", Fret: 11, String: 4, Octave: 4, Start: 1000, End: 2000},
+				{Measure: 3, Note: "E", Fret: 10, String: 3, Octave: 4, Start: 2200, End: 3000},
+				{Measure: 4, Note: "C", Fret: 11, String: 2, Octave: 4, Start: 3000, End: 4000},
+				{Measure: 5, Note: "D", Fret: 14, String: 1, Octave: 5, Start: 4000, End: 5000},
+				{Measure: 6, Note: "E", Fret: 2, String: 5, Octave: 5, Start: 5000, End: 6000},
+				{Measure: 7, Note: "C", Fret: 3, String: 4, Octave: 5, Start: 6000, End: 7000},
+				{Measure: 7, Note: "A", Fret: 1, String: 2, Octave: 5, Start: 7000, End: 8000},
+			},
+		},
+		{
+			Title: "Corinna",
+			Notes: []*model.SongNote{
+				{Measure: 1, Note: "A", Fret: 10, String: 2, Octave: 4, Start: 0, End: 1000},
+				{Measure: 2, Note: "A", Fret: 11, String: 2, Octave: 4, Start: 1000, End: 2000},
+				{Measure: 3, Note: "C", Fret: 10, String: 2, Octave: 4, Start: 2000, End: 3000},
+				{Measure: 4, Note: "A", Fret: 11, String: 2, Octave: 4, Start: 3000, End: 4000},
+				{Measure: 5, Note: "C", Fret: 11, String: 2, Octave: 5, Start: 4000, End: 5000},
+				{Measure: 6, Note: "A", Fret: 11, String: 2, Octave: 5, Start: 5000, End: 6000},
+				{Measure: 7, Note: "C", Fret: 1, String: 2, Octave: 5, Start: 6000, End: 7000},
+				{Measure: 7, Note: "C", Fret: 2, String: 2, Octave: 5, Start: 7000, End: 8000},
+			},
+		},
+	}, nil
 }
 
 // Mutation returns MutationResolver implementation.

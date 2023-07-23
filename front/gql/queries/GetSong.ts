@@ -21,8 +21,8 @@ export type GetSongQuery = {
             fret: number;
             string: number;
             octave: number;
-            start: any;
-            end: any;
+            start: number;
+            end: number;
         } | null>;
     } | null>;
 };

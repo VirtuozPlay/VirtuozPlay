@@ -98,6 +98,7 @@ const stopAnimation = () => {
     console.log('Stop animation');
     animationRunning.value = false;
     animationPaused.value = true;
+    currentIndex.value = 0;
 };
 
 const isCurrentFret = (fret: number) => {

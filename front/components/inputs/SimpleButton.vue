@@ -1,6 +1,8 @@
 <script setup lang="ts">
 // problème -> le bouton play ne veut pas se mettre en état disabled
-const props = defineProps(['animationRunning']);
+defineProps<{
+    animationRunning?: boolean;
+}>();
 const emit = defineEmits<{
     click: [];
 }>();

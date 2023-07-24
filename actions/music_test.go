@@ -9,7 +9,7 @@ import (
 // HomeHandler is a default handler to serve up
 // a home page.
 func Test_ParseMusicXML(t *testing.T) {
-	file, err := os.ReadFile("../front/assets/music/charles-fox/score.xml")
+	file, err := os.ReadFile("../front/assets/music/alabama/cleanalabama.xml")
 	if err != nil {
 		t.Fatal(err)
 	}

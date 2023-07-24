@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { initMicrophone, getTones, getNoise } from '@/utilities/sound/microphone';
-import { notes as notesRegistered, Note, notesPhaseOpposition } from '@/utilities/sound/notes';
+import { notes as notesRegistered, Note } from '@/utilities/sound/notes';
 import { shallowRef, watch, watchEffect } from 'vue';
 
 const props = defineProps<{
@@ -22,7 +22,7 @@ watch(stream, () => {
         if (isRecordingNoise) {
             getNoise();
         } else {
-            getTones(notes, startTimeStamp, props.enableCanvas, 35);
+            getTones(startTimeStamp, props.enableCanvas, 35);
         }
 
         requestAnimationFrame(setTones);
@@ -41,7 +41,7 @@ function onClick() {
             isRecordingNoise = false;
             // recording starts
             startTimeStamp = Date.now();
-            console.log(notesPhaseOpposition);
+            console.log(notes);
         }, 5000);
         if (isLocalStorageAcessible) localStorage.setItem('mic_sensivity', String(sensitivity.value));
 

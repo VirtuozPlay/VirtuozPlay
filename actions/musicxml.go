@@ -18,6 +18,7 @@ type Part struct {
 // Measure represents a measure in a piece of music
 type Measure struct {
 	Number int    `xml:"number,attr"`
+	Beat   int    `xml:"beat"`
 	Notes  []Note `xml:"note"`
 	Key    []Key  `xml:"key"`
 	Time   []Time `xml:"time"`
@@ -43,6 +44,8 @@ type Note struct {
 	Type     string   `xml:"type"`
 	Rest     xml.Name `xml:"rest"`
 	Chord    xml.Name `xml:"chord"`
+	Notations Notations `xml:"notations"`
+	Default float64    `xml:"default-x,attr"`
 }
 
 // Pitch represents the pitch of a note
@@ -50,6 +53,15 @@ type Pitch struct {
 	Accidental int8   `xml:"alter"`
 	Step       string `xml:"step"`
 	Octave     int    `xml:"octave"`
+}
+
+type Notations struct {
+	Technical Technical    `xml:"technical"`
+}
+
+type Technical struct {
+	String int   `xml:"string"`
+	Fret       string `xml:"fret"`
 }
 
 type JsonNote struct {
@@ -89,7 +101,7 @@ func CompareNotes() error {
 		{Name: "A", Duration: 1},
 	}
 
-	xmlData, err := os.ReadFile("../front/assets/music/alabama/cleanalabama.xml") // To update
+	xmlData, err := os.ReadFile("../assets/musicXml/cleanCancan.xml") // To update
 	if err != nil {
 		// Managing errors
 		fmt.Printf("%s\n", err.Error())

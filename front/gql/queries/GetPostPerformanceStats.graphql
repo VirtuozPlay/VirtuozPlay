@@ -1,0 +1,13 @@
+query GetPostPerformanceStats($id: ID!) {
+  performance(id: $id) {
+    song {
+      id
+      title
+    }
+    author {
+      id
+      name
+    }
+    duration
+  }
+}

@@ -68,12 +68,15 @@ func App() *buffalo.App {
 		app.Use(translations())
 
 		// Protect against CSRF attacks. https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)
-		app.GET("/", csrf.New(HomeHandler))
-		app.GET("/about", csrf.New(HomeHandler))
-		app.GET("/checkup", csrf.New(HomeHandler))
-		app.GET("/collection", csrf.New(HomeHandler))
-		app.GET("/profile", csrf.New(HomeHandler))
-		app.GET("/stats", csrf.New(HomeHandler))
+		homeHandler := csrf.New(HomeHandler)
+		app.GET("/", homeHandler)
+		app.GET("/about", homeHandler)
+		app.GET("/checkup", homeHandler)
+		app.GET("/collection", homeHandler)
+		app.GET("/profile", homeHandler)
+		app.GET("/stats", homeHandler)
+		app.GET("/play", homeHandler)
+		app.GET("/play/{performanceId}", homeHandler)
 
 		// GraphQL endpoints
 		// TODO add CSRF protection

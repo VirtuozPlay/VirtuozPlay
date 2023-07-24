@@ -55,9 +55,22 @@ func ToGraphQLPerformance(performance *db.Performance, err error) (*model.Perfor
 	}
 	createdAt := performance.CreatedAt.String()
 
+	userName := "DummyUser"
 	return &model.Performance{
 		ID:        string(performance.NanoID),
 		CreatedAt: &createdAt,
 		Notes:     notes,
+		// FIXME VERY TEMPORARY, please replace by proper DB relation
+		Duration: 42069,
+		// TODO VERY TEMPORARY, please replace by proper DB relation
+		Author: &model.User{
+			ID:   string(performance.NanoID),
+			Name: &userName,
+		},
+		// TODO VERY TEMPORARY, please replace by proper DB relation
+		Song: &model.Song{
+			ID:    string(performance.NanoID),
+			Title: "Some Dummy Title",
+		},
 	}, nil
 }

@@ -16,6 +16,7 @@ export default defineConfig({
             '^/collection$': 'http://127.0.0.1:3000',
             '^/profile$': 'http://127.0.0.1:3000',
             '^/stats$': 'http://127.0.0.1:3000',
+            '^/play': 'http://127.0.0.1:3000',
             '^/graphql': {
                 ws: true,
                 target: 'http://127.0.0.1:3000',

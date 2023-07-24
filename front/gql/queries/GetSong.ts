@@ -15,7 +15,7 @@ export type GetSongQuery = {
         __typename?: 'Song';
         title: string;
         notes: Array<{
-            __typename?: 'Note';
+            __typename?: 'SongNote';
             measure: number;
             note: string;
             fret: number;

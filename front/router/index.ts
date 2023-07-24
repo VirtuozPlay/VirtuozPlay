@@ -38,6 +38,10 @@ const router = createRouter({
             component: () => import('../views/CollectionView.vue'),
         },
         {
+            path: '/play',
+            redirect: '/collection',
+        },
+        {
             path: '/collection/cancan',
             name: 'cancan',
             component: () => import('../views/SongView.vue'),
@@ -46,6 +50,11 @@ const router = createRouter({
             path: '/collection/corinna',
             name: 'corinna',
             component: () => import('../views/SongView.vue'),
+        },
+        {
+            path: '/play/:performanceId',
+            props: true,
+            component: () => import('../views/PostPerformanceView.vue'),
         },
     ],
 });

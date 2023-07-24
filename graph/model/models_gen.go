@@ -12,8 +12,11 @@ type InputNote struct {
 }
 
 type Performance struct {
-	ID        string  `json:"id"`
-	Author    *string `json:"author,omitempty"`
+	ID string `json:"id"`
+	// The song that is being/was performed
+	Song *Song `json:"song"`
+	// The creator of this performance, null when user was not logged in
+	Author    *User   `json:"author,omitempty"`
 	CreatedAt *string `json:"createdAt,omitempty"`
 	// The total duration of the performance, in milliseconds.
 	Duration int `json:"duration"`
@@ -45,6 +48,12 @@ type SongNote struct {
 	Octave  int    `json:"octave"`
 	Start   int    `json:"start"`
 	End     int    `json:"end"`
+}
+
+type User struct {
+	ID    string  `json:"id"`
+	Name  *string `json:"name,omitempty"`
+	Email *string `json:"email,omitempty"`
 }
 
 type VirtuozPlay struct {

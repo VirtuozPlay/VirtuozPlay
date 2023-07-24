@@ -18,6 +18,15 @@ type Query {
   songs: [Song]!
 }
 
+"The root mutation type."
+type Mutation {
+  "Begin a new performance."
+  startPerformance: Performance!
+  "Add notes to a performance, each new note must have a 'at' value greater than any existing note's 'at' value in the performance."
+  addNotesToPerformance(id: ID!, notes: [InputNote!]!): Performance!
+  finishPerformance(id: ID!): Performance!
+}
+
 type Song {
   id: ID!
   title: String!
@@ -41,7 +50,10 @@ type VirtuozPlay {
 
 type Performance {
   id: ID!
-  author: ID
+  "The song that is being/was performed"
+  song: Song!
+  "The creator of this performance, null when user was not logged in"
+  author: User
   createdAt: String
   "The total duration of the performance, in milliseconds."
   duration: Int!
@@ -58,15 +70,6 @@ type PerformanceNote {
   value: String!
 }
 
-"The root mutation type."
-type Mutation {
-  "Begin a new performance."
-  startPerformance: Performance!
-  "Add notes to a performance, each new note must have a 'at' value greater than any existing note's 'at' value in the performance."
-  addNotesToPerformance(id: ID!, notes: [InputNote!]!): Performance!
-  finishPerformance(id: ID!): Performance!
-}
-
 input InputNote {
   "The offset of the note's start from the beginning of the performance, in milliseconds."
   at: Int!
@@ -74,4 +77,10 @@ input InputNote {
   duration: Int!
   "Human-readable representation of the note (e.g. 'C#', 'D', 'Fb', etc.)"
   value: String!
+}
+
+type User {
+  id: ID!
+  name: String
+  email: String
 }

@@ -19,8 +19,84 @@ export type Scalars = {
     Float: { input: number; output: number };
 };
 
-export type Note = {
-    readonly __typename?: 'Note';
+export type InputNote = {
+    /** The offset of the note's start from the beginning of the performance, in milliseconds. */
+    readonly at: Scalars['Int']['input'];
+    /** The duration of the note, in milliseconds. */
+    readonly duration: Scalars['Int']['input'];
+    /** Human-readable representation of the note (e.g. 'C#', 'D', 'Fb', etc.) */
+    readonly value: Scalars['String']['input'];
+};
+
+/** The root mutation type. */
+export type Mutation = {
+    readonly __typename?: 'Mutation';
+    /** Add notes to a performance, each new note must have a 'at' value greater than any existing note's 'at' value in the performance. */
+    readonly addNotesToPerformance: Performance;
+    readonly finishPerformance: Performance;
+    /** Begin a new performance. */
+    readonly startPerformance: Performance;
+};
+
+/** The root mutation type. */
+export type MutationAddNotesToPerformanceArgs = {
+    id: Scalars['ID']['input'];
+    notes: ReadonlyArray<InputNote>;
+};
+
+/** The root mutation type. */
+export type MutationFinishPerformanceArgs = {
+    id: Scalars['ID']['input'];
+};
+
+export type Performance = {
+    readonly __typename?: 'Performance';
+    /** The creator of this performance, null when user was not logged in */
+    readonly author?: Maybe<User>;
+    readonly createdAt?: Maybe<Scalars['String']['output']>;
+    /** The total duration of the performance, in milliseconds. */
+    readonly duration: Scalars['Int']['output'];
+    readonly id: Scalars['ID']['output'];
+    /** An array of *all* notes in the performance, sorted by their start time. */
+    readonly notes: ReadonlyArray<PerformanceNote>;
+    /** The song that is being/was performed */
+    readonly song: Song;
+};
+
+export type PerformanceNote = {
+    readonly __typename?: 'PerformanceNote';
+    /** The offset of the note's start from the beginning of the performance, in milliseconds. */
+    readonly at: Scalars['Int']['output'];
+    /** The duration of the note, in milliseconds. */
+    readonly duration: Scalars['Int']['output'];
+    /** Human-readable representation of the note (e.g. 'C#', 'D', 'Fb', etc.) */
+    readonly value: Scalars['String']['output'];
+};
+
+/** The root query type. */
+export type Query = {
+    readonly __typename?: 'Query';
+    /** Retrieve a performance by its ID. */
+    readonly performance?: Maybe<Performance>;
+    readonly songs: ReadonlyArray<Maybe<Song>>;
+    readonly virtuozPlay: VirtuozPlay;
+};
+
+/** The root query type. */
+export type QueryPerformanceArgs = {
+    id: Scalars['ID']['input'];
+};
+
+export type Song = {
+    readonly __typename?: 'Song';
+    readonly id: Scalars['ID']['output'];
+    readonly notes: ReadonlyArray<Maybe<SongNote>>;
+    readonly title: Scalars['String']['output'];
+};
+
+/** This is a separate type from PerformanceNote for now */
+export type SongNote = {
+    readonly __typename?: 'SongNote';
     readonly end: Scalars['Int']['output'];
     readonly fret: Scalars['Int']['output'];
     readonly measure: Scalars['Int']['output'];
@@ -30,16 +106,11 @@ export type Note = {
     readonly string: Scalars['Int']['output'];
 };
 
-export type Query = {
-    readonly __typename?: 'Query';
-    readonly songs: ReadonlyArray<Maybe<Song>>;
-    readonly virtuozPlay: VirtuozPlay;
-};
-
-export type Song = {
-    readonly __typename?: 'Song';
-    readonly notes: ReadonlyArray<Maybe<Note>>;
-    readonly title: Scalars['String']['output'];
+export type User = {
+    readonly __typename?: 'User';
+    readonly email?: Maybe<Scalars['String']['output']>;
+    readonly id: Scalars['ID']['output'];
+    readonly name?: Maybe<Scalars['String']['output']>;
 };
 
 export type VirtuozPlay = {

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import TextualButton from '@/components/inputs/TextualButton.vue';
-import { RouterLink } from 'vue-router';
 import GraphQL from '@/components/GraphQL.vue';
 import { GetSongDocument, GetSongQuery } from '@/gql/queries/GetSong';
 import type { QueryResult } from '@apollo/client';
@@ -30,7 +29,7 @@ const handleClick = (song: any) => {
                         <img src="https://placehold.co/600x400?text=Hello+World2" :alt="item?.title" class="w-full" />
                     </div>
                     <div class="col-span-1">
-                        <TextualButton @click="handleClick(item)" aria-label="example button G" hover-color="#FAFF00">
+                        <TextualButton aria-label="example button G" hover-color="#FAFF00" @click="handleClick(item)">
                             Lancer {{ item?.title }}
                         </TextualButton>
                     </div>

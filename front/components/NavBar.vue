@@ -16,10 +16,10 @@ import HeaderLink from '@/components/HeaderLink.vue';
         </RouterLink>
 
         <nav aria-label="section navigation" class="flex items-center flex-wrap p-4 md:p-8 gap-8">
-            <HeaderLink name="home" class="hidden md:inline">Acceuil</HeaderLink>
+            <HeaderLink name="home" class="hidden md:inline">Accueil</HeaderLink>
             <HeaderLink name="profile" class="hidden md:inline">Profil</HeaderLink>
             <HeaderDrawer>
-                <HeaderLink name="home">Acceuil</HeaderLink>
+                <HeaderLink name="home">Accueil</HeaderLink>
                 <HeaderLink name="profile">Profil</HeaderLink>
                 <HeaderLink name="about">A Propos de VirtuozPlay</HeaderLink>
             </HeaderDrawer>

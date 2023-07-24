@@ -9,7 +9,7 @@ import (
 // HomeHandler is a default handler to serve up
 // a home page.
 func Test_ParseMusicXML(t *testing.T) {
-	file, err := os.ReadFile("../front/assets/music/alabama/cleanalabama.xml")
+	file, err := os.ReadFile("../assets/musicXml/cleanCancan.xml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -28,7 +28,7 @@ func Test_ParseMusicXML(t *testing.T) {
 				// Access the duration of each note
 				duration := note.Duration
 				// Store information or perform desired processing
-				fmt.Println("Mesure:", measure.Number, "Notes: {", "Pitch: {", "Accidental:", note.Pitch.Accidental, "Step:", note.Pitch.Step, "Octave:", note.Pitch.Octave, "}", "Duration:", duration, "Voice:", note.Voice, "Type:", note.Type, "Rest:", note.Rest, "Chord:", note.Chord, " }")
+				fmt.Println("Mesure:", measure.Number, "Beat: ", measure.Beat, "Default-x: ", note.Default, " Notes: {", "Pitch: {", "Step:", note.Pitch.Step, "Octave:", note.Pitch.Octave, "}", "Duration:", duration, "String:", note.Notations.Technical.String, "Fret:", note.Notations.Technical.Fret, " }")
 				// fmt.Print( note.Duration)
 			}
 		}

@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { initMicrophone, getTones, getNoise } from '@/utilities/sound/microphone';
-import { notes as notesRegistered, Note } from '@/utilities/sound/notes';
+import { initMicrophone, getTones, getNoise, getDuration } from '@/utilities/sound/microphone';
+import { notes } from '@/utilities/sound/notes';
 import { shallowRef, watch, watchEffect } from 'vue';
 
 const props = defineProps<{
     enableCanvas: boolean;
 }>();
-const notes: Note[] = notesRegistered;
 const stream = shallowRef<MediaStream | null>(null);
 const sensitivity = shallowRef<number>(
     localStorage.getItem('mic_sensivity') ? Number(localStorage.getItem('mic_sensivity')) : 50
@@ -40,7 +39,7 @@ watch(stream, () => {
 });
 watch(sensitivity, () => null); // Required to display sensitivity in real time
 
-function onClick() {
+const onClick = () => {
     if (stream.value === null) {
         // start by recording noise for 5 s
         isRecordingNoise = true;
@@ -49,7 +48,9 @@ function onClick() {
             // recording starts
             startTimeStamp = Date.now();
             console.log(notes);
+            getDuration(stream, startTimeStamp);
         }, 5000);
+
         if (isLocalStorageAcessible) localStorage.setItem('mic_sensivity', String(sensitivity.value));
 
         initMicrophone(sensitivity.value).then((s: MediaStream) => (stream.value = s));
@@ -58,7 +59,7 @@ function onClick() {
         stream.value.getAudioTracks().forEach((track: MediaStreamTrack) => track.stop());
         stream.value = null;
     }
-}
+};
 
 // check if Local Storage is available
 try {

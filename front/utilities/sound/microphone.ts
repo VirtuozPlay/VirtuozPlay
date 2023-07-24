@@ -2,6 +2,7 @@
  * This code is the retranscription in typescript based on https://github.com/aerik/aerik.github.io
  */
 
+import { ShallowRef } from 'vue';
 import { Note, NotePlayed, notes } from './notes';
 
 let analyser: AnalyserNode;
@@ -48,6 +49,11 @@ export const initMicrophone = async (sensitivity: number): Promise<MediaStream> 
     micSource.connect(gainNode);
     micSource.connect(analyser);
 
+    // reset timestamps
+    notes.forEach((note) => {
+        note.timestamps = [];
+    });
+
     return stream;
 };
 
@@ -84,30 +90,6 @@ export const getTones = (startTimeStamp: number, enableCanvas = false, decibelMi
                     maxBytePlayed = notes[nPtr].power;
                     const currentTimestamp = Date.now() - startTimeStamp;
 
-                    // TODO check for note duration
-                    // if(notesPlayed.length === 0) {
-                    //     notesPlayed.push({
-                    //         octave: notes[nPtr].octave,
-                    //         step: notes[nPtr].step,
-                    //         timestamp: currentTimestamp - startTimeStamp,
-                    //         duration: 0,
-                    //     });
-                    // } else {
-                    //     notesPlayed.forEach((notePlayed: NotePlayed) => {
-                    //         if (
-                    //             notes[nPtr].octave === notePlayed.octave &&
-                    //             notes[nPtr].step === notePlayed.step &&
-                    //             (currentTimestamp - startTimeStamp - 500) <= notePlayed.timestamp // if the note has been played in 500 ms
-                    //         ) {
-                    //             notesPlayed.push({
-                    //                 octave: notes[nPtr].octave,
-                    //                 step: notes[nPtr].step,
-                    //                 timestamp: currentTimestamp - startTimeStamp,
-                    //                 duration: currentTimestamp - notePlayed.timestamp,
-                    //             });
-                    //         }
-                    //     });
-                    // }
                     // this condition aims to not log too much notes
                     if (
                         // if note is different
@@ -119,7 +101,9 @@ export const getTones = (startTimeStamp: number, enableCanvas = false, decibelMi
                             currentTimestamp - 500 >= lastNotePlayed.timestamp)
                     ) {
                         // TODO a note is detected !
-                        console.log(JSON.stringify(notes[nPtr]) + ' timestamp: ' + currentTimestamp);
+                        notes[nPtr].timestamps.push(currentTimestamp);
+
+                        //console.log(JSON.stringify(notes[nPtr]) + ' timestamp: ' + currentTimestamp);
                     }
                     // save the note that has been detected
                     lastNotePlayed = {
@@ -204,4 +188,35 @@ export const getNoise = () => {
             }
         }
     }
+};
+
+export const getDuration = (stream: ShallowRef<MediaStream | null>, startTimeStamp: number) => {
+    if (stream.value !== null) {
+        setTimeout(() => {
+            getDuration(stream, startTimeStamp);
+        }, 2000);
+    }
+
+    const currentTimestamp = Date.now() - startTimeStamp;
+
+    notes.forEach((note) => {
+        const timestamps = note.timestamps.filter((timestamp) => timestamp > currentTimestamp - 2000);
+
+        if (timestamps.length > 0) {
+            const timestamp = timestamps[0];
+            const noteDuration = timestamps.length === 1 ? 0 : timestamps[timestamps.length - 1] - timestamp;
+
+            // TODO send note to back
+            console.log(
+                'Note detected: Pitch: ',
+                note.step,
+                'Octave: ',
+                note.octave,
+                'Timestamp: ',
+                timestamp,
+                'Duration: ',
+                noteDuration
+            );
+        }
+    });
 };

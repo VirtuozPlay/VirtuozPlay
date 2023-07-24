@@ -2,7 +2,7 @@
  * This code is the retranscription in typescript based on https://github.com/aerik/aerik.github.io
  */
 
-import { Note, NotePlayed, notesPhaseOpposition } from './notes';
+import { Note, NotePlayed, notes } from './notes';
 
 let analyser: AnalyserNode;
 
@@ -53,12 +53,11 @@ export const initMicrophone = async (sensitivity: number): Promise<MediaStream> 
 
 /**
  * Record played notes
- * @param notes             Array of notes associated with their frequencies
  * @param startTimeStamp    Timestamp of the start of the track
  * @param enableCanvas      Enable canvans
  * @param decibelMin        Minimum binary value of decibel to track (between 0 and 255)
  */
-export const getTones = (notes: Note[], startTimeStamp: number, enableCanvas = false, decibelMin: number) => {
+export const getTones = (startTimeStamp: number, enableCanvas = false, decibelMin: number) => {
     analyser.getByteFrequencyData(frequencyData);
     let count = 0;
     let total = 0;
@@ -78,7 +77,7 @@ export const getTones = (notes: Note[], startTimeStamp: number, enableCanvas = f
             }
         } else {
             if (count > 0) {
-                const power = total / count - notesPhaseOpposition[nPtr].power;
+                const power = total / count - notes[nPtr].noise;
                 notes[nPtr].power = power > 0 ? power : 0; // this check is only done to not display aberrations in canvas
                 // if a note is detected
                 if (notes[nPtr].power > maxBytePlayed * 0.8 && notes[nPtr].power > decibelMin) {
@@ -182,8 +181,8 @@ export const getNoise = () => {
     for (let i = 0; i < buflen; i++) {
         const fdat: number = frequencyData[i];
         const freq: number = i * hertzBinSize; //freq in hertz for this sample
-        const curNote: Note = notesPhaseOpposition[nPtr];
-        const nextNote: Note = notesPhaseOpposition[nPtr + 1];
+        const curNote: Note = notes[nPtr];
+        const nextNote: Note = notes[nPtr + 1];
         //cut off halfway into the next note
         const hzLimit: number = curNote.frequency + (nextNote.frequency - curNote.frequency) / 2;
         if (freq < hzLimit) {
@@ -193,14 +192,14 @@ export const getNoise = () => {
             }
         } else {
             if (count > 0) {
-                if (total / count > notesPhaseOpposition[nPtr].power) {
-                    notesPhaseOpposition[nPtr].power = total / count;
+                if (total / count > notes[nPtr].noise) {
+                    notes[nPtr].noise = total / count;
                 }
                 count = 0;
                 total = 0;
             }
             //next note
-            if (nPtr < notesPhaseOpposition.length - 2) {
+            if (nPtr < notes.length - 2) {
                 nPtr++;
             }
         }

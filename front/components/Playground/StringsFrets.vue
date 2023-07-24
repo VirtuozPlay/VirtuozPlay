@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps(['isPosition']);
+defineProps(['isPosition']);
 </script>
 
 <style>

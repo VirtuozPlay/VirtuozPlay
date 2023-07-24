@@ -14,6 +14,7 @@ const sensitivity = shallowRef<number>(
 let isRecordingNoise = true,
     isLocalStorageAcessible = false;
 let startTimeStamp = 0;
+const fps = 30;
 
 watch(stream, () => {
     const setTones = () => {
@@ -25,7 +26,13 @@ watch(stream, () => {
             getTones(startTimeStamp, props.enableCanvas, 35);
         }
 
-        requestAnimationFrame(setTones);
+        /* This program requires too much ressources.
+         * By default, requestAnimationFrame is based on monitor
+         * refresh rate. Get sound 60/120 times per second is overkill.
+         */
+        setTimeout(() => {
+            requestAnimationFrame(setTones);
+        }, 1000 / fps);
     };
     watchEffect(() => {
         requestAnimationFrame(setTones);

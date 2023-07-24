@@ -89,7 +89,7 @@ func CompareNotes() error {
 		{Name: "A", Duration: 1},
 	}
 
-	xmlData, err := os.ReadFile("../front/assets/music/charles-fox/score.xml") // To update
+	xmlData, err := os.ReadFile("../front/assets/music/alabama/cleanalabama.xml") // To update
 	if err != nil {
 		// Managing errors
 		fmt.Printf("%s\n", err.Error())

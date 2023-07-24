@@ -2,7 +2,13 @@
 import SquareIcon from '@/components/icons/SquareIcon.vue';
 import SimpleButton from '@/components/inputs/SimpleButton.vue';
 
-const props = defineProps(['onListen', 'onPlay', 'onPause', 'onStop', 'animationRunning']);
+defineProps<{
+    onListen(): void;
+    onPlay(): void;
+    onPause(): void;
+    onStop(): void;
+    animationRunning: boolean;
+}>();
 </script>
 
 <template>

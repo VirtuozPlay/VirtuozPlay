@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import ListenPlayPause from '@/components/Playground/ListenPlayPause.vue';
 import StringsFrets from '@/components/Playground/StringsFrets.vue';
 import { useSongStore } from '@/store';
+import { Note } from '@/gql/types';
 
 const isPlaying = ref(false);
 const stringsFretsRef = ref(null);
@@ -16,11 +17,17 @@ interface Position {
 const store = useSongStore();
 console.log('getSong', store.getCurrentSong);
 const title = store.getCurrentSong.title;
-const positions: Position[] = store.getCurrentSong.notes.map((note: any) => ({
-    string: note.string,
-    fret: note.fret,
-    start: note.start,
-}));
+const positions: Position[] = store.getCurrentSong.notes
+    .filter((note) => note != null)
+    .map((note: Note | null) => {
+        // null notes are filtered out, we can safely use non-null assertions
+        const n = note as Note;
+        return {
+            string: n.string,
+            fret: n.fret,
+            start: n.start,
+        };
+    });
 
 console.log('positions', positions);
 
@@ -28,7 +35,7 @@ const currentIndex = ref(0);
 const animationRunning = ref(false);
 const animationPaused = ref(false);
 
-const handleListenCanCan = () => {
+const handleListen = () => {
     if (!isPlaying.value) {
         console.log('I listen to CanCan');
         // audio.play();
@@ -46,7 +53,6 @@ const isPosition = (string: number, fret: number): boolean => {
 };
 
 const startAnimation = () => {
-    let currentTime = 0;
     console.log('Start animation');
     if (animationRunning.value) {
         console.log('Animation already in progress -> exit');
@@ -57,7 +63,6 @@ const startAnimation = () => {
     } else {
         // restart the animation from the beginning
         currentIndex.value = 0;
-        currentTime = 0;
     }
 
     const animate = () => {
@@ -70,7 +75,6 @@ const startAnimation = () => {
 
         console.log(start);
 
-        currentTime += duration;
         currentIndex.value = (currentIndex.value + 1) % positions.length;
 
         if (!animationPaused.value) {
@@ -119,7 +123,7 @@ const isCurrentFret = (fret: number) => {
             </div>
 
             <ListenPlayPause
-                :on-listen="handleListenCanCan"
+                :on-listen="handleListen"
                 :on-play="startAnimation"
                 :on-pause="pauseAnimation"
                 :on-stop="stopAnimation"

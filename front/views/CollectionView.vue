@@ -5,12 +5,13 @@ import { GetSongDocument, GetSongQuery } from '@/gql/queries/GetSong';
 import type { QueryResult } from '@apollo/client';
 import { useRouter } from 'vue-router';
 import { useSongStore } from '@/store';
+import { Song } from '@/gql/types';
 
 const router = useRouter();
-const songstore = useSongStore();
+const songStore = useSongStore();
 
-const handleClick = (song: any) => {
-    songstore.setCurrentSong(song);
+const handleClick = (song: Song) => {
+    songStore.setCurrentSong(song);
 
     router.push({
         path: `/collection/${song?.title}`,
@@ -29,7 +30,11 @@ const handleClick = (song: any) => {
                         <img src="https://placehold.co/600x400?text=Hello+World2" :alt="item?.title" class="w-full" />
                     </div>
                     <div class="col-span-1">
-                        <TextualButton aria-label="example button G" hover-color="#FAFF00" @click="handleClick(item)">
+                        <TextualButton
+                            aria-label="example button G"
+                            hover-color="#FAFF00"
+                            @click="item != null && handleClick(item)"
+                        >
                             Lancer {{ item?.title }}
                         </TextualButton>
                     </div>

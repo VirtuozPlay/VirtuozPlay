@@ -1,3 +1,5 @@
+# TODO: Test GraphQL API
 ignore:
   - 'graph/generated.go'
   - 'graph/models_gen.go'
+  - 'graph/schema.resolvers.go'

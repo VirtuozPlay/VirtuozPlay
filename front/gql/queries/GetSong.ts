@@ -14,6 +14,8 @@ export type GetSongQuery = {
     songs: Array<{
         __typename?: 'Song';
         title: string;
+        imgurl: string;
+        music: string;
         notes: Array<{
             __typename?: 'SongNote';
             measure: number;
@@ -33,6 +35,8 @@ export const GetSongDocument = /*#__PURE__*/ gql`
     query GetSong {
         songs {
             title
+            imgurl
+            music
             notes {
                 measure
                 note

@@ -13,7 +13,7 @@ export default defineConfig({
             '^/sw/serviceWorker.js$': 'http://127.0.0.1:3000',
             '^/about$': 'http://127.0.0.1:3000',
             '^/checkup$': 'http://127.0.0.1:3000',
-            '^/collection$': 'http://127.0.0.1:3000',
+            '^/collection': 'http://127.0.0.1:3000',
             '^/profile$': 'http://127.0.0.1:3000',
             '^/stats$': 'http://127.0.0.1:3000',
             '^/play': 'http://127.0.0.1:3000',

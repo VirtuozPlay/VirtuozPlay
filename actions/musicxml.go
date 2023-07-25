@@ -38,30 +38,30 @@ type Time struct {
 
 // Note represents a note in a measure
 type Note struct {
-	Pitch    Pitch    `xml:"pitch"`
-	Duration int      `xml:"duration"`
-	Voice    int      `xml:"voice"`
-	Type     string   `xml:"type"`
-	Rest     xml.Name `xml:"rest"`
-	Chord    xml.Name `xml:"chord"`
+	Pitch     Pitch     `xml:"pitch"`
+	Duration  int       `xml:"duration"`
+	Voice     int       `xml:"voice"`
+	Type      string    `xml:"type"`
+	Rest      xml.Name  `xml:"rest"`
+	Chord     xml.Name  `xml:"chord"`
 	Notations Notations `xml:"notations"`
-	Default float64    `xml:"default-x,attr"`
+	Default   float64   `xml:"default-x,attr"`
 }
 
 // Pitch represents the pitch of a note
 type Pitch struct {
-	Accidental int8   `xml:"alter"`
-	Step       string `xml:"step"`
-	Octave     int    `xml:"octave"`
+	Step   string `xml:"step"`
+	Octave int    `xml:"octave"`
+	Alter  int    `xml:"alter"`
 }
 
 type Notations struct {
-	Technical Technical    `xml:"technical"`
+	Technical Technical `xml:"technical"`
 }
 
 type Technical struct {
-	String int   `xml:"string"`
-	Fret       string `xml:"fret"`
+	String int    `xml:"string"`
+	Fret   string `xml:"fret"`
 }
 
 type JsonNote struct {

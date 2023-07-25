@@ -46,8 +46,13 @@ type SongNote {
   fret: Int!
   string: Int!
   octave: Int!
+  duration: Int!
+  alter: Int!
   start: Int!
   end: Int!
+  default: Float!
+  beat: Int!
+  type: String!
 }
 
 type VirtuozPlay {

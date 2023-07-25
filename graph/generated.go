@@ -59,6 +59,7 @@ type ComplexityRoot struct {
 		Duration  func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Notes     func(childComplexity int) int
+		Precision func(childComplexity int) int
 		Song      func(childComplexity int) int
 	}
 
@@ -219,6 +220,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Performance.Notes(childComplexity), true
+
+	case "Performance.precision":
+		if e.complexity.Performance.Precision == nil {
+			break
+		}
+
+		return e.complexity.Performance.Precision(childComplexity), true
 
 	case "Performance.song":
 		if e.complexity.Performance.Song == nil {
@@ -783,6 +791,8 @@ func (ec *executionContext) fieldContext_Mutation_startPerformance(ctx context.C
 				return ec.fieldContext_Performance_createdAt(ctx, field)
 			case "duration":
 				return ec.fieldContext_Performance_duration(ctx, field)
+			case "precision":
+				return ec.fieldContext_Performance_precision(ctx, field)
 			case "notes":
 				return ec.fieldContext_Performance_notes(ctx, field)
 			}
@@ -852,6 +862,8 @@ func (ec *executionContext) fieldContext_Mutation_addNotesToPerformance(ctx cont
 				return ec.fieldContext_Performance_createdAt(ctx, field)
 			case "duration":
 				return ec.fieldContext_Performance_duration(ctx, field)
+			case "precision":
+				return ec.fieldContext_Performance_precision(ctx, field)
 			case "notes":
 				return ec.fieldContext_Performance_notes(ctx, field)
 			}
@@ -921,6 +933,8 @@ func (ec *executionContext) fieldContext_Mutation_finishPerformance(ctx context.
 				return ec.fieldContext_Performance_createdAt(ctx, field)
 			case "duration":
 				return ec.fieldContext_Performance_duration(ctx, field)
+			case "precision":
+				return ec.fieldContext_Performance_precision(ctx, field)
 			case "notes":
 				return ec.fieldContext_Performance_notes(ctx, field)
 			}
@@ -1241,6 +1255,50 @@ func (ec *executionContext) fieldContext_Performance_duration(ctx context.Contex
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Performance_precision(ctx context.Context, field graphql.CollectedField, obj *model.Performance) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Performance_precision(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Precision, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Performance_precision(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Performance",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1570,6 +1628,8 @@ func (ec *executionContext) fieldContext_Query_performance(ctx context.Context, 
 				return ec.fieldContext_Performance_createdAt(ctx, field)
 			case "duration":
 				return ec.fieldContext_Performance_duration(ctx, field)
+			case "precision":
+				return ec.fieldContext_Performance_precision(ctx, field)
 			case "notes":
 				return ec.fieldContext_Performance_notes(ctx, field)
 			}
@@ -4673,6 +4733,11 @@ func (ec *executionContext) _Performance(ctx context.Context, sel ast.SelectionS
 			out.Values[i] = ec._Performance_createdAt(ctx, field, obj)
 		case "duration":
 			out.Values[i] = ec._Performance_duration(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "precision":
+			out.Values[i] = ec._Performance_precision(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

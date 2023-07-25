@@ -4,10 +4,17 @@ import { ApolloQuery } from '@vue/apollo-components';
 import type { DocumentNode } from 'graphql/language';
 import type { ApolloQueryResult } from '@apollo/client/core/types';
 
-defineProps<{
-    query: DocumentNode;
-    variables?: Record<string, unknown>;
-}>();
+withDefaults(
+    defineProps<{
+        query: DocumentNode;
+        variables?: Record<string, unknown>;
+        tag?: Element['tagName'];
+    }>(),
+    {
+        variables: undefined,
+        tag: 'div',
+    }
+);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 defineSlots<ApolloQueryResult<any> & { default: any }>();
@@ -18,7 +25,7 @@ defineSlots<ApolloQueryResult<any> & { default: any }>();
     ApolloQuery component with TypeScript.
 -->
 <template>
-    <ApolloQuery :query="() => $props.query" :variables="$props.variables">
+    <ApolloQuery :query="() => $props.query" :variables="$props.variables" :tag='$props.tag'>
         <template #default="{ result }: { result: ApolloQueryResult<any> }">
             <slot v-bind="result"></slot>
         </template>

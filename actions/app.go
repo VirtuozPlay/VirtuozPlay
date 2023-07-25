@@ -73,6 +73,7 @@ func App() *buffalo.App {
 		app.GET("/about", homeHandler)
 		app.GET("/checkup", homeHandler)
 		app.GET("/collection", homeHandler)
+		app.GET("/collection/{songIdOrName}", homeHandler)
 		app.GET("/profile", homeHandler)
 		app.GET("/stats", homeHandler)
 		app.GET("/play", homeHandler)

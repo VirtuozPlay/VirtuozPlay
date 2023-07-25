@@ -16,6 +16,9 @@ interface Position {
 
 const store = useSongStore();
 const title = store.currentSong.title;
+const image = store.currentSong.imgurl;
+const music = store.currentSong.music;
+const audio = new Audio(music);
 const positions: Position[] = (store.currentSong.notes ?? [])
     .filter((note?: SongNote | null) => note != null)
     .map((note: SongNote | null) => {
@@ -28,27 +31,50 @@ const positions: Position[] = (store.currentSong.notes ?? [])
         };
     });
 
-console.log('positions', positions);
+const notename = (store.currentSong.notes ?? [])
+    .filter((note?: SongNote | null) => note != null)
+    .map((note: SongNote | null) => {
+        const n = note as SongNote;
+        return {
+            note: n.note,
+        };
+    });
+
+const updateCurrentNoteName = () => {
+    const currentNote = notename[currentIndex.value];
+    if (currentNote) {
+        currentNoteName.value = currentNote.note;
+    } else {
+        currentNoteName.value = '';
+    }
+};
 
 const currentIndex = ref(0);
+const currentNoteName = ref('');
 const animationRunning = ref(false);
 const animationPaused = ref(false);
 
+const iconState = ref(['fas', 'headphones']);
+
 const handleListen = () => {
-    if (!isPlaying.value) {
-        console.log('I listen to CanCan');
-        // audio.play();
-        isPlaying.value = true;
-    } else {
-        console.log('CanCan is paused');
-        // audio.pause();
+    if (isPlaying.value) {
+        audio.pause();
         isPlaying.value = false;
+        iconState.value = ['fas', 'headphones'];
+    } else {
+        audio.play();
+        isPlaying.value = true;
+        iconState.value = ['fas', 'stop'];
     }
 };
 
 const isPosition = (string: number, fret: number): boolean => {
     const currentPosition = positions[currentIndex.value];
     return string === currentPosition.string && fret === currentPosition.fret;
+};
+
+const isCurrentFret = (fret: number) => {
+    return positions[currentIndex.value].fret === fret;
 };
 
 const startAnimation = () => {
@@ -60,8 +86,7 @@ const startAnimation = () => {
     if (animationPaused.value) {
         animationPaused.value = false;
     } else {
-        // restart the animation from the beginning
-        currentIndex.value = 0;
+        currentIndex.value = 0; // restart from the beginning
     }
 
     const animate = () => {
@@ -81,6 +106,7 @@ const startAnimation = () => {
         } else {
             animationRunning.value = false;
         }
+        updateCurrentNoteName();
     };
 
     animate();
@@ -100,16 +126,20 @@ const stopAnimation = () => {
     animationPaused.value = true;
     currentIndex.value = 0;
 };
-
-const isCurrentFret = (fret: number) => {
-    return positions[currentIndex.value].fret === fret;
-};
 </script>
 
 <template>
     <main aria-label="songview section" class="mt-16 w-80vw mx-auto">
         <div>
-            <h1>{{ title }}</h1>
+            <h1 class="text-3xl text-center font-extrabold">{{ title }}</h1>
+            <div class="flex flex-row justify-center text-3xl my-14">
+                <p class="mx-5">
+                    Notes : <span class="font-extrabold">{{ animationRunning ? currentNoteName : '▶' }}</span>
+                </p>
+                <p>⚡</p>
+                <p class="mx-5">Toi : <span class="font-extrabold">B</span></p>
+            </div>
+
             <div v-for="string in 1" :key="string" class="flex flex-row flex-wrap w-full justify-around text-gray-900">
                 <div v-for="fret in 14" :key="fret" :class="{ 'anim-fret': isCurrentFret(fret) }">
                     {{ fret }}
@@ -128,6 +158,8 @@ const isCurrentFret = (fret: number) => {
                 :on-pause="pauseAnimation"
                 :on-stop="stopAnimation"
                 :animation-running="animationRunning"
+                :icon-state="iconState"
+                :is-playing="isPlaying"
             />
         </div>
     </main>

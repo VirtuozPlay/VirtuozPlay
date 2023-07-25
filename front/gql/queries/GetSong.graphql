@@ -1,6 +1,8 @@
 query GetSong {
   songs {
     title
+    imgurl
+    music
     notes {
       measure
       note

@@ -14,7 +14,7 @@ const handleClick = (song: Partial<Song>) => {
     songStore.setCurrentSong(song);
 
     router.push({
-        path: `/collection/${song?.title}`,
+        path: `/collection/${song?.id}`,
     });
 };
 </script>
@@ -22,20 +22,30 @@ const handleClick = (song: Partial<Song>) => {
 <template>
     <GraphQL :query="GetSongDocument">
         <template #default="{ data }: ApolloQueryResult<GetSongQuery>">
-            <main v-if="data" title="collection section" class="mt-16 w-80vw mx-auto">
-                <div class="w-full text-center"><h1>Collection</h1></div>
-                <div v-for="(item, index) in data.songs" :key="index" class="mx-auto grid grid-cols-2 gap-4">
-                    <div class="col-span-1">
-                        <h2 class="text-center mt-2">{{ item?.title }}</h2>
-                        <img src="https://placehold.co/600x400?text=Hello+World2" :alt="item?.title" class="w-full" />
+            <div class="container mx-auto px-4 lg:px-0 lg:max-w-4xl">
+                <main v-if="data" title="collection section" class="mt-16">
+                    <h1 class="text-center text-3xl font-semibold m-5">Collection</h1>
+                    <div
+                        v-for="(item, index) in data.songs"
+                        :key="index"
+                        class="mx-4 lg:mx-0 grid grid-cols-2 gap-4 items-center"
+                    >
+                        <div class="col-span-1">
+                            <h2 class="text-center mt-2">{{ item.title }}</h2>
+                            <img style="width: 300px" :src="item?.imgurl" :alt="item.title" class="" />
+                        </div>
+                        <div class="col-span-1">
+                            <TextualButton
+                                aria-label="example button G"
+                                hover-color="#FAFF00"
+                                @click="handleClick(item)"
+                            >
+                                Lancer {{ item.title }}
+                            </TextualButton>
+                        </div>
                     </div>
-                    <div class="col-span-1">
-                        <TextualButton aria-label="example button G" hover-color="#FAFF00" @click="handleClick(item)">
-                            Lancer {{ item?.title }}
-                        </TextualButton>
-                    </div>
-                </div>
-            </main>
+                </main>
+            </div>
         </template>
     </GraphQL>
 </template>

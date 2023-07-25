@@ -112,6 +112,8 @@ export type QuerySongArgs = {
 export type Song = {
     readonly __typename?: 'Song';
     readonly id: Scalars['ID']['output'];
+    readonly imgurl: Scalars['String']['output'];
+    readonly music: Scalars['String']['output'];
     readonly notes: ReadonlyArray<SongNote>;
     readonly title: Scalars['String']['output'];
 };

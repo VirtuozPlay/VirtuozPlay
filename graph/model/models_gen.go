@@ -38,9 +38,11 @@ type PerformanceNote struct {
 }
 
 type Song struct {
-	ID    string      `json:"id"`
-	Title string      `json:"title"`
-	Notes []*SongNote `json:"notes"`
+	ID     string      `json:"id"`
+	Title  string      `json:"title"`
+	Imgurl string      `json:"imgurl"`
+	Music  string      `json:"music"`
+	Notes  []*SongNote `json:"notes"`
 }
 
 // This is a separate type from PerformanceNote for now

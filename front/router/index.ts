@@ -42,13 +42,9 @@ const router = createRouter({
             redirect: '/collection',
         },
         {
-            path: '/collection/cancan',
-            name: 'cancan',
-            component: () => import('../views/SongView.vue'),
-        },
-        {
-            path: '/collection/corinna',
-            name: 'corinna',
+            path: '/collection/:id',
+            name: 'id',
+            props: true,
             component: () => import('../views/SongView.vue'),
         },
         {

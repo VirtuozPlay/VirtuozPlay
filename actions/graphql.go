@@ -16,6 +16,7 @@ func init() {
 	// Initialize the GraphQL server
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
 		Performances: repository.NewPerformancesRepository(models.DB),
+		Songs:        repository.NewSongsRepository(models.DB),
 	}}))
 
 	// Supported ways to submit queries

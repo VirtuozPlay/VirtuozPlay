@@ -3,30 +3,125 @@
 name = "performance_all_possible_notes"
 
 [[scenario.table]]
-name = "performance"
+name = "song"
 
 [[scenario.table.row]]
 id = "1"
-nano_id = "test-1"
+nano_id = "song-1"
+created_at = "<%= now() %>"
+updated_at = "<%= now() %>"
+title = "Empty Song of Silence"
+
+[[scenario.table]]
+name = "performance"
+
+[[scenario.table.row]]
+id = 1
+nano_id = "perf-1"
 created_at = "<%= now() %>"
 updated_at = "<%= now() %>"
 notes_count = 21
+song_id = 1
 notes_encoding = 1 # Base64 encoding
 # Notes are encoded as base64 because TOML does not support binary data
 notes = "AN8GAQCoBxEAkwkTAO0QCQDAFgoA5hYGAO0WCwDvFwAA0hgMAPcaCAC5IA4A9CMFAJMkBADCJAIAoCUQAL8tFQCRNgMAzzwNAJVAEgCvQBYArkIU"
+
+[[scenario]]
+name = "performance_creation"
+
+[[scenario.table]]
+name = "song"
+
+[[scenario]]
+name = "performance_mark_as_finished"
+
+[[scenario.table]]
+name = "song"
+
+[[scenario.table.row]]
+id = "4"
+nano_id = "song-4"
+created_at = "<%= now() %>"
+updated_at = "<%= now() %>"
+title = "Empty Song of Silence"
 
 [[scenario]]
 # Purposly badly encoded performance
 name = "performance_bad_encoding"
 
 [[scenario.table]]
+name = "song"
+
+[[scenario.table.row]]
+id = "2"
+nano_id = "song-2"
+created_at = "<%= now() %>"
+updated_at = "<%= now() %>"
+title = "Empty Song of Silence"
+
+[[scenario.table]]
 name = "performance"
 
 [[scenario.table.row]]
 id = "2"
-nano_id = "test-2"
+nano_id = "perf-2"
 created_at = "<%= now() %>"
 updated_at = "<%= now() %>"
 notes_count = 5
 notes_encoding = 1
+song_id = 2
 notes = "rbhvbçbg;?????  W????AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+
+[[scenario]]
+name = "performance_append_notes"
+
+[[scenario.table]]
+name = "song"
+
+[[scenario.table.row]]
+id = "3"
+nano_id = "song-3"
+created_at = "<%= now() %>"
+updated_at = "<%= now() %>"
+title = "Empty Song of Silence"
+
+[[scenario.table]]
+name = "performance"
+
+[[scenario.table.row]]
+id = 3
+nano_id = "perf-3"
+created_at = "<%= now() %>"
+updated_at = "<%= now() %>"
+notes_count = 21
+song_id = 3
+notes_encoding = 1 # Base64 encoding
+# Notes are encoded as base64 because TOML does not support binary data
+notes = "AN8GAQCoBxEAkwkTAO0QCQDAFgoA5hYGAO0WCwDvFwAA0hgMAPcaCAC5IA4A9CMFAJMkBADCJAIAoCUQAL8tFQCRNgMAzzwNAJVAEgCvQBYArkIU"
+
+[[scenario]]
+name = "performance_to_update"
+
+[[scenario.table]]
+name = "song"
+
+[[scenario.table.row]]
+id = "5"
+nano_id = "song-5"
+created_at = "<%= now() %>"
+updated_at = "<%= now() %>"
+title = "Empty Song of Silence"
+
+[[scenario.table]]
+name = "performance"
+
+[[scenario.table.row]]
+id = 5
+nano_id = "perf-5"
+created_at = "<%= now() %>"
+updated_at = "<%= now() %>"
+notes_count = 21
+song_id = 5
+notes_encoding = 1 # Base64 encoding
+# Notes are encoded as base64 because TOML does not support binary data
+notes = "AN8GAQCoBxEAkwkTAO0QCQDAFgoA5hYGAO0WCwDvFwAA0hgMAPcaCAC5IA4A9CMFAJMkBADCJAIAoCUQAL8tFQCRNgMAzzwNAJVAEgCvQBYArkIU"

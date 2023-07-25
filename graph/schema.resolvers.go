@@ -6,16 +6,22 @@ package graph
 
 import (
 	"context"
+	"github.com/99designs/gqlgen/graphql"
 	"virtuozplay/graph/model"
 	db "virtuozplay/models"
+	"virtuozplay/models/repository"
 
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 // StartPerformance is the resolver for the startPerformance field.
-func (r *mutationResolver) StartPerformance(ctx context.Context) (*model.Performance, error) {
+func (r *mutationResolver) StartPerformance(ctx context.Context, songID string) (*model.Performance, error) {
 	_ = ctx
-	return ToGraphQLPerformance(r.Performances.New())
+	song, err := r.Songs.FindByNanoID(db.NanoID(songID))
+	if err != nil {
+		return nil, err
+	}
+	return ToGraphQLPerformance(r.Performances.New(song))
 }
 
 // AddNotesToPerformance is the resolver for the addNotesToPerformance field.
@@ -63,6 +69,26 @@ func (r *mutationResolver) FinishPerformance(ctx context.Context, id string) (*m
 	return ToGraphQLPerformance(perf, r.Performances.MarkAsFinished(perf))
 }
 
+// DebugCreateSong is the resolver for the debug_createSong field.
+func (r *mutationResolver) DebugCreateSong(ctx context.Context, title string) (*model.Song, error) {
+	// TODO: TEMPORARY, remove this once we have a proper song creation flow
+	_ = ctx
+	id, err := db.NewNanoID()
+	if err != nil {
+		return nil, err
+	}
+	song := &db.Song{
+		NanoID: id,
+		Title:  title,
+	}
+	err = r.Songs.Create(song)
+	return &model.Song{
+		ID:    string(song.NanoID),
+		Title: song.Title,
+		Notes: []*model.SongNote{},
+	}, wrapError(err)
+}
+
 // VirtuozPlay is the resolver for the virtuozPlay field.
 func (r *queryResolver) VirtuozPlay(ctx context.Context) (*model.VirtuozPlay, error) {
 	_ = ctx
@@ -71,55 +97,29 @@ func (r *queryResolver) VirtuozPlay(ctx context.Context) (*model.VirtuozPlay, er
 
 // Performance is the resolver for the performance field.
 func (r *queryResolver) Performance(ctx context.Context, id string) (*model.Performance, error) {
-	_ = ctx
-	return ToGraphQLPerformance(r.Performances.FindByNanoID(db.NanoID(id)))
+	fields := graphql.CollectAllFields(ctx)
+	nanoID := db.NanoID(id)
+
+	return ToGraphQLPerformance(r.Performances.FindByNanoID(nanoID, fields...))
 }
 
 // Songs is the resolver for the songs field.
 func (r *queryResolver) Songs(ctx context.Context) ([]*model.Song, error) {
-	return []*model.Song{
-		{
-			ID:    "h8rHA-Q0dD5dBbY1L2Fzf",
-			Title: "Cancan",
-			Notes: []*model.SongNote{
-				{Measure: 1, Note: "C", Fret: 10, String: 2, Start: 0, End: 1000},
-				{Measure: 2, Note: "C", Fret: 11, String: 2, Start: 1000, End: 2000},
-				{Measure: 3, Note: "C", Fret: 10, String: 2, Start: 2000, End: 3000},
-				{Measure: 4, Note: "C", Fret: 11, String: 2, Start: 3000, End: 4000},
-				{Measure: 5, Note: "C", Fret: 17, String: 2, Start: 4000, End: 5000},
-				{Measure: 6, Note: "C", Fret: 18, String: 2, Start: 5000, End: 6000},
-				{Measure: 7, Note: "C", Fret: 17, String: 2, Start: 6000, End: 7000},
-				{Measure: 7, Note: "C", Fret: 18, String: 2, Start: 7000, End: 8000},
-			},
-		},
-		{
-			ID:    "",
-			Title: "Cancan",
-			Notes: []*model.SongNote{
-				{Measure: 1, Note: "C", Fret: 10, String: 4, Octave: 4, Start: 0, End: 1000},
-				{Measure: 2, Note: "D", Fret: 11, String: 4, Octave: 4, Start: 1000, End: 2000},
-				{Measure: 3, Note: "E", Fret: 10, String: 3, Octave: 4, Start: 2200, End: 3000},
-				{Measure: 4, Note: "C", Fret: 11, String: 2, Octave: 4, Start: 3000, End: 4000},
-				{Measure: 5, Note: "D", Fret: 14, String: 1, Octave: 5, Start: 4000, End: 5000},
-				{Measure: 6, Note: "E", Fret: 2, String: 5, Octave: 5, Start: 5000, End: 6000},
-				{Measure: 7, Note: "C", Fret: 3, String: 4, Octave: 5, Start: 6000, End: 7000},
-				{Measure: 7, Note: "A", Fret: 1, String: 2, Octave: 5, Start: 7000, End: 8000},
-			},
-		},
-		{
-			Title: "Corinna",
-			Notes: []*model.SongNote{
-				{Measure: 1, Note: "A", Fret: 10, String: 2, Octave: 4, Start: 0, End: 1000},
-				{Measure: 2, Note: "A", Fret: 11, String: 2, Octave: 4, Start: 1000, End: 2000},
-				{Measure: 3, Note: "C", Fret: 10, String: 2, Octave: 4, Start: 2000, End: 3000},
-				{Measure: 4, Note: "A", Fret: 11, String: 2, Octave: 4, Start: 3000, End: 4000},
-				{Measure: 5, Note: "C", Fret: 11, String: 2, Octave: 5, Start: 4000, End: 5000},
-				{Measure: 6, Note: "A", Fret: 11, String: 2, Octave: 5, Start: 5000, End: 6000},
-				{Measure: 7, Note: "C", Fret: 1, String: 2, Octave: 5, Start: 6000, End: 7000},
-				{Measure: 7, Note: "C", Fret: 2, String: 2, Octave: 5, Start: 7000, End: 8000},
-			},
-		},
-	}, nil
+	_ = ctx
+
+	// FIXME: Remove this when we have a proper loading for songs
+	allSongs := make([]*model.Song, 0, len(repository.HardcodedSongs))
+	for _, song := range repository.HardcodedSongs {
+		s, _ := ToGraphQLSong(song, nil)
+		allSongs = append(allSongs, s)
+	}
+	return allSongs, nil
+}
+
+// Song is the resolver for the song field.
+func (r *queryResolver) Song(ctx context.Context, id string) (*model.Song, error) {
+	_ = ctx
+	return ToGraphQLSong(r.Resolver.Songs.FindByNanoID(db.NanoID(id)))
 }
 
 // Mutation returns MutationResolver implementation.

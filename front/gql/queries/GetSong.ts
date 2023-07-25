@@ -23,8 +23,8 @@ export type GetSongQuery = {
             octave: number;
             start: number;
             end: number;
-        } | null>;
-    } | null>;
+        }>;
+    }>;
 };
 
 export declare const GetSong: import('graphql').DocumentNode;

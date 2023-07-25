@@ -31,7 +31,8 @@ CREATE TABLE public.performance (
     notes_encoding smallint DEFAULT '0'::smallint,
     notes bytea,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    song_id bigint NOT NULL
 );
 
 
@@ -70,10 +71,53 @@ CREATE TABLE public.schema_migration (
 ALTER TABLE public.schema_migration OWNER TO postgres;
 
 --
+-- Name: song; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.song (
+    id bigint NOT NULL,
+    nano_id character varying(21),
+    title character varying(255),
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.song OWNER TO postgres;
+
+--
+-- Name: song_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.song_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.song_id_seq OWNER TO postgres;
+
+--
+-- Name: song_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.song_id_seq OWNED BY public.song.id;
+
+
+--
 -- Name: performance id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.performance ALTER COLUMN id SET DEFAULT nextval('public.performance_id_seq'::regclass);
+
+
+--
+-- Name: song id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.song ALTER COLUMN id SET DEFAULT nextval('public.song_id_seq'::regclass);
 
 
 --
@@ -93,10 +137,26 @@ ALTER TABLE ONLY public.schema_migration
 
 
 --
+-- Name: song song_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.song
+    ADD CONSTRAINT song_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: schema_migration_version_idx; Type: INDEX; Schema: public; Owner: postgres
 --
 
 CREATE UNIQUE INDEX schema_migration_version_idx ON public.schema_migration USING btree (version);
+
+
+--
+-- Name: performance performance_song_song_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.performance
+    ADD CONSTRAINT performance_song_song_id_fk FOREIGN KEY (song_id) REFERENCES public.song(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

@@ -1,0 +1,12 @@
+create_table("song") {
+	t.Column("id", "bigint", {primary: true})
+	t.Column("nano_id", "string", {null: false, size: 21, unique: true})
+	t.Column("title", "string", {null: false})
+}
+
+add_column("performance", "song_id", "bigint")
+add_foreign_key("performance", "song_id", {"song": ["id"]}, {
+    "name": "performance_song_song_id_fk",
+    "on_delete": "cascade",
+    "on_update": "cascade",
+})

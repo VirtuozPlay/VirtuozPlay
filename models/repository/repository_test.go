@@ -9,6 +9,7 @@ import (
 type RepositorySuite struct {
 	*suite.Model
 	Performances Performances
+	Songs        Songs
 }
 
 func Test_RepositorySuite(t *testing.T) {
@@ -20,6 +21,7 @@ func Test_RepositorySuite(t *testing.T) {
 	as := &RepositorySuite{
 		Model:        model,
 		Performances: NewPerformancesRepository(model.DB),
+		Songs:        NewSongsRepository(model.DB),
 	}
 	suite.Run(t, as)
 }

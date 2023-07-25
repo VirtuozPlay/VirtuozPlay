@@ -37,11 +37,8 @@ func wrapError(err error) error {
 
 // ToGraphQLPerformance converts an instance of the Performance model to its GraphQL representation.
 func ToGraphQLPerformance(performance *db.Performance, err error) (*model.Performance, error) {
-	if err = wrapError(err); err != nil {
+	if err = wrapError(err); performance == nil || err != nil {
 		return nil, err
-	}
-	if performance == nil {
-		panic("performance is nil")
 	}
 
 	notes := make([]*model.PerformanceNote, len(performance.Notes))
@@ -54,6 +51,10 @@ func ToGraphQLPerformance(performance *db.Performance, err error) (*model.Perfor
 		}
 	}
 	createdAt := performance.CreatedAt.String()
+	song, err := ToGraphQLSong(performance.Song, nil)
+	if err != nil {
+		return nil, err
+	}
 
 	userName := "DummyUser"
 	return &model.Performance{
@@ -67,10 +68,26 @@ func ToGraphQLPerformance(performance *db.Performance, err error) (*model.Perfor
 			ID:   string(performance.NanoID),
 			Name: &userName,
 		},
-		// TODO VERY TEMPORARY, please replace by proper DB relation
-		Song: &model.Song{
-			ID:    string(performance.NanoID),
-			Title: "Some Dummy Title",
-		},
+		Song: song,
+	}, nil
+}
+
+// ToGraphQLSong converts an instance of model.Song to its GraphQL representation.
+func ToGraphQLSong(song *db.Song, err error) (*model.Song, error) {
+	if err = wrapError(err); song == nil || err != nil {
+		return nil, err
+	}
+
+	notes := make([]*model.SongNote, len(song.Notes))
+
+	for i, note := range song.Notes {
+		n := note
+		notes[i] = &n
+	}
+
+	return &model.Song{
+		ID:    string(song.NanoID),
+		Title: song.Title,
+		Notes: notes,
 	}, nil
 }

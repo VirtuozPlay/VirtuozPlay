@@ -10,4 +10,5 @@ import (
 
 type Resolver struct {
 	Performances repository.Performances
+	Songs        repository.Songs
 }

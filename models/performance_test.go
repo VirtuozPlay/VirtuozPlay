@@ -9,6 +9,8 @@ func (ms *ModelSuite) Test_performanceInterfaceImplementations() {
 	ms.Implements((*pop.AfterCreateable)(nil), &Performance{})
 	ms.Implements((*pop.AfterUpdateable)(nil), &Performance{})
 	ms.Implements((*pop.AfterFindable)(nil), &Performance{})
+	ms.Implements((*Value)(nil), &Performance{})
+	ms.Implements((*PreLoadable)(nil), &Performance{})
 }
 
 func (ms *ModelSuite) Test_decodeEncodeAllNotes() {
@@ -18,7 +20,7 @@ func (ms *ModelSuite) Test_decodeEncodeAllNotes() {
 	ms.NoError(ms.Model.DB.First(&perf))
 
 	ms.Equal(int64(1), perf.ID)
-	ms.Equal(NanoID("test-1"), perf.NanoID)
+	ms.Equal(NanoID("perf-1"), perf.NanoID)
 	ms.Equal(Base64Notes, perf.NotesEncoding)
 	ms.Equal(21, len(perf.Notes))
 
@@ -66,10 +68,17 @@ func (ms *ModelSuite) Test_badPerfEncoding() {
 }
 
 func (ms *ModelSuite) Test_createPerformance() {
+	// Load reference song
+	ms.LoadFixture("song_empty")
+	var song Song
+	ms.NoError(ms.Model.DB.First(&song))
+
 	perf := Performance{
-		ID:     12,
+		ID:     1200,
 		NanoID: "test-12",
 		Notes:  []Note{{At: 0, Duration: 128, Value: "A"}},
+		Song:   &song,
+		SongID: song.ID,
 	}
 	validationErrs, err := ms.DB.ValidateAndCreate(&perf)
 	ms.NoError(err)
@@ -229,7 +238,7 @@ func (ms *ModelSuite) Test_normalizePerformance() {
 }
 
 func (ms *ModelSuite) Test_appendNote() {
-	ms.LoadFixture("performance_all_possible_notes")
+	ms.LoadFixture("performance_append_notes")
 
 	var perf Performance
 	ms.NoError(ms.Model.DB.First(&perf))
@@ -251,4 +260,13 @@ func (ms *ModelSuite) Test_appendNote() {
 
 	// Same note, but with invalid value
 	ms.Error(perf.AppendNote(0, 20999, 67, "Ez"))
+}
+
+func (ms *ModelSuite) Test_Performance_ResolvePreloads() {
+	var perf Performance
+
+	ms.Empty(perf.ResolvePreloads())
+	ms.Contains(perf.ResolvePreloads("song"), "Song")
+	ms.Contains(perf.ResolvePreloads("SONG"), "Song")
+	ms.Len(perf.ResolvePreloads("Song", "sOnG", "other"), 1)
 }

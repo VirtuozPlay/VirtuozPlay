@@ -41,13 +41,18 @@ type Song struct {
 
 // This is a separate type from PerformanceNote for now
 type SongNote struct {
-	Measure int    `json:"measure"`
-	Note    string `json:"note"`
-	Fret    int    `json:"fret"`
-	String  int    `json:"string"`
-	Octave  int    `json:"octave"`
-	Start   int    `json:"start"`
-	End     int    `json:"end"`
+	Measure  int     `json:"measure"`
+	Note     string  `json:"note"`
+	Fret     int     `json:"fret"`
+	String   int     `json:"string"`
+	Octave   int     `json:"octave"`
+	Duration int     `json:"duration"`
+	Alter    int     `json:"alter"`
+	Start    int     `json:"start"`
+	End      int     `json:"end"`
+	Default  float64 `json:"default"`
+	Beat     int     `json:"beat"`
+	Type     string  `json:"type"`
 }
 
 type User struct {

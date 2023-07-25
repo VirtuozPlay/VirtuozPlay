@@ -1,34 +1,94 @@
 package graph
 
 import (
+	"encoding/xml"
 	"fmt"
 	"os"
-	"strings"
+	"path/filepath"
 )
 
+type MusicXML struct {
+	Title string  `xml:"title"`
+	Parts []Parts `xml:"part"`
+}
 
-func findFileByTitle(directoryPath, fileTitle string) (string, error) {
-	// Lire le contenu du répertoire
-	files, err := os.ReadDir( "../assets/musicXml")
-	if err != nil {
-		return "", err
-	}
-	
-	var foundFiles []string // Tableau pour stocker les noms de fichiers trouvés
-	
-	// Browse directory files
-	for _, file := range files {
-		foundFiles = append(foundFiles, file.Name())
-		fmt.Printf("Liste des fichiers : %s\n", foundFiles)
-		// Vérifier si le fichier est un fichier régulier
-		if file.Type().IsRegular() {
-			// Vérifier si le nom du fichier contient le titre de la chanson (en supposant que le titre est dans le nom du fichier)
-			if strings.Contains(strings.ToLower(file.Name()), strings.ToLower(fileTitle)) {
-				return file.Name(), nil
-			}
+// Part represents a part in a piece of music
+type Parts struct {
+	Measures []Measure `xml:"measure"`
+}
+
+// Measure represents a measure in a piece of music
+type Measure struct {
+	Number int    `xml:"number,attr"`
+	Beat   int    `xml:"beat"`
+	Notes  []Note `xml:"note"`
+	// Key    []Key  `xml:"key"`
+	// Time   []Time `xml:"time"`
+}
+
+// Note represents a note in a measure
+type Note struct {
+	Pitch     Pitch     `xml:"pitch"`
+	Duration  int       `xml:"duration"`
+	Voice     int       `xml:"voice"`
+	Type      string    `xml:"type"`
+	Rest      xml.Name  `xml:"rest"`
+	Chord     xml.Name  `xml:"chord"`
+	Notations Notations `xml:"notations"`
+	Default   float64   `xml:"default-x,attr"`
+}
+
+type Pitch struct {
+	Step   string `xml:"step"`
+	Octave int    `xml:"octave"`
+	Alter  int    `xml:"alter"`
+}
+
+type Notations struct {
+	Technical Technical `xml:"technical"`
+}
+
+type Technical struct {
+	String int `xml:"string"`
+	Fret   int `xml:"fret"`
+}
+
+func ListFilesInDirectory(directoryPath string) ([]string, error) {
+	var files []string
+
+	err := filepath.Walk(directoryPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
 		}
+		if !info.IsDir() {
+			files = append(files, path)
+		}
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
 	}
 
-	// Si aucun fichier correspondant n'est trouvé, renvoyer une erreur
-	return "", fmt.Errorf("Aucun fichier trouvé pour la chanson : %s", fileTitle)
+	return files, nil
+}
+
+func ParseXMLFiles(files []string) ([]MusicXML, error) {
+	var musicXMLList []MusicXML
+
+	for i, file := range files {
+		fmt.Println(i)
+		f, err := os.Open(file)
+		if err != nil {
+			return nil, err
+		}
+		defer f.Close()
+
+		if err := xml.NewDecoder(f).Decode(&musicXMLList); err != nil {
+			return nil, err
+		}
+
+	}
+
+	return musicXMLList, nil
 }

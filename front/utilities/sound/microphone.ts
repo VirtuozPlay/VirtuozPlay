@@ -4,6 +4,8 @@
 
 import { ShallowRef } from 'vue';
 import { Note, NotePlayed, notes } from './notes';
+import { AddNotesDocument } from '@/gql/mutations/AddNote';
+import apolloProvider from '@/apollo';
 
 let analyser: AnalyserNode;
 
@@ -12,7 +14,7 @@ let hertzBinSize: number;
 let frequencyData: Uint8Array;
 let buflen: number;
 
-let lastNotePlayed: NotePlayed = { octave: 0, step: '', timestamp: 0, duration: 0 };
+let lastNotePlayed: NotePlayed = { octave: 0, value: '', at: 0, duration: 0 };
 let maxBytePlayed = 0; // max gain of note played
 // canvas
 const maxValue = 256; //based on Uint8Array possible values
@@ -94,11 +96,11 @@ export const getTones = (startTimeStamp: number, enableCanvas = false, decibelMi
                     if (
                         // if note is different
                         notes[nPtr].octave !== lastNotePlayed.octave ||
-                        notes[nPtr].step !== lastNotePlayed.step ||
+                        notes[nPtr].step !== lastNotePlayed.value ||
                         // if the same note has been played after 500 ms
                         (notes[nPtr].octave === lastNotePlayed.octave &&
-                            notes[nPtr].step === lastNotePlayed.step &&
-                            currentTimestamp - 500 >= lastNotePlayed.timestamp)
+                            notes[nPtr].step === lastNotePlayed.value &&
+                            currentTimestamp - 500 >= lastNotePlayed.at)
                     ) {
                         // TODO a note is detected !
                         notes[nPtr].timestamps.push(currentTimestamp);
@@ -108,8 +110,8 @@ export const getTones = (startTimeStamp: number, enableCanvas = false, decibelMi
                     // save the note that has been detected
                     lastNotePlayed = {
                         octave: notes[nPtr].octave,
-                        step: notes[nPtr].step,
-                        timestamp: currentTimestamp,
+                        value: notes[nPtr].step,
+                        at: currentTimestamp,
                         duration: 0,
                     };
                 }
@@ -191,32 +193,39 @@ export const getNoise = () => {
 };
 
 export const getDuration = (stream: ShallowRef<MediaStream | null>, startTimeStamp: number) => {
+    const durationInterval = 500;
     if (stream.value !== null) {
         setTimeout(() => {
             getDuration(stream, startTimeStamp);
-        }, 2000);
+        }, durationInterval);
     }
 
     const currentTimestamp = Date.now() - startTimeStamp;
+    const notesDetected: NotePlayed[] = [];
 
     notes.forEach((note) => {
-        const timestamps = note.timestamps.filter((timestamp) => timestamp > currentTimestamp - 2000);
+        const timestamps = note.timestamps.filter((timestamp) => timestamp > currentTimestamp - durationInterval);
 
         if (timestamps.length > 0) {
             const timestamp = timestamps[0];
             const noteDuration = timestamps.length === 1 ? 0 : timestamps[timestamps.length - 1] - timestamp;
 
-            // TODO send note to back
-            console.log(
-                'Note detected: Pitch: ',
-                note.step,
-                'Octave: ',
-                note.octave,
-                'Timestamp: ',
-                timestamp,
-                'Duration: ',
-                noteDuration
-            );
+            notesDetected.push({ at: timestamp, duration: noteDuration, value: note.step, octave: note.octave });
         }
     });
+    if (notesDetected.length > 0) {
+        // sort in ascending order based on notes timestamps
+        notesDetected.sort((a: NotePlayed, b: NotePlayed) => a.at - b.at);
+        console.log(notesDetected);
+
+        // send notes to back
+        apolloProvider.defaultClient.mutate({
+            mutation: AddNotesDocument,
+            variables: {
+                // TODO : ID is hardcoded
+                ID: 'CXKu0YxHzIgBrwtXS42Ld',
+                inputNote: notesDetected,
+            },
+        });
+    }
 };

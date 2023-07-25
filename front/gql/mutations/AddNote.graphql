@@ -1,0 +1,5 @@
+mutation AddNotes($ID: ID!, $inputNote: [InputNote!]!) {
+  addNotesToPerformance(id: $ID, notes: $inputNote) {
+    id
+  }
+}

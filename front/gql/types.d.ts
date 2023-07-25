@@ -24,6 +24,8 @@ export type InputNote = {
     readonly at: Scalars['Int']['input'];
     /** The duration of the note, in milliseconds. */
     readonly duration: Scalars['Int']['input'];
+    /** Octave of the note */
+    readonly octave: Scalars['Int']['input'];
     /** Human-readable representation of the note (e.g. 'C#', 'D', 'Fb', etc.) */
     readonly value: Scalars['String']['input'];
 };
@@ -33,6 +35,8 @@ export type Mutation = {
     readonly __typename?: 'Mutation';
     /** Add notes to a performance, each new note must have a 'at' value greater than any existing note's 'at' value in the performance. */
     readonly addNotesToPerformance: Performance;
+    /** TEMPORARY: Create a new song, to *delete* when we have a proper song creation flow. */
+    readonly debug_createSong: Song;
     readonly finishPerformance: Performance;
     /** Begin a new performance for the given song. */
     readonly startPerformance: Performance;
@@ -40,13 +44,18 @@ export type Mutation = {
 
 /** The root mutation type. */
 export type MutationAddNotesToPerformanceArgs = {
+    id: Scalars['ID']['input'];
     notes: ReadonlyArray<InputNote>;
-    performanceId: Scalars['ID']['input'];
+};
+
+/** The root mutation type. */
+export type MutationDebug_CreateSongArgs = {
+    title: Scalars['String']['input'];
 };
 
 /** The root mutation type. */
 export type MutationFinishPerformanceArgs = {
-    performanceId: Scalars['ID']['input'];
+    id: Scalars['ID']['input'];
 };
 
 /** The root mutation type. */
@@ -83,12 +92,20 @@ export type Query = {
     readonly __typename?: 'Query';
     /** Retrieve a performance by its ID. */
     readonly performance?: Maybe<Performance>;
+    /** Fetches a single song by its ID. */
+    readonly song?: Maybe<Song>;
+    /** Fetches _ALL_ songs, there might be a lot of data. */
     readonly songs: ReadonlyArray<Song>;
     readonly virtuozPlay: VirtuozPlay;
 };
 
 /** The root query type. */
 export type QueryPerformanceArgs = {
+    id: Scalars['ID']['input'];
+};
+
+/** The root query type. */
+export type QuerySongArgs = {
     id: Scalars['ID']['input'];
 };
 

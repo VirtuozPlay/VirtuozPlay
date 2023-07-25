@@ -10,31 +10,29 @@ import (
 // Performances is the repository for the Performance model.
 // Provides methods for find and CRUD operations of performances.
 type Performances struct {
-	db         *pop.Connection
+	DatabaseRepository[models.Performance]
 	inProgress map[models.NanoID]*models.Performance
 }
 
 func NewPerformancesRepository(db *pop.Connection) Performances {
-	return Performances{db: db, inProgress: make(map[models.NanoID]*models.Performance)}
+	return Performances{
+		DatabaseRepository: NewDatabaseRepository[models.Performance](db),
+		inProgress:         map[models.NanoID]*models.Performance{},
+	}
 }
 
 // FindByNanoID finds a performance by its nanoID.
-func (r *Performances) FindByNanoID(nanoID models.NanoID) (*models.Performance, error) {
+// preloadFields is a list of associations to load eagerly. (see https://gobuffalo.io/documentation/database/relations/#load-specific-associations)
+// when preloadFields is empty, no associations are preloaded.
+func (r *Performances) FindByNanoID(nanoID models.NanoID, preloadedFields ...string) (*models.Performance, error) {
 	if perf, isInProgress := r.inProgress[nanoID]; isInProgress {
 		return perf, nil
 	}
 
-	var err error
-	perf := &models.Performance{}
-
-	query := r.db.Where("nano_id = ?", nanoID)
-	if err = query.First(perf); err != nil {
-		return nil, fmt.Errorf("performance %v not found", nanoID)
-	}
-	return perf, nil
+	return r.DatabaseRepository.FindByNanoID(nanoID, preloadedFields...)
 }
 
-// FindInProgressByNanoID finds a performance by its nanoID only if it stored in memory (a.K.a. in progress)
+// FindInProgressByNanoID finds a performance by its nanoID only if it stored in memory (a.k.a. in progress)
 func (r *Performances) FindInProgressByNanoID(nanoID models.NanoID) (*models.Performance, error) {
 	perf, isInProgress := r.inProgress[nanoID]
 
@@ -44,35 +42,34 @@ func (r *Performances) FindInProgressByNanoID(nanoID models.NanoID) (*models.Per
 	return perf, nil
 }
 
-// Create saves the given performance to the database.
-func (r *Performances) Create(perf *models.Performance) *models.ValidationErrors {
-	return models.WrapValidation(r.db.ValidateAndCreate(perf))
-}
-
 // New creates a new in-progress performance with a unique nanoID (without saving it to the database).
-func (r *Performances) New(nanoIDLen ...int) (*models.Performance, error) {
+func (r *Performances) New(song *models.Song, nanoIDLen ...int) (*models.Performance, error) {
 	nanoId, err := models.NewNanoID(nanoIDLen...)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate unique id for performance")
 	}
-	perf := &models.Performance{NanoID: nanoId}
-	perf.CreatedAt = time.Now().Truncate(time.Microsecond)
+	perf := &models.Performance{
+		NanoID:    nanoId,
+		SongID:    song.ID,
+		Song:      song,
+		CreatedAt: time.Now().Truncate(time.Microsecond),
+	}
 
 	r.inProgress[nanoId] = perf
 	return perf, nil
 }
 
 // Update updates the given performance in the database.
-func (r *Performances) Update(perf *models.Performance) *models.ValidationErrors {
+func (r *Performances) Update(perf *models.Performance) error {
 	if _, isInProgress := r.inProgress[perf.NanoID]; isInProgress {
 		return models.WrapValidation(perf.Validate(nil))
 	}
-	return models.WrapValidation(r.db.ValidateAndUpdate(perf))
+	return r.DatabaseRepository.Update(perf)
 }
 
 // MarkAsFinished marks the given performance as finished by removing it from the in-progress map and saving it to the database.
-func (r *Performances) MarkAsFinished(perf *models.Performance) *models.ValidationErrors {
+func (r *Performances) MarkAsFinished(perf *models.Performance) error {
 	if _, isInProgress := r.inProgress[perf.NanoID]; !isInProgress {
 		return models.WrapValidation(nil, fmt.Errorf("performance %v does not exist or is not in progress", perf.NanoID))
 	}

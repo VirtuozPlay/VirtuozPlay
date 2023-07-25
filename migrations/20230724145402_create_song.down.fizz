@@ -1,0 +1,4 @@
+drop_foreign_key("performance", "performance_song_song_id_fk", {"if_exists": true})
+drop_column("performance", "song_id")
+
+drop_table("song")

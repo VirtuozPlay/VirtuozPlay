@@ -10,7 +10,7 @@ import { Song } from '@/gql/types';
 const router = useRouter();
 const songStore = useSongStore();
 
-const handleClick = (song: Song) => {
+const handleClick = (song: Partial<Song>) => {
     songStore.setCurrentSong(song);
 
     router.push({
@@ -30,11 +30,7 @@ const handleClick = (song: Song) => {
                         <img src="https://placehold.co/600x400?text=Hello+World2" :alt="item?.title" class="w-full" />
                     </div>
                     <div class="col-span-1">
-                        <TextualButton
-                            aria-label="example button G"
-                            hover-color="#FAFF00"
-                            @click="item != null && handleClick(item)"
-                        >
+                        <TextualButton aria-label="example button G" hover-color="#FAFF00" @click="handleClick(item)">
                             Lancer {{ item?.title }}
                         </TextualButton>
                     </div>

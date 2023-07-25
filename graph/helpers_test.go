@@ -61,10 +61,11 @@ func (hs *HelpersSuite) Test_WrapValidationErrorMultiple() {
 }
 
 func (hs *HelpersSuite) Test_ToGraphQLPerformance() {
-	// both performance and error should not be nil
-	hs.Panics(func() { _, _ = ToGraphQLPerformance(nil, nil) })
+	perf, err := ToGraphQLPerformance(nil, nil)
+	hs.Nil(perf)
+	hs.NoError(err)
 
-	perf, err := ToGraphQLPerformance(nil, errors.New("some error"))
+	perf, err = ToGraphQLPerformance(nil, errors.New("some error"))
 	hs.Nil(perf)
 	hs.EqualError(err, "some error")
 

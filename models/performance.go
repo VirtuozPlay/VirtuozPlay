@@ -31,6 +31,8 @@ type Performance struct {
 	NanoID        NanoID        `db:"nano_id"`        // NanoID is the user-facing ID of the performance, generated using Go Nanoid.
 	CreatedAt     time.Time     `db:"created_at"`     //
 	UpdatedAt     time.Time     `db:"updated_at"`     //
+	SongID        int64         `db:"song_id"`        //
+	Song          *Song         `belongs_to:"song"`   // Always linked to a Song
 	Notes         []Note        `db:"-"`              // Notes is the list of notes played during the performance.
 	NotesCount    int           `db:"notes_count"`    // NotesCount is the number of notes in the performance.
 	NotesEncoding NotesEncoding `db:"notes_encoding"` // NotesEncoding is the encoding used for the EncodedNotes field.
@@ -100,6 +102,15 @@ func (p *Performance) AppendNote(index int, at int, duration int, value string) 
 	}
 	p.Notes = append(p.Notes, note)
 
+	return nil
+}
+
+func (p *Performance) ResolvePreloads(preloads ...string) []string {
+	for _, preload := range preloads {
+		if strings.EqualFold(preload, "song") {
+			return []string{"Song"}
+		}
+	}
 	return nil
 }
 

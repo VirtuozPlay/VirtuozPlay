@@ -17,7 +17,8 @@ func (e *ValidationErrors) Error() string {
 	return e.Wrapped.Error()
 }
 
-func WrapValidation(errors *validate.Errors, err error) *ValidationErrors {
+// WrapValidation wraps an error and/or validation errors into a single error.
+func WrapValidation(errors *validate.Errors, err error) error {
 	if err == nil && (errors == nil || !errors.HasAny()) {
 		return nil
 	}

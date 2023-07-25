@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import ListenPlayPause from '@/components/Playground/ListenPlayPause.vue';
 import StringsFrets from '@/components/Playground/StringsFrets.vue';
 import { useSongStore } from '@/store';
-import { Note } from '@/gql/types';
+import { SongNote } from '@/gql/types';
 
 const isPlaying = ref(false);
 const stringsFretsRef = ref(null);
@@ -15,13 +15,12 @@ interface Position {
 }
 
 const store = useSongStore();
-console.log('getSong', store.getCurrentSong);
-const title = store.getCurrentSong.title;
-const positions: Position[] = store.getCurrentSong.notes
-    .filter((note) => note != null)
-    .map((note: Note | null) => {
+const title = store.currentSong.title;
+const positions: Position[] = (store.currentSong.notes ?? [])
+    .filter((note?: SongNote | null) => note != null)
+    .map((note: SongNote | null) => {
         // null notes are filtered out, we can safely use non-null assertions
-        const n = note as Note;
+        const n = note as SongNote;
         return {
             string: n.string,
             fret: n.fret,

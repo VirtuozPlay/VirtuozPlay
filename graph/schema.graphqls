@@ -15,22 +15,28 @@ type Query {
   virtuozPlay: VirtuozPlay!
   "Retrieve a performance by its ID."
   performance(id: ID!): Performance
-  songs: [Song]!
+  "Fetches _ALL_ songs, there might be a lot of data."
+  songs: [Song!]!
+  "Fetches a single song by its ID."
+  song(id: ID!): Song
 }
 
 "The root mutation type."
 type Mutation {
-  "Begin a new performance."
-  startPerformance: Performance!
+  "Begin a new performance for the given song."
+  startPerformance(songId: ID!): Performance!
   "Add notes to a performance, each new note must have a 'at' value greater than any existing note's 'at' value in the performance."
   addNotesToPerformance(id: ID!, notes: [InputNote!]!): Performance!
   finishPerformance(id: ID!): Performance!
+
+  "TEMPORARY: Create a new song, to *delete* when we have a proper song creation flow."
+  debug_createSong(title: String!): Song!
 }
 
 type Song {
   id: ID!
   title: String!
-  notes: [SongNote]!
+  notes: [SongNote!]!
 }
 
 "This is a separate type from PerformanceNote for now"

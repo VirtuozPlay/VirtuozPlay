@@ -1,0 +1,52 @@
+[[scenario]]
+name = "song_empty"
+
+[[scenario.table]]
+name = "song"
+
+[[scenario.table.row]]
+id = "1001"
+nano_id = "song-1001"
+created_at = "<%= now() %>"
+updated_at = "<%= now() %>"
+title = "Empty Song of Silence"
+
+[[scenario]]
+name = "song_empty_2"
+
+[[scenario.table]]
+name = "song"
+
+[[scenario.table.row]]
+id = "1002"
+nano_id = "song-1002"
+created_at = "<%= now() %>"
+updated_at = "<%= now() %>"
+title = "Empty Song of Silence"
+
+[[scenario]]
+name = "song_empty_3"
+
+[[scenario.table]]
+name = "song"
+
+[[scenario.table.row]]
+id = "1003"
+nano_id = "song-1003"
+created_at = "<%= now() %>"
+updated_at = "<%= now() %>"
+title = "Empty Song of Silence"
+
+
+[[scenario]]
+name = "song_empty_4"
+
+[[scenario.table]]
+name = "song"
+
+[[scenario.table.row]]
+id = "1004"
+nano_id = "song-1004"
+created_at = "<%= now() %>"
+updated_at = "<%= now() %>"
+title = "Empty Song of Silence"

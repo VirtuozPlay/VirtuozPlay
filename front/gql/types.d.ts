@@ -34,19 +34,24 @@ export type Mutation = {
     /** Add notes to a performance, each new note must have a 'at' value greater than any existing note's 'at' value in the performance. */
     readonly addNotesToPerformance: Performance;
     readonly finishPerformance: Performance;
-    /** Begin a new performance. */
+    /** Begin a new performance for the given song. */
     readonly startPerformance: Performance;
 };
 
 /** The root mutation type. */
 export type MutationAddNotesToPerformanceArgs = {
-    id: Scalars['ID']['input'];
     notes: ReadonlyArray<InputNote>;
+    performanceId: Scalars['ID']['input'];
 };
 
 /** The root mutation type. */
 export type MutationFinishPerformanceArgs = {
-    id: Scalars['ID']['input'];
+    performanceId: Scalars['ID']['input'];
+};
+
+/** The root mutation type. */
+export type MutationStartPerformanceArgs = {
+    songId: Scalars['ID']['input'];
 };
 
 export type Performance = {
@@ -78,7 +83,7 @@ export type Query = {
     readonly __typename?: 'Query';
     /** Retrieve a performance by its ID. */
     readonly performance?: Maybe<Performance>;
-    readonly songs: ReadonlyArray<Maybe<Song>>;
+    readonly songs: ReadonlyArray<Song>;
     readonly virtuozPlay: VirtuozPlay;
 };
 
@@ -90,7 +95,7 @@ export type QueryPerformanceArgs = {
 export type Song = {
     readonly __typename?: 'Song';
     readonly id: Scalars['ID']['output'];
-    readonly notes: ReadonlyArray<Maybe<SongNote>>;
+    readonly notes: ReadonlyArray<SongNote>;
     readonly title: Scalars['String']['output'];
 };
 

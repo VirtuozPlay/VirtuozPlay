@@ -11,7 +11,21 @@ import (
 // throughout your application.
 var DB *pop.Connection
 
+// NanoID is the unique id format used throughout the application.
+// Use NewNanoID to generate a new NanoID instance.
 type NanoID string
+
+// Value is the interface that all models must implement.
+type Value interface {
+	pop.TableNameAble
+}
+
+// The PreLoadable interface.
+// When a model implements PreLoadable, the ResolvePreloads method is called to converts the `preloads` arrays from
+// the GraphQL query into a list of database associations to load eagerly.
+type PreLoadable interface {
+	ResolvePreloads(preloads ...string) []string
+}
 
 // NewNanoID generates a new (99.99999%) unique id.
 func NewNanoID(length ...int) (NanoID, error) {

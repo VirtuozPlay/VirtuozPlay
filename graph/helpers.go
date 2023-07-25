@@ -58,13 +58,19 @@ func ToGraphQLPerformance(performance *db.Performance, err error) (*model.Perfor
 		return nil, err
 	}
 
+	duration := 0
+	if len(notes) > 0 {
+		lastNote := notes[len(notes)-1]
+		duration = lastNote.At + lastNote.Duration
+	}
+
 	userName := "DummyUser"
 	return &model.Performance{
 		ID:        string(performance.NanoID),
 		CreatedAt: &createdAt,
 		Notes:     notes,
 		// FIXME VERY TEMPORARY, please replace by proper DB relation
-		Duration: 42069,
+		Duration: duration,
 		// TODO VERY TEMPORARY, please replace by proper DB relation
 		Author: &model.User{
 			ID:   string(performance.NanoID),

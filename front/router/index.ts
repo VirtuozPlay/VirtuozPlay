@@ -33,7 +33,7 @@ const router = createRouter({
             component: () => import('../views/CheckupView.vue'),
         },
         {
-            path: '/collection',
+            path: '/collection/:songIdOrName?',
             name: 'collection',
             component: () => import('../views/CollectionView.vue'),
         },

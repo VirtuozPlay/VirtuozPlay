@@ -22,6 +22,8 @@ type Performance struct {
 	CreatedAt *string `json:"createdAt,omitempty"`
 	// The total duration of the performance, in milliseconds.
 	Duration int `json:"duration"`
+	// The total precision scope, ranging from 0 to 1.
+	Precision float64 `json:"precision"`
 	// An array of *all* notes in the performance, sorted by their start time.
 	Notes []*PerformanceNote `json:"notes"`
 }

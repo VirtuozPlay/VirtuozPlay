@@ -4393,7 +4393,7 @@ func (ec *executionContext) unmarshalInputInputNote(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"at", "duration", "value"}
+	fieldsInOrder := [...]string{"at", "duration", "value", "octave"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4427,6 +4427,15 @@ func (ec *executionContext) unmarshalInputInputNote(ctx context.Context, obj int
 				return it, err
 			}
 			it.Value = data
+		case "octave":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("octave"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Octave = data
 		}
 	}
 

@@ -3,3 +3,12 @@ ignore:
   - 'graph/generated.go'
   - 'graph/models_gen.go'
   - 'graph/schema.resolvers.go'
+
+coverage:
+  status:
+    patch:
+      default:
+        target: 75%
+    project:
+      default:
+        target: 75%

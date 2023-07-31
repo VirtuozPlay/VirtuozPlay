@@ -87,10 +87,11 @@ func ToGraphQLSong(song *db.Song, err error) (*model.Song, error) {
 	}
 
 	return &model.Song{
-		ID:     string(song.NanoID),
-		Title:  song.Title,
-		Imgurl: song.Imgurl,
-		Music:  song.Music,
-		Notes:  notes,
+		ID:        string(song.NanoID),
+		Title:     song.Title,
+		ImgURL:    song.ImgURL,
+		URL:       song.URL,
+		MusicPath: song.MusicPath,
+		Notes:     notes,
 	}, nil
 }

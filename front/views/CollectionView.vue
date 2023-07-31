@@ -14,7 +14,7 @@ const handleClick = (song: Partial<Song>) => {
     songStore.setCurrentSong(song);
 
     router.push({
-        path: `/collection/${song?.id}`,
+        path: `/collection/${song?.url}`,
     });
 };
 </script>
@@ -32,7 +32,7 @@ const handleClick = (song: Partial<Song>) => {
                     >
                         <div class="col-span-1">
                             <h2 class="text-center mt-2">{{ item.title }}</h2>
-                            <img style="width: 300px" :src="item?.imgurl" :alt="item.title" class="" />
+                            <img style="width: 300px" :src="item?.img_url" :alt="item.title" class="" />
                         </div>
                         <div class="col-span-1">
                             <TextualButton

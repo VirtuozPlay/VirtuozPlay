@@ -36,8 +36,9 @@ type Mutation {
 type Song {
   id: ID!
   title: String!
-  imgurl: String!
-  music: String!
+  img_url: String!
+  url: String!
+  music_path: String!
   notes: [SongNote!]!
 }
 

@@ -112,15 +112,20 @@ export type QuerySongArgs = {
 export type Song = {
     readonly __typename?: 'Song';
     readonly id: Scalars['ID']['output'];
-    readonly imgurl: Scalars['String']['output'];
-    readonly music: Scalars['String']['output'];
+    readonly img_url: Scalars['String']['output'];
+    readonly music_path: Scalars['String']['output'];
     readonly notes: ReadonlyArray<SongNote>;
     readonly title: Scalars['String']['output'];
+    readonly url: Scalars['String']['output'];
 };
 
 /** This is a separate type from PerformanceNote for now */
 export type SongNote = {
     readonly __typename?: 'SongNote';
+    readonly alter: Scalars['Int']['output'];
+    readonly beat: Scalars['Int']['output'];
+    readonly default: Scalars['Float']['output'];
+    readonly duration: Scalars['Int']['output'];
     readonly end: Scalars['Int']['output'];
     readonly fret: Scalars['Int']['output'];
     readonly measure: Scalars['Int']['output'];
@@ -128,6 +133,7 @@ export type SongNote = {
     readonly octave: Scalars['Int']['output'];
     readonly start: Scalars['Int']['output'];
     readonly string: Scalars['Int']['output'];
+    readonly type: Scalars['String']['output'];
 };
 
 export type User = {

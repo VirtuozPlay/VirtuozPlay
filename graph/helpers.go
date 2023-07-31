@@ -1,9 +1,10 @@
 package graph
 
 import (
-	"github.com/vektah/gqlparser/v2/gqlerror"
 	"virtuozplay/graph/model"
 	db "virtuozplay/models"
+
+	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 // This file will not be regenerated automatically.
@@ -47,7 +48,7 @@ func ToGraphQLPerformance(performance *db.Performance, err error) (*model.Perfor
 		notes[i] = &model.PerformanceNote{
 			At:       int(note.At),
 			Duration: int(note.Duration),
-			Value:    note.Value,
+			Value:    note.Step,
 		}
 	}
 	createdAt := performance.CreatedAt.String()

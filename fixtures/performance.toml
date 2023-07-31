@@ -24,7 +24,7 @@ notes_count = 21
 song_id = 1
 notes_encoding = 1 # Base64 encoding
 # Notes are encoded as base64 because TOML does not support binary data
-notes = "AN8GAQCoBxEAkwkTAO0QCQDAFgoA5hYGAO0WCwDvFwAA0hgMAPcaCAC5IA4A9CMFAJMkBADCJAIAoCUQAL8tFQCRNgMAzzwNAJVAEgCvQBYArkIU"
+notes = "Bd8QBgAK8hgFCBSNNAcQaasrBwFuxCMECXiNGQQRzQHQKgUC0gG4GwMK3AHDIAYSsQKJSgADtgLoMgALwAKHTAATlQOcPgYEmgO4OQYMpAPmGAgU+QO1EQEF/gODKwcNiATCQAQV3QTPOQcG4gTuKwEO7ATSNwQW"
 
 [[scenario]]
 name = "performance_creation"
@@ -97,7 +97,7 @@ notes_count = 21
 song_id = 3
 notes_encoding = 1 # Base64 encoding
 # Notes are encoded as base64 because TOML does not support binary data
-notes = "AN8GAQCoBxEAkwkTAO0QCQDAFgoA5hYGAO0WCwDvFwAA0hgMAPcaCAC5IA4A9CMFAJMkBADCJAIAoCUQAL8tFQCRNgMAzzwNAJVAEgCvQBYArkIU"
+notes = "Bd8QBgAK8hgFCBSNNAcQaasrBwFuxCMECXiNGQQRzQHQKgUC0gG4GwMK3AHDIAYSsQKJSgADtgLoMgALwAKHTAATlQOcPgYEmgO4OQYMpAPmGAgU+QO1EQEF/gODKwcNiATCQAQV3QTPOQcG4gTuKwEO7ATSNwQW"
 
 [[scenario]]
 name = "performance_to_update"
@@ -124,4 +124,4 @@ notes_count = 21
 song_id = 5
 notes_encoding = 1 # Base64 encoding
 # Notes are encoded as base64 because TOML does not support binary data
-notes = "AN8GAQCoBxEAkwkTAO0QCQDAFgoA5hYGAO0WCwDvFwAA0hgMAPcaCAC5IA4A9CMFAJMkBADCJAIAoCUQAL8tFQCRNgMAzzwNAJVAEgCvQBYArkIU"
+notes = "Bd8QBgAK8hgFCBSNNAcQaasrBwFuxCMECXiNGQQRzQHQKgUC0gG4GwMK3AHDIAYSsQKJSgADtgLoMgALwAKHTAATlQOcPgYEmgO4OQYMpAPmGAgU+QO1EQEF/gODKwcNiATCQAQV3QTPOQcG4gTuKwEO7ATSNwQW"

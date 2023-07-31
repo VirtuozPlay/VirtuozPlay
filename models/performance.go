@@ -5,15 +5,16 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"io"
+	"sort"
+	"strings"
+	"time"
+
 	"github.com/go-interpreter/wagon/wasm/leb128"
 	"github.com/gobuffalo/pop/v6"
 	"github.com/gobuffalo/validate/v3"
 	"github.com/gobuffalo/validate/v3/validators"
 	log "github.com/sirupsen/logrus"
-	"io"
-	"sort"
-	"strings"
-	"time"
 )
 
 type NotesEncoding int16
@@ -42,7 +43,8 @@ type Performance struct {
 type Note struct {
 	At       int32  // At is the offset of th:wre note's start from the beginning of the performance, in milliseconds.
 	Duration int32  // Duration is the duration of the note, in milliseconds.
-	Value    string // Human-readable representation of the note (e.g. "C#", "D", "Fb", etc.)
+	Step     string // Human-readable representation of the note (e.g. "C#", "D", "Fb", etc.)
+	Octave   int32
 }
 
 func (p Performance) TableName() string {
@@ -77,11 +79,12 @@ func (p *Performance) AfterFind(*pop.Connection) error {
 
 // AppendNote adds a new note to the performance.
 // The function returns an error if the note is invalid or its timestamp occurs before the latest note in the performance.
-func (p *Performance) AppendNote(index int, at int, duration int, value string) error {
+func (p *Performance) AppendNote(index int, at int, duration int, step string, octave int) error {
 	note := Note{
 		At:       int32(at),
 		Duration: int32(duration),
-		Value:    value,
+		Step:     step,
+		Octave:   int32(octave),
 	}
 
 	errMsg := note.validate(index)
@@ -92,7 +95,8 @@ func (p *Performance) AppendNote(index int, at int, duration int, value string) 
 		lastNote := p.Notes[len(p.Notes)-1]
 
 		// if the note is identical to the last note, we can ignore it
-		if lastNote.At == note.At && lastNote.Duration == note.Duration && lastNote.Value == note.Value {
+		if lastNote.At == note.At && lastNote.Duration == note.Duration &&
+			lastNote.Octave == note.Octave && lastNote.Step == note.Step {
 			return nil
 		}
 
@@ -132,8 +136,12 @@ func compareNotes(a, b Note) int {
 	if a.Duration != b.Duration {
 		return int(a.Duration - b.Duration)
 	}
-	// 3. compare value
-	return strings.Compare(a.Value, b.Value)
+	// 3. compare octave
+	if a.Octave != b.Octave {
+		return int(a.Octave - b.Octave)
+	}
+	// 4. compare step
+	return strings.Compare(a.Step, b.Step)
 }
 
 func (p *Performance) decode() error {
@@ -153,6 +161,7 @@ func (p *Performance) decode() error {
 // EncodedNotes are encoded as a slice of bytes, where each note is encoded as follows:
 // - The `at` field is encoded as a LEB128 unsigned integer.
 // - The `duration` field is encoded as a LEB128 unsigned integer.
+// - The `octave` field is encoded as a LEB128 unsigned integer.
 // - The `value` is a single byte, the low 3 bits of which are the letter, and the high 2 bits are the modifier (see decodeNote()).
 func decodeNotes(notes []byte, count int, encoding NotesEncoding) ([]Note, error) {
 	n, err := encoding.decodeBytes(notes)
@@ -192,7 +201,7 @@ func encodeNotes(notes []Note, encoding NotesEncoding) []byte {
 // decodeNote decodes a single note from the given reader.
 // The encoding is assumed to by BinaryNotes.
 func decodeNote(src io.Reader) (Note, error) {
-	var at, duration uint32
+	var at, duration, octave uint32
 	var err error
 
 	// Read the note's components
@@ -204,17 +213,22 @@ func decodeNote(src io.Reader) (Note, error) {
 	if duration, err = leb128.ReadVarUint32(src); err != nil {
 		return Note{}, err
 	}
-	// 3. read the note's (encoded) value
-	valueBuf := []byte{0}
-	if _, err = io.ReadFull(src, valueBuf); err != nil {
+	// 3. read the note's octave
+	if octave, err = leb128.ReadVarUint32(src); err != nil {
 		return Note{}, err
 	}
-	value := decodeNoteValue(valueBuf[0])
+	// 4. read the note's (encoded) step
+	stepBuf := []byte{0}
+	if _, err = io.ReadFull(src, stepBuf); err != nil {
+		return Note{}, err
+	}
+	step := decodeNoteValue(stepBuf[0])
 
 	return Note{
 		At:       int32(at),
 		Duration: int32(duration),
-		Value:    value,
+		Step:     step,
+		Octave:   int32(octave),
 	}, nil
 }
 
@@ -225,8 +239,10 @@ func encodeNote(dst io.Writer, note Note) {
 	_, _ = leb128.WriteVarUint32(dst, uint32(note.At))
 	// 2. write the note's duration
 	_, _ = leb128.WriteVarUint32(dst, uint32(note.Duration))
-	// 3. write the note's (encoded) value
-	_, _ = dst.Write([]byte{encodeNoteValue(note.Value)})
+	// 3. write the note's octave
+	_, _ = leb128.WriteVarUint32(dst, uint32(note.Octave))
+	// 4. write the note's (encoded) step
+	_, _ = dst.Write([]byte{encodeNoteValue(note.Step)})
 }
 
 // decodeNoteValue transform a byte-encode note into its string representation.
@@ -346,18 +362,24 @@ func (n *Note) validate(i int) string {
 	if n.Duration < 0 {
 		return fmt.Sprintf("invalid note at index %v: negative duration (%v)", i, n.Duration)
 	}
-	if len(n.Value) == 0 {
-		return fmt.Sprintf("invalid note at index %v: empty value", i)
+	if n.Octave < 0 {
+		return fmt.Sprintf("invalid note at index %v: negative octave (%v)", i, n.Octave)
 	}
-	if len(n.Value) > 2 {
-		return fmt.Sprintf("invalid note at index %v: invalid value (%v)", i, n.Value)
+	if n.Octave > 9 {
+		return fmt.Sprintf("invalid note at index %v: octave above 9 (%v)", i, n.Octave)
 	}
-	if n.Value[0] < 'A' || n.Value[0] > 'G' {
-		return fmt.Sprintf("invalid note at index %v: invalid note letter (%v)", i, n.Value)
+	if len(n.Step) == 0 {
+		return fmt.Sprintf("invalid note at index %v: empty step", i)
 	}
-	if len(n.Value) == 2 {
-		if n.Value[1] != '#' && n.Value[1] != 'b' {
-			return fmt.Sprintf("invalid note at index %v: invalid note modifier (%v)", i, n.Value)
+	if len(n.Step) > 2 {
+		return fmt.Sprintf("invalid note at index %v: invalid step (%v)", i, n.Step)
+	}
+	if n.Step[0] < 'A' || n.Step[0] > 'G' {
+		return fmt.Sprintf("invalid note at index %v: invalid note letter (%v)", i, n.Step)
+	}
+	if len(n.Step) == 2 {
+		if n.Step[1] != '#' && n.Step[1] != 'b' {
+			return fmt.Sprintf("invalid note at index %v: invalid note modifier (%v)", i, n.Step)
 		}
 	}
 	return ""

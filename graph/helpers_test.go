@@ -3,14 +3,15 @@ package graph
 import (
 	"errors"
 	"fmt"
-	"github.com/gobuffalo/validate/v3"
-	"github.com/gobuffalo/validate/v3/validators"
-	"github.com/stretchr/testify/suite"
-	"github.com/vektah/gqlparser/v2/gqlerror"
 	"sort"
 	"testing"
 	"time"
 	"virtuozplay/models"
+
+	"github.com/gobuffalo/validate/v3"
+	"github.com/gobuffalo/validate/v3/validators"
+	"github.com/stretchr/testify/suite"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 // This file will not be regenerated automatically.
@@ -74,7 +75,7 @@ func (hs *HelpersSuite) Test_ToGraphQLPerformance() {
 	perf, err = ToGraphQLPerformance(&models.Performance{NanoID: "nano", CreatedAt: now, Notes: []models.Note{{
 		At:       91,
 		Duration: 7121,
-		Value:    "Bb",
+		Step:     "Bb",
 	}}}, nil)
 
 	hs.NoError(err)

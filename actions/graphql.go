@@ -1,15 +1,18 @@
 package actions
 
 import (
+	"net/http"
+	"virtuozplay/graph"
+	"virtuozplay/models"
+	"virtuozplay/models/repository"
+
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gobuffalo/buffalo"
-	"virtuozplay/graph"
-	"virtuozplay/models"
-	"virtuozplay/models/repository"
+	"github.com/gorilla/websocket"
 )
 
 func init() {
@@ -25,7 +28,7 @@ func init() {
 	srv.AddTransport(transport.GET{})
 	srv.AddTransport(transport.POST{})
 	srv.AddTransport(transport.MultipartForm{})
-	srv.AddTransport(transport.Websocket{})
+	srv.AddTransport(transport.Websocket{Upgrader: websocket.Upgrader{CheckOrigin: func(r *http.Request) bool { return true }}})
 
 	srv.SetQueryCache(lru.New(1000))
 

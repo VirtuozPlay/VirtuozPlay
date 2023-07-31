@@ -65,6 +65,7 @@ type ComplexityRoot struct {
 	PerformanceNote struct {
 		At       func(childComplexity int) int
 		Duration func(childComplexity int) int
+		Octave   func(childComplexity int) int
 		Value    func(childComplexity int) int
 	}
 
@@ -238,6 +239,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.PerformanceNote.Duration(childComplexity), true
+
+	case "PerformanceNote.octave":
+		if e.complexity.PerformanceNote.Octave == nil {
+			break
+		}
+
+		return e.complexity.PerformanceNote.Octave(childComplexity), true
 
 	case "PerformanceNote.value":
 		if e.complexity.PerformanceNote.Value == nil {
@@ -1263,6 +1271,8 @@ func (ec *executionContext) fieldContext_Performance_notes(ctx context.Context, 
 				return ec.fieldContext_PerformanceNote_duration(ctx, field)
 			case "value":
 				return ec.fieldContext_PerformanceNote_value(ctx, field)
+			case "octave":
+				return ec.fieldContext_PerformanceNote_octave(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type PerformanceNote", field.Name)
 		},
@@ -1397,6 +1407,50 @@ func (ec *executionContext) fieldContext_PerformanceNote_value(ctx context.Conte
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PerformanceNote_octave(ctx context.Context, field graphql.CollectedField, obj *model.PerformanceNote) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PerformanceNote_octave(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Octave, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PerformanceNote_octave(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PerformanceNote",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4601,6 +4655,11 @@ func (ec *executionContext) _PerformanceNote(ctx context.Context, sel ast.Select
 			}
 		case "value":
 			out.Values[i] = ec._PerformanceNote_value(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "octave":
+			out.Values[i] = ec._PerformanceNote_octave(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

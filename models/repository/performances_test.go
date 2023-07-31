@@ -76,7 +76,7 @@ func (rs *RepositorySuite) Test_Performance_Update() {
 	rs.NoError(err)
 	rs.NotNil(perf)
 
-	perf.Notes = append(perf.Notes, models.Note{At: 0, Duration: 0, Value: "A"})
+	perf.Notes = append(perf.Notes, models.Note{At: 0, Duration: 0, Step: "A"})
 	rs.Nil(rs.Performances.Update(perf))
 
 	perf, err = rs.Performances.FindByNanoID("perf-5")
@@ -95,7 +95,7 @@ func (rs *RepositorySuite) Test_Performance_Update_inProgress() {
 	rs.NotNil(perf)
 	rs.NoError(err)
 
-	perf.Notes = append(perf.Notes, models.Note{At: 0, Duration: 0, Value: "A"})
+	perf.Notes = append(perf.Notes, models.Note{At: 0, Duration: 0, Step: "A"})
 	rs.Nil(rs.Performances.Update(perf))
 
 	perf, err = rs.Performances.FindInProgressByNanoID(perf.NanoID)
@@ -131,7 +131,7 @@ func (rs *RepositorySuite) Test_Performance_MarkAsFinished_invalidPerformance() 
 	rs.NoError(err)
 	rs.NotNil(perf)
 
-	perf.Notes = append(perf.Notes, models.Note{At: -888, Duration: 0, Value: "?"})
+	perf.Notes = append(perf.Notes, models.Note{At: -888, Duration: 0, Step: "?"})
 
 	rs.Error(rs.Performances.MarkAsFinished(perf))
 }

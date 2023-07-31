@@ -5,7 +5,8 @@
 import { ShallowRef } from 'vue';
 import { Note, NotePlayed, notes } from './notes';
 import { AddNotesDocument } from '@/gql/mutations/AddNote';
-import apolloProvider from '@/apollo';
+import { ApolloClient } from '@apollo/client/core/ApolloClient';
+import { NormalizedCacheObject } from '@apollo/client/cache/inmemory/types';
 
 let analyser: AnalyserNode;
 
@@ -192,11 +193,15 @@ export const getNoise = () => {
     }
 };
 
-export const getDuration = (stream: ShallowRef<MediaStream | null>, startTimeStamp: number) => {
+export const getDuration = (
+    stream: ShallowRef<MediaStream | null>,
+    apolloClient: ApolloClient<NormalizedCacheObject>,
+    startTimeStamp: number
+) => {
     const durationInterval = 500;
     if (stream.value !== null) {
         setTimeout(() => {
-            getDuration(stream, startTimeStamp);
+            getDuration(stream, apolloClient, startTimeStamp);
         }, durationInterval);
     }
 
@@ -219,13 +224,13 @@ export const getDuration = (stream: ShallowRef<MediaStream | null>, startTimeSta
         console.log(notesDetected);
 
         // send notes to back
-        apolloProvider.defaultClient.mutate({
+        apolloClient.mutate({
             mutation: AddNotesDocument,
             variables: {
                 // TODO : ID is hardcoded
                 ID: 'CXKu0YxHzIgBrwtXS42Ld',
                 inputNote: notesDetected,
-            },
-        });
+            }
+        })
     }
 };

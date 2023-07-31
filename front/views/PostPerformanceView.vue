@@ -10,11 +10,10 @@ import GraphQL from '@/components/GraphQL.vue';
 defineProps<{
     performanceId: string;
 }>();
+// <p>Performance id is {{ performanceId }}</p>
 </script>
 
 <template>
-    <p>Performance id is {{ performanceId }}</p>
-
     <GraphQL
         :query="GetPostPerformanceStatsDocument"
         :variables="{ id: performanceId } satisfies GetPostPerformanceStatsQueryVariables"

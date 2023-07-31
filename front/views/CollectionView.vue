@@ -2,7 +2,7 @@
 import TextualButton from '@/components/inputs/TextualButton.vue';
 import GraphQL from '@/components/GraphQL.vue';
 import { GetSongDocument, GetSongQuery } from '@/gql/queries/GetSong';
-import type { QueryResult } from '@apollo/client';
+import type { ApolloQueryResult } from '@apollo/client/core/types';
 import { useRouter } from 'vue-router';
 import { useSongStore } from '@/store';
 import { Song } from '@/gql/types';
@@ -21,7 +21,7 @@ const handleClick = (song: Partial<Song>) => {
 
 <template>
     <GraphQL :query="GetSongDocument">
-        <template #default="{ data }: QueryResult<GetSongQuery>">
+        <template #default="{ data }: ApolloQueryResult<GetSongQuery>">
             <main v-if="data" title="collection section" class="mt-16 w-80vw mx-auto">
                 <div class="w-full text-center"><h1>Collection</h1></div>
                 <div v-for="(item, index) in data.songs" :key="index" class="mx-auto grid grid-cols-2 gap-4">

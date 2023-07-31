@@ -2,7 +2,7 @@
 // noinspection JSDeprecatedSymbols
 import { ApolloQuery } from '@vue/apollo-components';
 import type { DocumentNode } from 'graphql/language';
-import type { QueryResult } from '@apollo/client';
+import type { ApolloQueryResult } from '@apollo/client/core/types';
 
 defineProps<{
     query: DocumentNode;
@@ -10,7 +10,7 @@ defineProps<{
 }>();
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-defineSlots<QueryResult & { default: any }>();
+defineSlots<ApolloQueryResult<any> & { default: any }>();
 </script>
 
 <!--
@@ -19,7 +19,7 @@ defineSlots<QueryResult & { default: any }>();
 -->
 <template>
     <ApolloQuery :query="() => $props.query" :variables="$props.variables">
-        <template #default="{ result }: { result: QueryResult }">
+        <template #default="{ result }: { result: ApolloQueryResult<any> }">
             <slot v-bind="result"></slot>
         </template>
     </ApolloQuery>

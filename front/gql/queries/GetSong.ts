@@ -13,9 +13,11 @@ export type GetSongQuery = {
     __typename?: 'Query';
     songs: Array<{
         __typename?: 'Song';
+        id: string;
         title: string;
-        imgurl: string;
-        music: string;
+        img_url: string;
+        music_path: string;
+        url: string;
         notes: Array<{
             __typename?: 'SongNote';
             measure: number;
@@ -23,8 +25,10 @@ export type GetSongQuery = {
             fret: number;
             string: number;
             octave: number;
-            start: number;
-            end: number;
+            alter: number;
+            beat: number;
+            duration: number;
+            type: string;
         }>;
     }>;
 };
@@ -34,17 +38,21 @@ export declare const GetSong: import('graphql').DocumentNode;
 export const GetSongDocument = /*#__PURE__*/ gql`
     query GetSong {
         songs {
+            id
             title
-            imgurl
-            music
+            img_url
+            music_path
+            url
             notes {
                 measure
                 note
                 fret
                 string
                 octave
-                start
-                end
+                alter
+                beat
+                duration
+                type
             }
         }
     }

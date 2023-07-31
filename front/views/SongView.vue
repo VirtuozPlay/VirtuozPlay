@@ -9,36 +9,44 @@ const isPlaying = ref(false);
 const stringsFretsRef = ref(null);
 
 interface Position {
-    string: number;
+    string: number | undefined;
     fret: number;
-    start: number;
+    beat: number;
 }
 
 const store = useSongStore();
 const title = store.currentSong.title;
-const image = store.currentSong.imgurl;
-const music = store.currentSong.music;
+const image = store.currentSong.img_url;
+const music = store.currentSong.music_path;
 const audio = new Audio(music);
-const positions: Position[] = (store.currentSong.notes ?? [])
-    .filter((note?: SongNote | null) => note != null)
-    .map((note: SongNote | null) => {
-        // null notes are filtered out, we can safely use non-null assertions
-        const n = note as SongNote;
-        return {
-            string: n.string,
-            fret: n.fret,
-            start: n.start,
-        };
-    });
+// const positions: Position[] = (store.currentSong.notes ?? [])
+//     .filter((note?: Partial<SongNote> | null) => note != null)
+//     .map((note: SongNote | null) => {
+//         // null notes are filtered out, we can safely use non-null assertions
+//         // const n = note as SongNote;
+//         return {
+//             string: note?.string,
+//             fret: note?.fret,
+//             beat: note?.start,
+//         };
+//     });
 
-const notename = (store.currentSong.notes ?? [])
-    .filter((note?: SongNote | null) => note != null)
-    .map((note: SongNote | null) => {
-        const n = note as SongNote;
-        return {
-            note: n.note,
-        };
-    });
+const positions: Position[] = (store.currentSong.notes ?? []).filter(
+    (note?: SongNote | null) => note != null && note.beat !== undefined
+) as SongNote[];
+//
+
+// const notename = (store.currentSong.notes ?? [])
+//     .filter((note?: SongNote | null) => note != null)
+//     .map((note: SongNote | null) => {
+//         // const n = note as SongNote;
+//         return {
+//             note: note?.note,
+//         };
+//     });
+
+const note = (store.currentSong.notes ?? []).filter((note?: SongNote | null) => note != null) as SongNote[];
+const notename = note.map((note: SongNote) => ({ note: note?.note }));
 
 const updateCurrentNoteName = () => {
     const currentNote = notename[currentIndex.value];
@@ -68,9 +76,9 @@ const handleListen = () => {
     }
 };
 
-const isPosition = (string: number, fret: number): boolean => {
+const isPosition = (string: number | undefined, fret: number): boolean => {
     const currentPosition = positions[currentIndex.value];
-    return string === currentPosition.string && fret === currentPosition.fret;
+    return string !== undefined && string === currentPosition.string && fret === currentPosition.fret;
 };
 
 const isCurrentFret = (fret: number) => {
@@ -93,8 +101,8 @@ const startAnimation = () => {
         const currentPosition = positions[currentIndex.value];
         const nextPosition = positions[(currentIndex.value + 1) % positions.length];
 
-        const start = currentPosition.start;
-        const end = nextPosition.start;
+        const start = currentPosition.beat;
+        const end = nextPosition.beat;
         const duration = end - start;
 
         console.log(start);

@@ -11,8 +11,9 @@ type Song struct {
 	CreatedAt    time.Time     `db:"created_at"`                        //
 	UpdatedAt    time.Time     `db:"updated_at"`                        //
 	Title        string        `db:"title"`                             // Title is the title of the song.
-	Imgurl       string        `db:"imgurl"`                            // Title is the title of the song.
-	Music        string        `db:"music"`                             // Title is the title of the song.
+	ImgURL       string        `db:"img_url"`                           // Image of the song.
+	URL          string        `db:"url"`                               // URL of the song.
+	MusicPath    string        `db:"music_path"`                        // Path of the mp3.
 	Performances []Performance `has_many:"performance" fk_id:"song_id"` //
 	// FIXME:     vvvvvvvv Replace with proper notes encoding
 	Notes []graph.SongNote `db:"-"`

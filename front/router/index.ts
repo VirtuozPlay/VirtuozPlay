@@ -42,8 +42,8 @@ const router = createRouter({
             redirect: '/collection',
         },
         {
-            path: '/collection/:id',
-            name: 'id',
+            path: '/collection/:url',
+            name: 'url',
             props: true,
             component: () => import('../views/SongView.vue'),
         },

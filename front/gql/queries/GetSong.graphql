@@ -1,16 +1,20 @@
 query GetSong {
   songs {
+    id
     title
-    imgurl
-    music
+    img_url
+    music_path
+    url
     notes {
       measure
       note
       fret
       string
       octave
-      start
-      end
+      alter
+      beat
+      duration
+      type
     }
   }
 }

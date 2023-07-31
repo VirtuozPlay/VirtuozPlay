@@ -6,12 +6,13 @@ package graph
 
 import (
 	"context"
-	"fmt"
+	// "fmt"
 	"virtuozplay/graph/model"
 	db "virtuozplay/models"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/vektah/gqlparser/v2/gqlerror"
+	"virtuozplay/models/repository"
 )
 
 // StartPerformance is the resolver for the startPerformance field.
@@ -106,63 +107,82 @@ func (r *queryResolver) Performance(ctx context.Context, id string) (*model.Perf
 
 // Songs is the resolver for the songs field.
 func (r *queryResolver) Songs(ctx context.Context) ([]*model.Song, error) {
-	files, err := ListFilesInDirectory("assets/musicXml")
-	if err != nil {
-		return nil, err
+	_ = ctx
+
+	// FIXME: Remove this when we have a proper loading for songs
+	allSongs := make([]*model.Song, 0, len(repository.HardcodedSongs))
+	for _, song := range repository.HardcodedSongs {
+		s, _ := ToGraphQLSong(song, nil)
+		allSongs = append(allSongs, s)
 	}
-
-	musicXMLList, err := ParseXMLFiles(files)
-	if err != nil {
-		return nil, err
-	}
-
-	var songs []*model.Song
-
-	for _, musicXML := range musicXMLList {
-		// Create an empty list to store song notes
-		var songNotes []*model.SongNote
-
-		// Browse the notes of each XML song and create the corresponding *model.SongNote object
-		for _, part := range musicXML.Parts {
-			for _, measure := range part.Measures {
-				for _, note := range measure.Notes {
-					songNote := &model.SongNote{
-						Measure:  measure.Number,
-						Note:     note.Pitch.Step,
-						Fret:     note.Notations.Technical.Fret,
-						String:   note.Notations.Technical.String,
-						Octave:   note.Pitch.Octave,
-						Duration: note.Duration,
-						Alter:    note.Pitch.Alter,
-						Default:  note.Default,
-						Beat:     measure.Beat,
-						Type:     note.Type,
-					}
-					songNotes = append(songNotes, songNote)
-				}
-				// Create the corresponding *model.Song object with associated notes and add it to the song list
-
-			}
-		}
-		id, err := db.NewNanoID()
-		if err != nil {
-			return nil, err
-		}
-		song := &model.Song{
-			ID:    string(id),
-			Title: musicXML.Title,
-			Notes: songNotes,
-		}
-		songs = append(songs, song)
-	}
-	// Return song list populated with musicXMLList data
-	return songs, nil
+	return allSongs, nil
 }
 
 // Song is the resolver for the song field.
 func (r *queryResolver) Song(ctx context.Context, id string) (*model.Song, error) {
-	panic(fmt.Errorf("not implemented: Song - song"))
+	_ = ctx
+	return ToGraphQLSong(r.Resolver.Songs.FindByNanoID(db.NanoID(id)))
 }
+
+// Songs is the resolver for the songs field.
+// func (r *queryResolver) Songs(ctx context.Context) ([]*model.Song, error) {
+// 	files, err := ListFilesInDirectory("assets/musicXml")
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	musicXMLList, err := ParseXMLFiles(files)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	var songs []*model.Song
+
+// 	for _, musicXML := range musicXMLList {
+// 		// Create an empty list to store song notes
+// 		var songNotes []*model.SongNote
+
+// 		// Browse the notes of each XML song and create the corresponding *model.SongNote object
+// 		for _, part := range musicXML.Parts {
+// 			for _, measure := range part.Measures {
+// 				for _, note := range measure.Notes {
+// 					songNote := &model.SongNote{
+// 						Measure:  measure.Number,
+// 						Note:     note.Pitch.Step,
+// 						Fret:     note.Notations.Technical.Fret,
+// 						String:   note.Notations.Technical.String,
+// 						Octave:   note.Pitch.Octave,
+// 						Duration: note.Duration,
+// 						Alter:    note.Pitch.Alter,
+// 						Default:  note.Default,
+// 						Beat:     measure.Beat,
+// 						Type:     note.Type,
+// 					}
+// 					songNotes = append(songNotes, songNote)
+// 				}
+// 				// Create the corresponding *model.Song object with associated notes and add it to the song list
+
+// 			}
+// 		}
+// 		id, err := db.NewNanoID()
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		song := &model.Song{
+// 			ID:    string(id),
+// 			Title: musicXML.Title,
+// 			Notes: songNotes,
+// 		}
+// 		songs = append(songs, song)
+// 	}
+// 	// Return song list populated with musicXMLList data
+// 	return songs, nil
+// }
+
+// Song is the resolver for the song field.
+// func (r *queryResolver) Song(ctx context.Context, id string) (*model.Song, error) {
+// 	panic(fmt.Errorf("not implemented: Song - song"))
+// }
 
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }

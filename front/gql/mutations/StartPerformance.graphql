@@ -1,0 +1,5 @@
+mutation StartPerformance($songId: ID!) {
+  startPerformance(songId: $songId) {
+    id
+  }
+}

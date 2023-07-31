@@ -90,12 +90,10 @@ type ComplexityRoot struct {
 		Beat     func(childComplexity int) int
 		Default  func(childComplexity int) int
 		Duration func(childComplexity int) int
-		End      func(childComplexity int) int
 		Fret     func(childComplexity int) int
 		Measure  func(childComplexity int) int
 		Note     func(childComplexity int) int
 		Octave   func(childComplexity int) int
-		Start    func(childComplexity int) int
 		String   func(childComplexity int) int
 		Type     func(childComplexity int) int
 	}
@@ -365,13 +363,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.SongNote.Duration(childComplexity), true
 
-	case "SongNote.end":
-		if e.complexity.SongNote.End == nil {
-			break
-		}
-
-		return e.complexity.SongNote.End(childComplexity), true
-
 	case "SongNote.fret":
 		if e.complexity.SongNote.Fret == nil {
 			break
@@ -399,13 +390,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.SongNote.Octave(childComplexity), true
-
-	case "SongNote.start":
-		if e.complexity.SongNote.Start == nil {
-			break
-		}
-
-		return e.complexity.SongNote.Start(childComplexity), true
 
 	case "SongNote.string":
 		if e.complexity.SongNote.String == nil {
@@ -2132,10 +2116,6 @@ func (ec *executionContext) fieldContext_Song_notes(ctx context.Context, field g
 				return ec.fieldContext_SongNote_duration(ctx, field)
 			case "alter":
 				return ec.fieldContext_SongNote_alter(ctx, field)
-			case "start":
-				return ec.fieldContext_SongNote_start(ctx, field)
-			case "end":
-				return ec.fieldContext_SongNote_end(ctx, field)
 			case "default":
 				return ec.fieldContext_SongNote_default(ctx, field)
 			case "beat":
@@ -2445,94 +2425,6 @@ func (ec *executionContext) _SongNote_alter(ctx context.Context, field graphql.C
 }
 
 func (ec *executionContext) fieldContext_SongNote_alter(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SongNote",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SongNote_start(ctx context.Context, field graphql.CollectedField, obj *model.SongNote) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_SongNote_start(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Start, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_SongNote_start(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SongNote",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SongNote_end(ctx context.Context, field graphql.CollectedField, obj *model.SongNote) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_SongNote_end(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.End, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_SongNote_end(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "SongNote",
 		Field:      field,
@@ -5105,16 +4997,6 @@ func (ec *executionContext) _SongNote(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "alter":
 			out.Values[i] = ec._SongNote_alter(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "start":
-			out.Values[i] = ec._SongNote_start(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "end":
-			out.Values[i] = ec._SongNote_end(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

@@ -126,12 +126,10 @@ export type SongNote = {
     readonly beat: Scalars['Int']['output'];
     readonly default: Scalars['Float']['output'];
     readonly duration: Scalars['Int']['output'];
-    readonly end: Scalars['Int']['output'];
     readonly fret: Scalars['Int']['output'];
     readonly measure: Scalars['Int']['output'];
     readonly note: Scalars['String']['output'];
     readonly octave: Scalars['Int']['output'];
-    readonly start: Scalars['Int']['output'];
     readonly string: Scalars['Int']['output'];
     readonly type: Scalars['String']['output'];
 };

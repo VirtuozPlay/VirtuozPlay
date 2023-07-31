@@ -2,10 +2,25 @@
 import { initMicrophone, getTones, getNoise, getDuration } from '@/utilities/sound/microphone';
 import { notes } from '@/utilities/sound/notes';
 import { shallowRef, watch, watchEffect } from 'vue';
+import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
+import { createClient } from "graphql-ws";
+import { ApolloClient } from '@apollo/client/core/ApolloClient';
+import { InMemoryCache } from '@apollo/client/cache/inmemory/inMemoryCache';
 
 const props = defineProps<{
     enableCanvas: boolean;
 }>();
+// Websocket client
+const link = new GraphQLWsLink(
+  createClient({
+    url: "ws://127.0.0.1:3000/",
+  }),
+);
+const apolloClient = new ApolloClient({
+    cache: new InMemoryCache(),
+    link: link
+});
+
 const stream = shallowRef<MediaStream | null>(null);
 const sensitivity = shallowRef<number>(
     localStorage.getItem('mic_sensivity') ? Number(localStorage.getItem('mic_sensivity')) : 50
@@ -48,7 +63,7 @@ const onClick = () => {
             // recording starts
             startTimeStamp = Date.now();
             console.log(notes);
-            getDuration(stream, startTimeStamp);
+            getDuration(stream, apolloClient, startTimeStamp);
         }, 5000);
 
         if (isLocalStorageAcessible) localStorage.setItem('mic_sensivity', String(sensitivity.value));

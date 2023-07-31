@@ -2295,6 +2295,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@kurkle/color@npm:^0.3.0":
+  version: 0.3.2
+  resolution: "@kurkle/color@npm:0.3.2"
+  checksum: 79e97b31f8f6efb28c69d373f94b0c7480226fe8ec95221f518ac998e156444a496727ce47de6d728eb5c3369288e794cba82cae34253deb0d472d3bfe080e49
+  languageName: node
+  linkType: hard
+
 "@nicolo-ribaudo/semver-v6@npm:^6.3.3":
   version: 6.3.3
   resolution: "@nicolo-ribaudo/semver-v6@npm:6.3.3"
@@ -4227,6 +4234,15 @@ __metadata:
   version: 0.7.0
   resolution: "chardet@npm:0.7.0"
   checksum: 6fd5da1f5d18ff5712c1e0aed41da200d7c51c28f11b36ee3c7b483f3696dabc08927fc6b227735eb8f0e1215c9a8abd8154637f3eff8cada5959df7f58b024d
+  languageName: node
+  linkType: hard
+
+"chart.js@npm:^4.3.1":
+  version: 4.3.1
+  resolution: "chart.js@npm:4.3.1"
+  dependencies:
+    "@kurkle/color": ^0.3.0
+  checksum: d0c9e727e1cf1bf4b8a85599f4ec89a48466d549aa78d2e0280b1269e2819ed28aa97d46f97993383be8d66e411a9dd539797d759e538eaf9649cfff9be1044d
   languageName: node
   linkType: hard
 
@@ -10647,8 +10663,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "virtuozplay-workspace@workspace:."
   dependencies:
+    chart.js: ^4.3.1
     front: ^0.0.1
     prettier: ^2.8.8
+    vue-chartjs: ^5.2.0
   languageName: unknown
   linkType: soft
 
@@ -10820,6 +10838,16 @@ __metadata:
   bin:
     vitest: vitest.mjs
   checksum: 0f3347aac5656e6ba14c2f82d8fc5bfa333766ec745f7250f02a28d4cf6b35e645a300f0116a7db542430f59edb96cfeb3d2bc87856b84c776c25d10581f051b
+  languageName: node
+  linkType: hard
+
+"vue-chartjs@npm:^5.2.0":
+  version: 5.2.0
+  resolution: "vue-chartjs@npm:5.2.0"
+  peerDependencies:
+    chart.js: ^4.1.1
+    vue: ^3.0.0-0 || ^2.7.0
+  checksum: e707bcbe442d85a3ec23825620f6b1ba4f43eba67c68e1bd845ef5536b754c4447dc9a249f4ec92f8a29a479981b07382bd32b6449686676dd22d5e18f366ffa
   languageName: node
   linkType: hard
 

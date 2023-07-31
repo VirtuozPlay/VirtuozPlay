@@ -11,6 +11,9 @@ nano_id = "song-1"
 created_at = "<%= now() %>"
 updated_at = "<%= now() %>"
 title = "Empty Song of Silence"
+img_url = "img1.png"
+music_path = "song1.mp3"
+url = "song1"
 
 [[scenario.table]]
 name = "performance"
@@ -44,6 +47,9 @@ nano_id = "song-4"
 created_at = "<%= now() %>"
 updated_at = "<%= now() %>"
 title = "Empty Song of Silence"
+img_url = "img4.png"
+music_path = "song4.mp3"
+url = "song4"
 
 [[scenario]]
 # Purposly badly encoded performance
@@ -58,6 +64,9 @@ nano_id = "song-2"
 created_at = "<%= now() %>"
 updated_at = "<%= now() %>"
 title = "Empty Song of Silence"
+img_url = "img2.png"
+music_path = "song2.mp3"
+url = "song2"
 
 [[scenario.table]]
 name = "performance"
@@ -84,6 +93,9 @@ nano_id = "song-3"
 created_at = "<%= now() %>"
 updated_at = "<%= now() %>"
 title = "Empty Song of Silence"
+img_url = "img3.png"
+music_path = "song3.mp3"
+url = "song3"
 
 [[scenario.table]]
 name = "performance"
@@ -111,6 +123,9 @@ nano_id = "song-5"
 created_at = "<%= now() %>"
 updated_at = "<%= now() %>"
 title = "Empty Song of Silence"
+img_url = "img5.png"
+music_path = "song5.mp3"
+url = "song5"
 
 [[scenario.table]]
 name = "performance"

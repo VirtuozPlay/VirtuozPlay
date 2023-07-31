@@ -62,7 +62,7 @@ yarn run lint
 yarn run test:unit
 ```
 
-- Once validated, merge to PR to `main` and remove the source branch (with `git branch -D <branch_name>`.
+- Once validated, merge to PR to `main` and remove the source branch with `git branch -D <branch_name>`.
 
 ---
 

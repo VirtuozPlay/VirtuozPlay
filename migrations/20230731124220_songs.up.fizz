@@ -1,0 +1,3 @@
+add_column("song", "img_url", "string", {})
+add_column("song", "music_path", "string", {})
+add_column("song", "url", "string", {})

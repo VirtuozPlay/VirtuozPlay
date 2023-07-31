@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 14.8
--- Dumped by pg_dump version 14.8
+-- Dumped from database version 15.3
+-- Dumped by pg_dump version 15.3
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -79,7 +79,10 @@ CREATE TABLE public.song (
     nano_id character varying(21),
     title character varying(255),
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    img_url character varying(255) NOT NULL,
+    music_path character varying(255) NOT NULL,
+    url character varying(255) NOT NULL
 );
 
 

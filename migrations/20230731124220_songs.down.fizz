@@ -1,0 +1,3 @@
+drop_column("song", "img_url", "string", {})
+drop_column("song", "music_path", "string", {})
+drop_column("song", "url", "string", {})

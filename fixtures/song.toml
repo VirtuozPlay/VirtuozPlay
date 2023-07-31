@@ -10,6 +10,9 @@ nano_id = "song-1001"
 created_at = "<%= now() %>"
 updated_at = "<%= now() %>"
 title = "Empty Song of Silence"
+img_url = "img1001.png"
+music_path = "song1001.mp3"
+url = "song1001"
 
 [[scenario]]
 name = "song_empty_2"
@@ -23,6 +26,9 @@ nano_id = "song-1002"
 created_at = "<%= now() %>"
 updated_at = "<%= now() %>"
 title = "Empty Song of Silence"
+img_url = "img1002.png"
+music_path = "song1002.mp3"
+url = "song1002"
 
 [[scenario]]
 name = "song_empty_3"
@@ -36,6 +42,9 @@ nano_id = "song-1003"
 created_at = "<%= now() %>"
 updated_at = "<%= now() %>"
 title = "Empty Song of Silence"
+img_url = "img1003.png"
+music_path = "song1003.mp3"
+url = "song1003"
 
 
 [[scenario]]
@@ -50,3 +59,6 @@ nano_id = "song-1004"
 created_at = "<%= now() %>"
 updated_at = "<%= now() %>"
 title = "Empty Song of Silence"
+img_url = "img1004.png"
+music_path = "song1004.mp3"
+url = "song1004"

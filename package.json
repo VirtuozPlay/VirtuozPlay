@@ -18,7 +18,9 @@
   },
   "repository": "github.com/VirtuozPlay/VirtuozPlay",
   "dependencies": {
-    "front": "^0.0.1"
+    "chart.js": "^4.3.1",
+    "front": "^0.0.1",
+    "vue-chartjs": "^5.2.0"
   },
   "devDependencies": {
     "prettier": "^2.8.8"

@@ -20,6 +20,7 @@ require (
 	github.com/gobuffalo/suite/v4 v4.0.4
 	github.com/gobuffalo/tags/v3 v3.1.4
 	github.com/gobuffalo/validate/v3 v3.3.3
+	github.com/gorilla/websocket v1.5.0
 	github.com/matoous/go-nanoid/v2 v2.0.0
 	github.com/rs/cors v1.9.0
 	github.com/sirupsen/logrus v1.9.0
@@ -55,7 +56,6 @@ require (
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gorilla/securecookie v1.1.1 // indirect
 	github.com/gorilla/sessions v1.2.1 // indirect
-	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.3 // indirect
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect

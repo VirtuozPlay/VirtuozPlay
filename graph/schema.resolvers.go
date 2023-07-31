@@ -39,6 +39,7 @@ func (r *mutationResolver) AddNotesToPerformance(ctx context.Context, id string,
 			note.At,
 			note.Duration,
 			note.Value,
+			note.Octave,
 		)
 		// Append the invalid notes to the errors list, but only if we haven't reached the limit (to avoid spamming the user)
 		if err != nil && uint(len(errors)) < db.NoteValidationLimit {

@@ -79,6 +79,8 @@ type PerformanceNote {
   duration: Int!
   "Human-readable representation of the note (e.g. 'C#', 'D', 'Fb', etc.)"
   value: String!
+  "Octave of the note"
+  octave: Int!
 }
 
 input InputNote {

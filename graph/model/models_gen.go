@@ -33,6 +33,8 @@ type PerformanceNote struct {
 	Duration int `json:"duration"`
 	// Human-readable representation of the note (e.g. 'C#', 'D', 'Fb', etc.)
 	Value string `json:"value"`
+	// Octave of the note
+	Octave int `json:"octave"`
 }
 
 type Song struct {

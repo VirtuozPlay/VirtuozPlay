@@ -55,8 +55,6 @@ type SongNote struct {
 	Octave   int     `json:"octave"`
 	Duration int     `json:"duration"`
 	Alter    int     `json:"alter"`
-	Start    int     `json:"start"`
-	End      int     `json:"end"`
 	Default  float64 `json:"default"`
 	Beat     int     `json:"beat"`
 	Type     string  `json:"type"`

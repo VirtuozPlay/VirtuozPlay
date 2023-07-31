@@ -1,0 +1,5 @@
+mutation FinishPerformance($performanceId: ID!) {
+  finishPerformance(id: $performanceId) {
+    id
+  }
+}

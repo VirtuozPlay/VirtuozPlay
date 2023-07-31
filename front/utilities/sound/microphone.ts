@@ -7,6 +7,8 @@ import { Note, NotePlayed, notes } from './notes';
 import { AddNotesDocument } from '@/gql/mutations/AddNote';
 import { ApolloClient } from '@apollo/client/core/ApolloClient';
 import { NormalizedCacheObject } from '@apollo/client/cache/inmemory/types';
+import { StartPerformanceDocument } from '@/gql/mutations/StartPerformance';
+import { FinishPerformanceDocument } from '@/gql/mutations/FinishPerformance';
 
 let analyser: AnalyserNode;
 
@@ -24,7 +26,11 @@ const maxValue = 256; //based on Uint8Array possible values
  * Initialise settings of the microphone
  * @returns Audio stream
  */
-export const initMicrophone = async (sensitivity: number): Promise<MediaStream> => {
+export const initMicrophone = async (
+    sensitivity: number,
+    apolloClient: ApolloClient<NormalizedCacheObject>,
+    perfID: string
+): Promise<MediaStream> => {
     const audioCtx: AudioContext = new window.AudioContext();
 
     analyser = audioCtx.createAnalyser();
@@ -56,6 +62,16 @@ export const initMicrophone = async (sensitivity: number): Promise<MediaStream> 
     notes.forEach((note) => {
         note.timestamps = [];
     });
+
+    // Start performance
+    const result = await apolloClient.mutate({
+        mutation: StartPerformanceDocument,
+        variables: {
+            songId: '1SR-F8spyUptN20wQhAYi',
+        },
+    });
+    if (result.data?.startPerformance.id) perfID = result.data?.startPerformance.id;
+    console.log(perfID);
 
     return stream;
 };
@@ -196,13 +212,21 @@ export const getNoise = () => {
 export const getDuration = (
     stream: ShallowRef<MediaStream | null>,
     apolloClient: ApolloClient<NormalizedCacheObject>,
+    perfID: string,
     startTimeStamp: number
 ) => {
     const durationInterval = 500;
     if (stream.value !== null) {
         setTimeout(() => {
-            getDuration(stream, apolloClient, startTimeStamp);
+            getDuration(stream, apolloClient, perfID, startTimeStamp);
         }, durationInterval);
+    } else {
+        apolloClient.mutate({
+            mutation: FinishPerformanceDocument,
+            variables: {
+                performanceId: perfID,
+            },
+        });
     }
 
     const currentTimestamp = Date.now() - startTimeStamp;
@@ -227,10 +251,9 @@ export const getDuration = (
         apolloClient.mutate({
             mutation: AddNotesDocument,
             variables: {
-                // TODO : ID is hardcoded
-                ID: 'CXKu0YxHzIgBrwtXS42Ld',
+                ID: perfID,
                 inputNote: notesDetected,
-            }
-        })
+            },
+        });
     }
 };

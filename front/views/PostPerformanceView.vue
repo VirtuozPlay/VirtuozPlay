@@ -4,7 +4,7 @@ import {
     GetPostPerformanceStatsQuery,
     GetPostPerformanceStatsQueryVariables,
 } from '@/gql/queries/GetPostPerformanceStats';
-import { QueryResult } from '@apollo/client';
+import type { ApolloQueryResult } from '@apollo/client/core/types';
 import GraphQL from '@/components/GraphQL.vue';
 
 defineProps<{
@@ -19,7 +19,7 @@ defineProps<{
         :query="GetPostPerformanceStatsDocument"
         :variables="{ id: performanceId } satisfies GetPostPerformanceStatsQueryVariables"
     >
-        <template #default="{ loading, error, data }: QueryResult<GetPostPerformanceStatsQuery>">
+        <template #default="{ loading, error, data }: ApolloQueryResult<GetPostPerformanceStatsQuery>">
             <div v-if="loading">Loading...</div>
 
             <!-- Error -->

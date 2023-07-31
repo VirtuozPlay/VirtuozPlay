@@ -2,7 +2,7 @@
  * This code is the retranscription in typescript based on https://github.com/aerik/aerik.github.io
  */
 
-import { ShallowRef } from 'vue';
+import { Ref, ShallowRef } from 'vue';
 import { Note, NotePlayed, notes } from './notes';
 import { AddNotesDocument } from '@/gql/mutations/AddNote';
 import { ApolloClient } from '@apollo/client/core/ApolloClient';
@@ -29,7 +29,7 @@ const maxValue = 256; //based on Uint8Array possible values
 export const initMicrophone = async (
     sensitivity: number,
     apolloClient: ApolloClient<NormalizedCacheObject>,
-    perfID: string
+    perfID: Ref<string>
 ): Promise<MediaStream> => {
     const audioCtx: AudioContext = new window.AudioContext();
 
@@ -67,11 +67,11 @@ export const initMicrophone = async (
     const result = await apolloClient.mutate({
         mutation: StartPerformanceDocument,
         variables: {
-            songId: '1SR-F8spyUptN20wQhAYi',
+            songId: 'QyPqpmFqWC4uGInmkodgP',
         },
     });
-    if (result.data?.startPerformance.id) perfID = result.data?.startPerformance.id;
-    console.log(perfID);
+    if (result.data?.startPerformance.id) perfID.value = result.data?.startPerformance.id;
+    console.log(perfID.value);
 
     return stream;
 };
@@ -212,23 +212,10 @@ export const getNoise = () => {
 export const getDuration = (
     stream: ShallowRef<MediaStream | null>,
     apolloClient: ApolloClient<NormalizedCacheObject>,
-    perfID: string,
+    perfID: Ref<string>,
     startTimeStamp: number
 ) => {
     const durationInterval = 500;
-    if (stream.value !== null) {
-        setTimeout(() => {
-            getDuration(stream, apolloClient, perfID, startTimeStamp);
-        }, durationInterval);
-    } else {
-        apolloClient.mutate({
-            mutation: FinishPerformanceDocument,
-            variables: {
-                performanceId: perfID,
-            },
-        });
-    }
-
     const currentTimestamp = Date.now() - startTimeStamp;
     const notesDetected: NotePlayed[] = [];
 
@@ -245,14 +232,27 @@ export const getDuration = (
     if (notesDetected.length > 0) {
         // sort in ascending order based on notes timestamps
         notesDetected.sort((a: NotePlayed, b: NotePlayed) => a.at - b.at);
-        console.log(notesDetected);
 
         // send notes to back
         apolloClient.mutate({
             mutation: AddNotesDocument,
             variables: {
-                ID: perfID,
+                ID: perfID.value,
                 inputNote: notesDetected,
+            },
+        });
+    }
+
+    if (stream.value !== null) {
+        setTimeout(() => {
+            getDuration(stream, apolloClient, perfID, startTimeStamp);
+        }, durationInterval);
+    } else {
+        // no stream : end of performance
+        apolloClient.mutate({
+            mutation: FinishPerformanceDocument,
+            variables: {
+                performanceId: perfID.value,
             },
         });
     }

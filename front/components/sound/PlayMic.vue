@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { initMicrophone, getTones, getNoise, getDuration } from '@/utilities/sound/microphone';
 import { notes } from '@/utilities/sound/notes';
-import { shallowRef, watch, watchEffect } from 'vue';
+import { ref, shallowRef, watch, watchEffect } from 'vue';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { createClient } from 'graphql-ws';
 import { ApolloClient } from '@apollo/client/core/ApolloClient';
@@ -19,7 +19,7 @@ const apolloClient = new ApolloClient({
         })
     ),
 });
-let perfID: string;
+const perfID = ref('');
 const stream = shallowRef<MediaStream | null>(null);
 const sensitivity = shallowRef<number>(
     localStorage.getItem('mic_sensivity') ? Number(localStorage.getItem('mic_sensivity')) : 50

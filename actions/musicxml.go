@@ -45,7 +45,7 @@ type Note struct {
 	Rest      xml.Name  `xml:"rest"`
 	Chord     xml.Name  `xml:"chord"`
 	Notations Notations `xml:"notations"`
-	Default   float64   `xml:"default-x,attr"`
+	Abscissa   float64   `xml:"default-x,attr"`
 }
 
 // Pitch represents the pitch of a note

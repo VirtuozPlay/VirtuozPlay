@@ -128,9 +128,9 @@ export type Song = {
 /** This is a separate type from PerformanceNote for now */
 export type SongNote = {
     readonly __typename?: 'SongNote';
+    readonly abscissa: Scalars['Float']['output'];
     readonly alter: Scalars['Int']['output'];
     readonly beat: Scalars['Int']['output'];
-    readonly default: Scalars['Float']['output'];
     readonly duration: Scalars['Int']['output'];
     readonly fret: Scalars['Int']['output'];
     readonly measure: Scalars['Int']['output'];

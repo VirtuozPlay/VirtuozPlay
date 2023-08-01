@@ -2,6 +2,6 @@ create_table("performance") {
 	t.Column("id", "bigint", {primary: true})
 	t.Column("nano_id", "string", {null: false, size: 21, unique: true})
 	t.Column("notes_count", "integer", {null: false})
-	t.Column("notes_encoding", "smallint", {null: false, default: 0})
+	t.Column("notes_encoding", "smallint", {null: false, abscissa: 0})
 	t.Column("notes", "bytea", {null: false})
 }

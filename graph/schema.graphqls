@@ -51,7 +51,7 @@ type SongNote {
   octave: Int!
   duration: Int!
   alter: Int!
-  default: Float!
+  abscissa: Float!
   beat: Int!
   type: String!
 }

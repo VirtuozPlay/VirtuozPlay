@@ -22,8 +22,9 @@ import {
     Tooltip,
 } from 'chart.js';
 import TextualButton from '@/components/inputs/TextualButton.vue';
+import Shadow from '@/utilities/chart/shadow';
 
-ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Shadow);
 
 defineProps<{
     performanceId: string;
@@ -39,7 +40,7 @@ const percentFormat = new Intl.NumberFormat('fr-FR', {
     maximumFractionDigits: 0,
 });
 
-const chartData = {
+const pieData: ChartData<'pie'> = {
     labels: ['Bien joué!', 'Pas terrible', 'Raté'],
     datasets: [
         {
@@ -47,20 +48,27 @@ const chartData = {
             backgroundColor: ['#74DBA3', '#FFCC15', '#E9121C'],
         },
     ],
-} satisfies ChartData<'pie'>;
-const chartOptions = {
+};
+const pieOptions: ChartOptions<'pie'> = {
     responsive: true,
     maintainAspectRatio: true,
+    cutout: '40%',
+    borderColor: '#4C324D',
     plugins: {
-        legend: {
-            position: 'bottom',
+        legend: false,
+        shadow: {
+            enable: true,
+            color: '#4C324D',
+            offsetX: 32,
+            offsetY: 32,
         },
     },
-    cutout: '50%',
-    borderColor: '#4C324D',
-} satisfies ChartOptions<'pie'>;
+    layout: {
+        padding: 16,
+    },
+};
 
-const lineData = {
+const lineData: ChartData<'line'> = {
     datasets: [
         {
             label: 'Précision',
@@ -83,9 +91,8 @@ const lineData = {
             tension: 0.1,
         },
     ],
-} satisfies ChartData<'line'>;
-
-const lineOptions = {
+};
+const lineOptions: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
     scales: {
@@ -94,7 +101,7 @@ const lineOptions = {
             max: 1,
             ticks: {
                 stepSize: 0.2,
-                callback: (value) => Number(value) * 100 + ' %',
+                callback: (value) => percentFormat.format(Number(value)),
             },
             border: {
                 color: '#4C324D',
@@ -114,7 +121,7 @@ const lineOptions = {
             },
         },
     },
-} satisfies ChartOptions<'line'>;
+};
 </script>
 
 <template>
@@ -145,18 +152,18 @@ const lineOptions = {
             <div v-if="data && data.performance" class="flex flex-row flex-wrap gap-3 my-4">
                 <BigStatistic name="temps" :value="timeFormat.format(new Date(data.performance.duration * 100))" />
                 <BigStatistic name="précision" :value="percentFormat.format(0.97)" />
-                <BigStatistic name="auteur" v-if="data.performance.author" :value="data.performance.author.name" />
+                <BigStatistic v-if="data.performance.author" name="auteur" :value="data.performance.author.name" />
             </div>
             <div class="flex flex-wrap justify-center">
                 <div class="relative max-w-[80vmin]">
-                    <Pie :id="'misses-' + performanceId" :options="chartOptions" :data="chartData" />
+                    <Pie :id="'misses-' + performanceId" :options="pieOptions" :data="pieData" />
                 </div>
                 <div class="relative min-w-[50vw] grow">
                     <Line :id="'precision-over-time-' + performanceId" :options="lineOptions" :data="lineData" />
                 </div>
             </div>
 
-            <div class='w-full flex flex-wrap justify-center'>
+            <div class="w-full flex flex-wrap justify-center">
                 <TextualButton aria-label="Réessayer" hover-color="#FAFF00">Réessayer</TextualButton>
             </div>
         </template>

@@ -29,7 +29,7 @@ export type GetSongQuery = {
             beat: number;
             duration: number;
             type: string;
-            default: number;
+            abscissa: number;
         }>;
     }>;
 };
@@ -54,7 +54,7 @@ export const GetSongDocument = /*#__PURE__*/ gql`
                 beat
                 duration
                 type
-                default
+                abscissa
             }
         }
     }

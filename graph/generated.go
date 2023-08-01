@@ -88,9 +88,9 @@ type ComplexityRoot struct {
 	}
 
 	SongNote struct {
+		Abscissa func(childComplexity int) int
 		Alter    func(childComplexity int) int
 		Beat     func(childComplexity int) int
-		Default  func(childComplexity int) int
 		Duration func(childComplexity int) int
 		Fret     func(childComplexity int) int
 		Measure  func(childComplexity int) int
@@ -351,6 +351,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Song.URL(childComplexity), true
 
+	case "SongNote.abscissa":
+		if e.complexity.SongNote.Abscissa == nil {
+			break
+		}
+
+		return e.complexity.SongNote.Abscissa(childComplexity), true
+
 	case "SongNote.alter":
 		if e.complexity.SongNote.Alter == nil {
 			break
@@ -364,13 +371,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.SongNote.Beat(childComplexity), true
-
-	case "SongNote.default":
-		if e.complexity.SongNote.Default == nil {
-			break
-		}
-
-		return e.complexity.SongNote.Default(childComplexity), true
 
 	case "SongNote.duration":
 		if e.complexity.SongNote.Duration == nil {
@@ -2230,8 +2230,8 @@ func (ec *executionContext) fieldContext_Song_notes(ctx context.Context, field g
 				return ec.fieldContext_SongNote_duration(ctx, field)
 			case "alter":
 				return ec.fieldContext_SongNote_alter(ctx, field)
-			case "default":
-				return ec.fieldContext_SongNote_default(ctx, field)
+			case "abscissa":
+				return ec.fieldContext_SongNote_abscissa(ctx, field)
 			case "beat":
 				return ec.fieldContext_SongNote_beat(ctx, field)
 			case "type":
@@ -2551,8 +2551,8 @@ func (ec *executionContext) fieldContext_SongNote_alter(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _SongNote_default(ctx context.Context, field graphql.CollectedField, obj *model.SongNote) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_SongNote_default(ctx, field)
+func (ec *executionContext) _SongNote_abscissa(ctx context.Context, field graphql.CollectedField, obj *model.SongNote) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SongNote_abscissa(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2565,7 +2565,7 @@ func (ec *executionContext) _SongNote_default(ctx context.Context, field graphql
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Default, nil
+		return obj.Abscissa, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2582,7 +2582,7 @@ func (ec *executionContext) _SongNote_default(ctx context.Context, field graphql
 	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_SongNote_default(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_SongNote_abscissa(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "SongNote",
 		Field:      field,
@@ -5124,8 +5124,8 @@ func (ec *executionContext) _SongNote(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "default":
-			out.Values[i] = ec._SongNote_default(ctx, field, obj)
+		case "abscissa":
+			out.Values[i] = ec._SongNote_abscissa(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

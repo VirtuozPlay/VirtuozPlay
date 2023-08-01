@@ -28,7 +28,7 @@ func Test_ParseMusicXML(t *testing.T) {
 				// Access the duration of each note
 				duration := note.Duration
 				// Store information or perform desired processing
-				fmt.Println("Mesure:", measure.Number, "Beats: ", measure.Beat, "Default-x: ", note.Default, " Notes: {", "Pitch: {", "Step:", note.Pitch.Step, " Alter: ", note.Pitch.Alter, " Octave:", note.Pitch.Octave, "}", "Duration:", duration, "String:", note.Notations.Technical.String, "Fret:", note.Notations.Technical.Fret, " }")
+				fmt.Println("Mesure:", measure.Number, "Beats: ", measure.Beat, "Default-x: ", note.Abscissa, " Notes: {", "Pitch: {", "Step:", note.Pitch.Step, " Alter: ", note.Pitch.Alter, " Octave:", note.Pitch.Octave, "}", "Duration:", duration, "String:", note.Notations.Technical.String, "Fret:", note.Notations.Technical.Fret, " }")
 				// fmt.Print( note.Duration)
 			}
 		}

@@ -18,7 +18,7 @@ type Part struct {
 // Measure represents a measure in a piece of music
 type Measure struct {
 	Number int    `xml:"number,attr"`
-	Beat   int    `xml:"beat"`
+	Beat   int    `xml:"beats"`
 	Notes  []Note `xml:"note"`
 	Key    []Key  `xml:"key"`
 	Time   []Time `xml:"time"`

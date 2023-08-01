@@ -8,7 +8,7 @@
   </identification>
   <part id="P1">
     <measure number="1" width="251.88">
-      <beat>4</beat>
+      <beats>4</beats>
       <note default-x="58.84" default-y="-60.00">
         <pitch>
           <step>C</step>
@@ -93,7 +93,7 @@
       </note>
     </measure>
     <measure number="2" width="197.18">
-      <beat>4</beat>
+      <beats>4</beats>
       <barline location="left">
         <bar-style>heavy-light</bar-style>
         <repeat direction="forward"/>
@@ -205,7 +205,7 @@
       </note>
     </measure>
     <measure number="3" width="214.68">
-      <beat>4</beat>
+      <beats>4</beats>
       <note default-x="16.10" default-y="-60.00">
         <pitch>
           <step>C</step>
@@ -342,7 +342,7 @@
       </note>
     </measure>
     <measure number="4" width="197.18">
-      <beat>4</beat>
+      <beats>4</beats>
       <note default-x="16.10" default-y="-60.00">
         <pitch>
           <step>C</step>
@@ -444,7 +444,7 @@
       </note>
     </measure>
     <measure number="5" width="249.68">
-      <beat>4</beat>
+      <beats>4</beats>
       <note default-x="16.10" default-y="-60.00">
         <pitch>
           <step>C</step>
@@ -600,7 +600,7 @@
       </note>
     </measure>
     <measure number="6" width="287.86">
-      <beat>4</beat>
+      <beats>4</beats>
       <print new-system="yes">
         <system-layout>
           <system-margins>
@@ -717,7 +717,7 @@
       </note>
     </measure>
     <measure number="7" width="280.09">
-      <beat>4</beat>
+      <beats>4</beats>
       <note default-x="16.10" default-y="-75.00">
         <pitch>
           <step>F</step>
@@ -854,7 +854,7 @@
       </note>
     </measure>
     <measure number="8" width="245.09">
-      <beat>4</beat>
+      <beats>4</beats>
       <harmony print-frame="no">
         <root>
           <root-step>C</root-step>
@@ -944,7 +944,7 @@
       </note>
     </measure>
     <measure number="9" width="297.59">
-      <beat>4</beat>
+      <beats>4</beats>
       <note default-x="16.10" default-y="-60.00">
         <pitch>
           <step>C</step>
@@ -1082,7 +1082,7 @@
       </note>
     </measure>
     <measure number="10" width="287.37">
-      <beat>4</beat>
+      <beats>4</beats>
       <print new-system="yes">
         <system-layout>
           <system-margins>
@@ -1199,7 +1199,7 @@
       </note>
     </measure>
     <measure number="11" width="279.60">
-      <beat>4</beat>
+      <beats>4</beats>
       <note default-x="16.10" default-y="-75.00">
         <pitch>
           <step>G</step>
@@ -1336,7 +1336,7 @@
       </note>
     </measure>
     <measure number="12" width="262.10">
-      <beat>4</beat>
+      <beats>4</beats>
       <harmony print-frame="no">
         <root>
           <root-step>C</root-step>
@@ -1444,7 +1444,7 @@
       </note>
     </measure>
     <measure number="13" width="281.53">
-      <beat>4</beat>
+      <beats>4</beats>
       <note default-x="16.10" default-y="-60.00">
         <pitch>
           <step>C</step>

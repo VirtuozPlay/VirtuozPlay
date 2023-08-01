@@ -19,15 +19,14 @@ const apolloClient = new ApolloClient({
         })
     ),
 });
-const perfID = ref('');
 const stream = shallowRef<MediaStream | null>(null);
 const sensitivity = shallowRef<number>(
     localStorage.getItem('mic_sensivity') ? Number(localStorage.getItem('mic_sensivity')) : 50
 );
+const fps = 30, acquisitionDelay = ref(500), perfID = ref('');
 let isRecordingNoise = true,
     isLocalStorageAcessible = false;
 let startTimeStamp = 0;
-const fps = 30;
 
 watch(stream, () => {
     const setTones = () => {
@@ -51,7 +50,6 @@ watch(stream, () => {
         requestAnimationFrame(setTones);
     });
 });
-watch(sensitivity, () => null); // Required to display sensitivity in real time
 
 const onClick = () => {
     if (stream.value === null) {
@@ -62,7 +60,7 @@ const onClick = () => {
             // recording starts
             startTimeStamp = Date.now();
             console.log(notes);
-            getDuration(stream, apolloClient, perfID, startTimeStamp);
+            getDuration(stream, apolloClient, perfID, startTimeStamp, acquisitionDelay);
         }, 5000);
 
         if (isLocalStorageAcessible) localStorage.setItem('mic_sensivity', String(sensitivity.value));
@@ -92,6 +90,12 @@ try {
                 v-text="-sensitivity"
             />
             Db
+        </div>
+        <div>
+            Réglage du délai entre chaque acquisition : <input v-model="acquisitionDelay" type="range" min="10" max="10000" /><span
+                v-text="acquisitionDelay"
+            />
+            ms
         </div>
 
         <button id="startBtn" type="button" @click="onClick()">{{ stream === null ? 'Start' : 'Stop' }}</button>

@@ -25,7 +25,7 @@ defineSlots<ApolloQueryResult<any> & { default: any }>();
     ApolloQuery component with TypeScript.
 -->
 <template>
-    <ApolloQuery :query="() => $props.query" :variables="$props.variables" :tag='$props.tag'>
+    <ApolloQuery :query="() => $props.query" :variables="$props.variables" :tag="$props.tag">
         <template #default="{ result }: { result: ApolloQueryResult<any> }">
             <slot v-bind="result"></slot>
         </template>

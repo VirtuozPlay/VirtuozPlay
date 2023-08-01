@@ -16,7 +16,6 @@ interface Position {
 
 const store = useSongStore();
 const title = store.currentSong.title;
-const image = store.currentSong.img_url;
 const music = store.currentSong.music_path;
 const audio = new Audio(music);
 // const positions: Position[] = (store.currentSong.notes ?? [])

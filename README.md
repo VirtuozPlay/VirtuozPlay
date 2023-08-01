@@ -69,6 +69,9 @@ buffalo plugins install
 7. create db
    `buffalo pop create -a`
 
+8. install node module
+   `yarn install`
+
 ### Recommended IDE Plugins
 
 #### VSCode
@@ -105,6 +108,7 @@ buffalo pop create -a
 
 ### Starting the Application
 
+Start by copying the `embed.go` file from public folder to the root of the dist folder.
 Buffalo ships with a command that will watch your application and automatically rebuild the Go binary and any assets for you. To do that run the "buffalo dev" command:
 
 If you point your browser to [http://localhost:5173](http://localhost:5173) you should see a "You did it!" page.

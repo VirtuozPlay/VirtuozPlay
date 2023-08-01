@@ -7,7 +7,7 @@
   </identification>
   <part id="P1">
     <measure number="1" width="154.18">
-      <beat>16</beat>
+      <beats>16</beats>
       <direction placement="above">
         <direction-type>
           <metronome parentheses="no" default-x="-33.50" default-y="40.00" relative-y="1.00">
@@ -27,7 +27,7 @@
       </note>
     </measure>
     <measure number="2" width="316.17">
-      <beat>16</beat>
+      <beats>16</beats>
       <note default-x="15.42" default-y="-150.00">
         <pitch>
           <step>D</step>
@@ -194,7 +194,7 @@
       </note>
     </measure>
     <measure number="3" width="324.02">
-      <beat>16</beat>
+      <beats>16</beats>
       <note default-x="15.42" default-y="-180.00">
         <pitch>
           <step>G</step>
@@ -451,7 +451,7 @@
       </note>
     </measure>
     <measure number="4" width="283.12">
-      <beat>16</beat>
+      <beats>16</beats>
       <note default-x="15.42" default-y="-150.00">
         <pitch>
           <step>D</step>
@@ -648,7 +648,7 @@
       </note>
     </measure>
     <measure number="5" width="420.40">
-      <beat>16</beat>
+      <beats>16</beats>
       <note default-x="53.18" default-y="-180.00">
         <pitch>
           <step>G</step>
@@ -907,7 +907,7 @@
       </note>
     </measure>
     <measure number="6" width="297.57">
-      <beat>16</beat>
+      <beats>16</beats>
       <note default-x="15.42" default-y="-150.00">
         <pitch>
           <step>D</step>
@@ -1116,7 +1116,7 @@
       </note>
     </measure>
     <measure number="7" width="359.51">
-      <beat>16</beat>
+      <beats>16</beats>
       <note default-x="15.42" default-y="-180.00">
         <pitch>
           <step>G</step>
@@ -1341,7 +1341,7 @@
       </note>
     </measure>
     <measure number="8" width="374.84">
-      <beat>16</beat>
+      <beats>16</beats>
       <note default-x="53.18" default-y="-150.00">
         <pitch>
           <step>D</step>
@@ -1569,7 +1569,7 @@
       </note>
     </measure>
     <measure number="9" width="371.91">
-      <beat>16</beat>
+      <beats>16</beats>
       <note default-x="15.42" default-y="-180.00">
         <pitch>
           <step>G</step>
@@ -1832,7 +1832,7 @@
       </note>
     </measure>
     <measure number="10" width="330.75">
-      <beat>16</beat>
+      <beats>16</beats>
       <note default-x="15.42" default-y="-150.00">
         <pitch>
           <step>D</step>
@@ -2023,7 +2023,7 @@
       </note>
     </measure>
     <measure number="11" width="420.31">
-      <beat>16</beat>
+      <beats>16</beats>
       <note default-x="53.18" default-y="-180.00">
         <pitch>
           <step>G</step>
@@ -2248,7 +2248,7 @@
       </note>
     </measure>
     <measure number="12" width="327.49">
-      <beat>16</beat>
+      <beats>16</beats>
       <note default-x="15.42" default-y="-150.00">
         <pitch>
           <step>D</step>
@@ -2449,7 +2449,7 @@
       </note>
     </measure>
     <measure number="13" width="329.70">
-      <beat>16</beat>
+      <beats>16</beats>
       <note default-x="15.42" default-y="-180.00">
         <pitch>
           <step>G</step>
@@ -2640,7 +2640,7 @@
       </note>
     </measure>
     <measure number="14" width="633.39">
-      <beat>16</beat>
+      <beats>16</beats>
       <note default-x="72.72" default-y="-165.00">
         <pitch>
           <step>E</step>
@@ -2943,7 +2943,7 @@
       </note>
     </measure>
     <measure number="15" width="444.11">
-      <beat>16</beat>
+      <beats>16</beats>
       <note default-x="15.42" default-y="-165.00">
         <pitch>
           <step>A</step>

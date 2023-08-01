@@ -213,14 +213,14 @@ export const getDuration = (
     stream: ShallowRef<MediaStream | null>,
     apolloClient: ApolloClient<NormalizedCacheObject>,
     perfID: Ref<string>,
-    startTimeStamp: number
+    startTimeStamp: number,
+    acquisitionDelay: Ref<number>
 ) => {
-    const durationInterval = 500;
     const currentTimestamp = Date.now() - startTimeStamp;
     const notesDetected: NotePlayed[] = [];
 
     notes.forEach((note) => {
-        const timestamps = note.timestamps.filter((timestamp) => timestamp > currentTimestamp - durationInterval);
+        const timestamps = note.timestamps.filter((timestamp) => timestamp > currentTimestamp - acquisitionDelay.value);
 
         if (timestamps.length > 0) {
             const timestamp = timestamps[0];
@@ -232,6 +232,7 @@ export const getDuration = (
     if (notesDetected.length > 0) {
         // sort in ascending order based on notes timestamps
         notesDetected.sort((a: NotePlayed, b: NotePlayed) => a.at - b.at);
+        console.log(notesDetected);
 
         // send notes to back
         apolloClient.mutate({
@@ -245,8 +246,8 @@ export const getDuration = (
 
     if (stream.value !== null) {
         setTimeout(() => {
-            getDuration(stream, apolloClient, perfID, startTimeStamp);
-        }, durationInterval);
+            getDuration(stream, apolloClient, perfID, startTimeStamp, acquisitionDelay);
+        }, acquisitionDelay.value);
     } else {
         // no stream : end of performance
         apolloClient.mutate({

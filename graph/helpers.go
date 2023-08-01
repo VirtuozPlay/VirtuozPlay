@@ -49,6 +49,7 @@ func ToGraphQLPerformance(performance *db.Performance, err error) (*model.Perfor
 			At:       int(note.At),
 			Duration: int(note.Duration),
 			Value:    note.Step,
+			Octave:   int(note.Octave),
 		}
 	}
 	createdAt := performance.CreatedAt.String()

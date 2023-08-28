@@ -20,14 +20,12 @@ const apolloClient = new ApolloClient({
     ),
 });
 const stream = shallowRef<MediaStream | null>(null);
-const sensitivity = shallowRef<number>(
-    localStorage.getItem('mic_sensivity') ? Number(localStorage.getItem('mic_sensivity')) : 50
-);
+const sensitivity = ref(localStorage.getItem('mic_sensivity') ? Number(localStorage.getItem('mic_sensivity')) : 50);
 const fps = 30,
     acquisitionDelay = ref(500),
     perfID = ref('');
 let isRecordingNoise = true,
-    isLocalStorageAcessible = false;
+    isLocalStorageAccessible = false;
 let startTimeStamp = 0;
 
 watch(stream, () => {
@@ -53,8 +51,12 @@ watch(stream, () => {
     });
 });
 
-const onClick = () => {
+const onClick = async () => {
     if (stream.value === null) {
+        stream.value = await initMicrophone(sensitivity.value, apolloClient, perfID);
+
+        if (isLocalStorageAccessible) localStorage.setItem('mic_sensivity', String(sensitivity.value));
+
         // start by recording noise for 5 s
         isRecordingNoise = true;
         setTimeout(() => {
@@ -64,10 +66,6 @@ const onClick = () => {
             console.log(notes);
             getDuration(stream, apolloClient, perfID, startTimeStamp, acquisitionDelay);
         }, 5000);
-
-        if (isLocalStorageAcessible) localStorage.setItem('mic_sensivity', String(sensitivity.value));
-
-        initMicrophone(sensitivity.value, apolloClient, perfID).then((s: MediaStream) => (stream.value = s));
     } else {
         // stop
         stream.value.getAudioTracks().forEach((track: MediaStreamTrack) => track.stop());
@@ -79,7 +77,7 @@ const onClick = () => {
 try {
     localStorage.setItem('testing local storage', 'test');
     localStorage.removeItem('testing local storage');
-    isLocalStorageAcessible = true;
+    isLocalStorageAccessible = true;
 } catch (e) {
     console.log('Local storage is not available');
 }

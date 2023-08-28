@@ -119,7 +119,10 @@ export const getTones = (startTimeStamp: number, enableCanvas = false, decibelMi
                             notes[nPtr].step === lastNotePlayed.value &&
                             currentTimestamp - 500 >= lastNotePlayed.at)
                     ) {
-                        // TODO a note is detected !
+                        /**
+                         * Push note into an array and is processed later
+                         * @see getDuration
+                         */
                         notes[nPtr].timestamps.push(currentTimestamp);
 
                         //console.log(JSON.stringify(notes[nPtr]) + ' timestamp: ' + currentTimestamp);
@@ -209,6 +212,14 @@ export const getNoise = () => {
     }
 };
 
+/**
+ * Get notes duration and send them to backend
+ * @param stream Shallow reference of the audio stream
+ * @param apolloClient Web socket client
+ * @param perfID Performance ID
+ * @param startTimeStamp timestamp when noise recording is finished
+ * @param acquisitionDelay Sending to backend delay
+ */
 export const getDuration = (
     stream: ShallowRef<MediaStream | null>,
     apolloClient: ApolloClient<NormalizedCacheObject>,
@@ -249,7 +260,7 @@ export const getDuration = (
             getDuration(stream, apolloClient, perfID, startTimeStamp, acquisitionDelay);
         }, acquisitionDelay.value);
     } else {
-        // no stream : end of performance
+        // no stream: end of performance
         apolloClient.mutate({
             mutation: FinishPerformanceDocument,
             variables: {

@@ -9,6 +9,7 @@ import { InMemoryCache } from '@apollo/client/cache/inmemory/inMemoryCache';
 
 const props = defineProps<{
     enableCanvas: boolean;
+    songId: string;
 }>();
 // Websocket client
 const apolloClient = new ApolloClient({
@@ -53,7 +54,7 @@ watch(stream, () => {
 
 const onClick = async () => {
     if (stream.value === null) {
-        stream.value = await initMicrophone(sensitivity.value, apolloClient, perfID);
+        stream.value = await initMicrophone(props.songId, sensitivity.value, apolloClient, perfID);
 
         if (isLocalStorageAccessible) localStorage.setItem('mic_sensivity', String(sensitivity.value));
 

@@ -114,7 +114,7 @@ export const notes: Note[] = [
     { octave: 6, step: 'F', frequency: 1396.91, power: 0, noise: 0, timestamps: [] },
     { octave: 6, step: 'F#', frequency: 1479.98, power: 0, noise: 0, timestamps: [] },
     { octave: 6, step: 'G', frequency: 1567.98, power: 0, noise: 0, timestamps: [] },
-    { octave: 6, step: 'G#/', frequency: 1661.22, power: 0, noise: 0, timestamps: [] },
+    { octave: 6, step: 'G#', frequency: 1661.22, power: 0, noise: 0, timestamps: [] },
     { octave: 6, step: 'A', frequency: 1760, power: 0, noise: 0, timestamps: [] },
     { octave: 6, step: 'A#', frequency: 1864.66, power: 0, noise: 0, timestamps: [] },
     { octave: 6, step: 'B', frequency: 1975.53, power: 0, noise: 0, timestamps: [] },

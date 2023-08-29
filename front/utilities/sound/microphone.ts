@@ -27,10 +27,11 @@ const maxValue = 256; //based on Uint8Array possible values
  * @returns Audio stream
  */
 export const initMicrophone = async (
+    songId: string,
     sensitivity: number,
     apolloClient: ApolloClient<NormalizedCacheObject>,
     perfID: Ref<string>
-): Promise<MediaStream> => {
+): Promise<MediaStream | null> => {
     const audioCtx: AudioContext = new window.AudioContext();
 
     analyser = audioCtx.createAnalyser();
@@ -47,7 +48,7 @@ export const initMicrophone = async (
     buflen = frequencyData.length;
 
     // ask for microphone permission
-    const stream = await navigator.mediaDevices.getUserMedia({
+    let stream: MediaStream | null = await navigator.mediaDevices.getUserMedia({
         audio: {
             noiseSuppression: true,
             echoCancellation: true,
@@ -64,14 +65,20 @@ export const initMicrophone = async (
     });
 
     // Start performance
-    const result = await apolloClient.mutate({
-        mutation: StartPerformanceDocument,
-        variables: {
-            songId: 'QyPqpmFqWC4uGInmkodgP',
-        },
-    });
-    if (result.data?.startPerformance.id) perfID.value = result.data?.startPerformance.id;
-    console.log(perfID.value);
+    try {
+        const result = await apolloClient.mutate({
+            mutation: StartPerformanceDocument,
+            variables: {
+                songId: songId,
+            },
+        });
+        if (result.data?.startPerformance.id) perfID.value = result.data?.startPerformance.id;
+        console.log(perfID.value);
+    } catch (e) {
+        console.error(e);
+        stream.getAudioTracks().forEach((track: MediaStreamTrack) => track.stop());
+        stream = null;
+    }
 
     return stream;
 };

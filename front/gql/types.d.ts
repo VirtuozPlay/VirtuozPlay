@@ -73,6 +73,8 @@ export type Performance = {
     readonly id: Scalars['ID']['output'];
     /** An array of *all* notes in the performance, sorted by their start time. */
     readonly notes: ReadonlyArray<PerformanceNote>;
+    /** The total precision scope, ranging from 0 to 1. */
+    readonly precision: Scalars['Float']['output'];
     /** The song that is being/was performed */
     readonly song: Song;
 };
@@ -83,6 +85,10 @@ export type PerformanceNote = {
     readonly at: Scalars['Int']['output'];
     /** The duration of the note, in milliseconds. */
     readonly duration: Scalars['Int']['output'];
+    /** Octave of the note */
+    readonly octave: Scalars['Int']['output'];
+    /** The precision of this performed note compared to the song's corresponding note, ranging from 0 (0%) to 1 (100%). */
+    readonly precision: Scalars['Float']['output'];
     /** Human-readable representation of the note (e.g. 'C#', 'D', 'Fb', etc.) */
     readonly value: Scalars['String']['output'];
 };

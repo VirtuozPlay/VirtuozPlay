@@ -84,6 +84,8 @@ type PerformanceNote {
   value: String!
   "Octave of the note"
   octave: Int!
+  "The precision of this performed note compared to the song's corresponding note, ranging from 0 (0%) to 1 (100%)."
+  precision: Float!
 }
 
 input InputNote {

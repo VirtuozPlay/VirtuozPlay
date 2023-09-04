@@ -1,6 +1,7 @@
 package graph
 
 import (
+	"math/rand"
 	"virtuozplay/graph/model"
 	db "virtuozplay/models"
 
@@ -46,10 +47,11 @@ func ToGraphQLPerformance(performance *db.Performance, err error) (*model.Perfor
 
 	for i, note := range performance.Notes {
 		notes[i] = &model.PerformanceNote{
-			At:       int(note.At),
-			Duration: int(note.Duration),
-			Value:    note.Step,
-			Octave:   int(note.Octave),
+			At:        int(note.At),
+			Duration:  int(note.Duration),
+			Value:     note.Step,
+			Octave:    int(note.Octave),
+			Precision: rand.Float64(), // FIXME: returning random precision for now, change once comparison is implemented.
 		}
 	}
 	createdAt := performance.CreatedAt.String()

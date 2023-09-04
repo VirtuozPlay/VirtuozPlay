@@ -37,6 +37,8 @@ type PerformanceNote struct {
 	Value string `json:"value"`
 	// Octave of the note
 	Octave int `json:"octave"`
+	// The precision of this performed note compared to the song's corresponding note, ranging from 0 (0%) to 1 (100%).
+	Precision float64 `json:"precision"`
 }
 
 type Song struct {

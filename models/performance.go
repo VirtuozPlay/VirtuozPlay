@@ -11,11 +11,13 @@ import (
 	"time"
 
 	"github.com/go-interpreter/wagon/wasm/leb128"
+	"github.com/gobuffalo/logger"
 	"github.com/gobuffalo/pop/v6"
 	"github.com/gobuffalo/validate/v3"
 	"github.com/gobuffalo/validate/v3/validators"
-	log "github.com/sirupsen/logrus"
 )
+
+var Logger = logger.New(logger.InfoLevel)
 
 type NotesEncoding int16
 
@@ -176,13 +178,13 @@ func decodeNotes(notes []byte, count int, encoding NotesEncoding) ([]Note, error
 	for i := 0; i < count; i++ {
 		note, err := decodeNote(src)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to decode note %v: %v", i, err)
 		}
 		decoded[i] = note
 	}
 
 	if src.Len() > 0 {
-		log.Warnf("%v notes were decoded, but %v bytes remain in the buffer", count, src.Len())
+		Logger.Warnf("%v notes were decoded, but %v bytes remain in the buffer", count, src.Len())
 	}
 
 	return decoded, nil

@@ -2,18 +2,20 @@ package repository
 
 import (
 	"fmt"
+	"github.com/gobuffalo/logger"
 	"github.com/gobuffalo/pop/v6"
 	"virtuozplay/models"
 )
 
 // DatabaseRepository is a generic database-based repository that is used as a base for other repos like Songs and Performances.
 type DatabaseRepository[V models.Value] struct {
-	db *pop.Connection
+	logger logger.FieldLogger
+	db     *pop.Connection
 }
 
 // NewDatabaseRepository creates a NewSongsRepository instance for the given database connection.
 func NewDatabaseRepository[V models.Value](db *pop.Connection) DatabaseRepository[V] {
-	return DatabaseRepository[V]{db: db}
+	return DatabaseRepository[V]{logger: logger.New(logger.InfoLevel), db: db}
 }
 
 // FindByNanoID finds a model instance by its nanoID.
@@ -36,6 +38,7 @@ func (r *DatabaseRepository[V]) FindByNanoID(nanoID models.NanoID, preloadFields
 	}
 
 	if err = query.First(value); err != nil {
+		r.logger.Errorf("error while fetching %v '%v': %v", (*value).TableName(), nanoID, err)
 		return nil, fmt.Errorf("%v '%v' not found", (*value).TableName(), nanoID)
 	}
 	return value, nil

@@ -6,60 +6,28 @@ import { useSongStore } from '@/store';
 import { SongNote } from '@/gql/types';
 
 const isPlaying = ref(false);
-const stringsFretsRef = ref(null);
-
-interface Position {
-    string: number | undefined;
-    fret: number;
-    beat: number;
-}
+const stringsFretsRef = ref(false);
 
 const store = useSongStore();
 const title = store.currentSong.title;
 const music = store.currentSong.music_path;
 const audio = new Audio(music);
-// const positions: Position[] = (store.currentSong.notes ?? [])
-//     .filter((note?: Partial<SongNote> | null) => note != null)
-//     .map((note: SongNote | null) => {
-//         // null notes are filtered out, we can safely use non-null assertions
-//         // const n = note as SongNote;
-//         return {
-//             string: note?.string,
-//             fret: note?.fret,
-//             beat: note?.start,
-//         };
-//     });
 
-const positions: Position[] = (store.currentSong.notes ?? []).filter(
-    (note?: SongNote | null) => note != null && note.beat !== undefined
-) as SongNote[];
-//
+// const positions: Position[] = (store.currentSong.notes ?? []).filter(
+//     (note?: SongNote | null) => note != null && note.beat !== undefined
+// ) as SongNote[];
 
-// const notename = (store.currentSong.notes ?? [])
-//     .filter((note?: SongNote | null) => note != null)
-//     .map((note: SongNote | null) => {
-//         // const n = note as SongNote;
-//         return {
-//             note: note?.note,
-//         };
-//     });
+// const isPosition = (string: number | undefined, fret: number): boolean => {
+//     const currentPosition = positions[currentIndex.value];
+//     return string !== undefined && string === currentPosition.string && fret === currentPosition.fret;
+// };
+// const isCurrentFret = (fret: number) => {
+//     return positions[currentIndex.value].fret === fret;
+// };
 
-const note = (store.currentSong.notes ?? []).filter((note?: SongNote | null) => note != null) as SongNote[];
-const notename = note.map((note: SongNote) => ({ note: note?.note }));
-
-const updateCurrentNoteName = () => {
-    const currentNote = notename[currentIndex.value];
-    if (currentNote) {
-        currentNoteName.value = currentNote.note;
-    } else {
-        currentNoteName.value = '';
-    }
-};
-
-const currentIndex = ref(0);
-const currentNoteName = ref('');
-const animationRunning = ref(false);
-const animationPaused = ref(false);
+// filter = exclut les éléments vides de la liste
+const notes = (store.currentSong.notes ?? []).filter((notes?: SongNote | null) => notes != null) as SongNote[];
+console.log('notes', notes);
 
 const iconState = ref(['fas', 'headphones']);
 
@@ -75,13 +43,125 @@ const handleListen = () => {
     }
 };
 
-const isPosition = (string: number | undefined, fret: number): boolean => {
-    const currentPosition = positions[currentIndex.value];
-    return string !== undefined && string === currentPosition.string && fret === currentPosition.fret;
+interface Chord {
+    note: string | undefined;
+    fret: number | undefined;
+    string: number | undefined;
+    // alter: number | undefined;
+    // octave: number | undefined;
+    abscissa: number | undefined;
+}
+
+interface MergeData {
+    measure: number;
+    beat: number;
+    duration: number;
+    chords: Chord[];
+}
+
+interface ChordTable {
+    measure: number;
+    beat: number;
+    duration: number;
+    start: number;
+    end: number;
+    chords: Chord[];
+}
+
+interface Position {
+    frets: (number | undefined)[];
+    strings: (number | undefined)[];
+}
+
+const currentIndex = ref(0);
+const animationRunning = ref(false);
+const animationPaused = ref(false);
+const currentNoteName = ref([]);
+
+function transformAndMergeData(): MergeData[] {
+    const transformedData = notes.map((item: SongNote) => ({
+        measure: item.measure,
+        beat: item.beat,
+        duration: item.duration,
+        chords: [
+            {
+                note: item.note,
+                fret: item.fret,
+                string: item.string,
+                abscissa: item.abscissa,
+            },
+        ],
+    }));
+
+    const mergedData = transformedData.reduce<MergeData[]>((acc, item, index) => {
+        if (index > 0 && item.chords[0].abscissa === acc[acc.length - 1].chords[0].abscissa) {
+            acc[acc.length - 1].chords.push(item.chords[0]);
+            acc[acc.length - 1].duration += item.duration;
+        } else {
+            acc.push({
+                measure: item.measure,
+                beat: item.beat,
+                duration: item.duration,
+                chords: [item.chords[0]],
+            });
+        }
+        return acc;
+    }, []);
+
+    return mergedData;
+}
+const mergedData = transformAndMergeData();
+
+function calculateStartEnd(mergedData: ChordTable[]) {
+    let currentTime = 0;
+
+    mergedData.forEach((item) => {
+        item.start = currentTime;
+        item.end = currentTime + item.duration * 1000;
+
+        currentTime = item.end;
+    });
+    return mergedData;
+}
+const chordDatas = calculateStartEnd(mergedData as ChordTable[]);
+console.log('chordDatas', chordDatas);
+
+const notenames = chordDatas.map((item) => item.chords.map((chord) => chord.note));
+console.log('notenames', notenames);
+
+const updateCurrentNoteName = () => {
+    const currentNote = notenames[currentIndex.value];
+    console.log('currentNote', currentNote);
+    if (currentNote) {
+        currentNoteName.value = currentNote;
+    } else {
+        currentNoteName.value = [];
+    }
 };
 
-const isCurrentFret = (fret: number) => {
-    return positions[currentIndex.value].fret === fret;
+const positions: Position[] = chordDatas.map((item: ChordTable) => {
+    const myfrets = item.chords.map((chord) => chord.fret);
+    const mystrings = item.chords.map((chord) => chord.string);
+    console.log('myfrets', myfrets);
+    console.log('mystrings', mystrings);
+    return {
+        frets: myfrets,
+        strings: mystrings,
+    };
+});
+
+console.log('positions', positions);
+
+const isPosition = (strings: number[], frets: number[]): boolean => {
+    const currentPosition = positions[currentIndex.value];
+    console.log('strings in current position', strings, currentPosition.strings.includes(strings));
+    console.log('fret in current position', frets, currentPosition.frets.includes(frets));
+    return strings !== undefined && currentPosition.strings.includes(strings) && currentPosition.frets.includes(frets);
+};
+
+const isCurrentFret = (frets: number): boolean => {
+    const currentPosition = positions[currentIndex.value];
+    return currentPosition && currentPosition.frets.includes(frets);
 };
 
 const startAnimation = () => {
@@ -97,18 +177,20 @@ const startAnimation = () => {
     }
 
     const animate = () => {
-        const currentPosition = positions[currentIndex.value];
-        const nextPosition = positions[(currentIndex.value + 1) % positions.length];
+        currentIndex.value = (currentIndex.value + 1) % chordDatas.length;
+        console.log('chordDatas.length', chordDatas.length);
+        const currentData = chordDatas[currentIndex.value];
+        console.log('currentData', currentData);
+        const nextData = chordDatas[(currentIndex.value + 1) % chordDatas.length];
 
-        const start = currentPosition.beat;
-        const end = nextPosition.beat;
+        const start = currentData.start;
+        console.log('start', start);
+        const end = nextData.start;
+        console.log('end', end);
         const duration = end - start;
 
-        console.log(start);
-
-        currentIndex.value = (currentIndex.value + 1) % positions.length;
-
         if (!animationPaused.value) {
+            console.log('duration', duration);
             setTimeout(animate, duration);
         } else {
             animationRunning.value = false;
@@ -141,15 +223,20 @@ const stopAnimation = () => {
             <h1 class="text-3xl text-center font-extrabold">{{ title }}</h1>
             <div class="flex flex-row justify-center text-3xl my-14">
                 <p class="mx-5">
-                    Notes : <span class="font-extrabold">{{ animationRunning ? currentNoteName : '▶' }}</span>
+                    Notes :
+                    <span class="font-extrabold">{{ animationRunning ? currentNoteName.join(' / ') : '▶' }}</span>
                 </p>
                 <p>⚡</p>
                 <p class="mx-5">Toi : <span class="font-extrabold">B</span></p>
             </div>
 
-            <div v-for="string in 1" :key="string" class="flex flex-row flex-wrap w-full justify-around text-gray-900">
-                <div v-for="fret in 14" :key="fret" :class="{ 'anim-fret': isCurrentFret(fret) }">
-                    {{ fret }}
+            <div
+                v-for="strings in 1"
+                :key="strings"
+                class="flex flex-row flex-wrap w-full justify-around text-gray-900"
+            >
+                <div v-for="frets in 14" :key="frets" :class="{ 'anim-fret': isCurrentFret(frets) }">
+                    {{ frets }}
                 </div>
             </div>
             <div class="relative">

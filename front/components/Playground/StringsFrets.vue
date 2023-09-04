@@ -1,15 +1,16 @@
 <script setup lang="ts">
 defineProps<{
-    isPosition(string: number, fret: number): boolean;
+    isPosition(strings, frets): boolean;
 }>();
 </script>
 
 <template>
-    <div v-for="string in 6" :key="string" class="flex flex-row flex-wrap w-full justify-around">
-        <div v-for="fret in 14" :key="fret" class="text-white text-sm text-center place">
-            <!-- r {{ string }}- c{{ fret }} -->
+    <div v-for="strings in 6" :key="strings" class="flex flex-row flex-wrap w-full justify-around">
+        <div v-for="frets in 14" :key="frets" class="text-white text-sm text-center place">
+            {{ console.log('fret:', [frets], 'string:', [strings]) }}
+            <!-- r{{ strings }}- c{{ frets }} -->
             <svg
-                v-if="isPosition(string, fret)"
+                v-if="isPosition(strings, frets)"
                 id="la_note"
                 xmlns="http://www.w3.org/2000/svg"
                 width="100"

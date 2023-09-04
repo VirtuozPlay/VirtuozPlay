@@ -1,5 +1,6 @@
 query GetPostPerformanceStats($id: ID!) {
   performance(id: $id) {
+    id
     song {
       id
       title
@@ -9,5 +10,9 @@ query GetPostPerformanceStats($id: ID!) {
       name
     }
     duration
+    notes {
+      at
+      precision
+    }
   }
 }

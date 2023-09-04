@@ -15,9 +15,11 @@ export type GetPostPerformanceStatsQuery = {
     __typename?: 'Query';
     performance?: {
         __typename?: 'Performance';
+        id: string;
         duration: number;
         song: { __typename?: 'Song'; id: string; title: string };
         author?: { __typename?: 'User'; id: string; name?: string | null } | null;
+        notes: Array<{ __typename?: 'PerformanceNote'; at: number; precision: number }>;
     } | null;
 };
 
@@ -26,6 +28,7 @@ export declare const GetPostPerformanceStats: import('graphql').DocumentNode;
 export const GetPostPerformanceStatsDocument = /*#__PURE__*/ gql`
     query GetPostPerformanceStats($id: ID!) {
         performance(id: $id) {
+            id
             song {
                 id
                 title
@@ -35,6 +38,10 @@ export const GetPostPerformanceStatsDocument = /*#__PURE__*/ gql`
                 name
             }
             duration
+            notes {
+                at
+                precision
+            }
         }
     }
 ` as unknown as DocumentNode<GetPostPerformanceStatsQuery, GetPostPerformanceStatsQueryVariables>;

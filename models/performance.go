@@ -122,12 +122,12 @@ func (p *Performance) encode() {
 	p.NotesCount = len(p.Notes)
 	p.NotesEncoding = BinaryNotes
 	sort.Slice(p.Notes, func(i, j int) bool {
-		return compareNotes(p.Notes[i], p.Notes[j]) < 0
+		return compareNotesForSorting(p.Notes[i], p.Notes[j]) < 0
 	})
 	p.EncodedNotes = encodeNotes(p.Notes, p.NotesEncoding)
 }
 
-func compareNotes(a, b Note) int {
+func compareNotesForSorting(a, b Note) int {
 	// 1. compare start time
 	if a.At != b.At {
 		return int(a.At - b.At)
@@ -150,7 +150,7 @@ func (p *Performance) decode() error {
 		return err
 	}
 	sort.Slice(notes, func(i, j int) bool {
-		return compareNotes(notes[i], notes[j]) < 0
+		return compareNotesForSorting(notes[i], notes[j]) < 0
 	})
 	p.Notes = notes
 	return nil
@@ -384,3 +384,4 @@ func (n *Note) validate(i int) string {
 	}
 	return ""
 }
+

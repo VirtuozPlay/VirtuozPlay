@@ -1,9 +1,10 @@
-package actions
+package models
 
 import (
 	"fmt"
 	"os"
 	"testing"
+	"virtuozplay/graph/model"
 )
 
 // HomeHandler is a default handler to serve up
@@ -24,7 +25,7 @@ func Test_ParseMusicXML(t *testing.T) {
 	for _, part := range result.Parts {
 		for _, measure := range part.Measures {
 			// Browse notes in each bar
-			for _, note := range measure.Notes {
+			for _, note := range measure.NoteXml {
 				// Access the duration of each note
 				duration := note.Duration
 				// Store information or perform desired processing
@@ -40,7 +41,15 @@ func Test_ParseMusicXML(t *testing.T) {
 }
 
 func Test_CompareNotes(t *testing.T) {
-	err := CompareNotes()
+	userNotes := []*model.InputNote{
+		{Value: "C", Duration: 2},
+		{Value: "D", Duration: 2},
+		{Value: "A", Duration: 2},
+		{Value: "E", Duration: 2},
+		{Value: "C", Duration: 2},
+		{Value: "A", Duration: 2},
+	}
+	err := CompareNotes(userNotes)
 
 	if err != nil {
 		t.Fatal(err)

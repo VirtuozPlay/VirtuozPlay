@@ -33,6 +33,12 @@ func (r *mutationResolver) AddNotesToPerformance(ctx context.Context, id string,
 		return nil, err
 	}
 
+	// Call CompareNotes function to validate notes
+
+	if err := db.CompareNotes(notes); err != nil { // TODO: Rajouter la variable à la fonction perf.Song,
+		return nil, err
+	}
+
 	errors := make(gqlerror.List, 0)
 
 	for i, note := range notes {

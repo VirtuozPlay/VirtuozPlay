@@ -11,6 +11,7 @@ require (
 	github.com/gobuffalo/grift v1.5.2
 	github.com/gobuffalo/helpers v0.6.7
 	github.com/gobuffalo/httptest v1.5.2
+	github.com/gobuffalo/logger v1.0.7
 	github.com/gobuffalo/mw-csrf v1.0.2
 	github.com/gobuffalo/mw-forcessl v1.0.2
 	github.com/gobuffalo/mw-i18n/v2 v2.0.3
@@ -23,7 +24,6 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/matoous/go-nanoid/v2 v2.0.0
 	github.com/rs/cors v1.9.0
-	github.com/sirupsen/logrus v1.9.0
 	github.com/stretchr/testify v1.8.2
 	github.com/unrolled/secure v1.13.0
 	github.com/vektah/gqlparser/v2 v2.5.4
@@ -45,7 +45,6 @@ require (
 	github.com/gobuffalo/fizz v1.14.4 // indirect
 	github.com/gobuffalo/flect v1.0.0 // indirect
 	github.com/gobuffalo/github_flavored_markdown v1.1.3 // indirect
-	github.com/gobuffalo/logger v1.0.7 // indirect
 	github.com/gobuffalo/meta v0.3.3 // indirect
 	github.com/gobuffalo/middleware v1.0.0 // indirect
 	github.com/gobuffalo/nulls v0.4.2 // indirect
@@ -83,6 +82,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.9.0 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
+	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/sourcegraph/annotate v0.0.0-20160123013949-f4cad6c6324d // indirect
 	github.com/sourcegraph/syntaxhighlight v0.0.0-20170531221838-bd320f5d308e // indirect
 	github.com/spf13/cobra v1.6.1 // indirect
@@ -91,8 +91,8 @@ require (
 	golang.org/x/mod v0.10.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/sync v0.2.0 // indirect
-	golang.org/x/sys v0.8.0 // indirect
-	golang.org/x/term v0.8.0 // indirect
+	golang.org/x/sys v0.12.0 // indirect
+	golang.org/x/term v0.12.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/tools v0.9.3 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

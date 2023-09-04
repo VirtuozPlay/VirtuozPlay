@@ -4237,12 +4237,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chart.js@npm:^4.3.1":
-  version: 4.3.1
-  resolution: "chart.js@npm:4.3.1"
+"chart.js@npm:^4.4.0":
+  version: 4.4.0
+  resolution: "chart.js@npm:4.4.0"
   dependencies:
     "@kurkle/color": ^0.3.0
-  checksum: d0c9e727e1cf1bf4b8a85599f4ec89a48466d549aa78d2e0280b1269e2819ed28aa97d46f97993383be8d66e411a9dd539797d759e538eaf9649cfff9be1044d
+  checksum: 5ee2d99b78608025525b5790af17178fdaa5adc3294e082deba2718029b0496109ba124f1b08dd1e4c8a04d6e842be7f384f2cfe9a11df8d1c6fe884acece52b
   languageName: node
   linkType: hard
 
@@ -10663,10 +10663,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "virtuozplay-workspace@workspace:."
   dependencies:
-    chart.js: ^4.3.1
     front: ^0.0.1
     prettier: ^2.8.8
-    vue-chartjs: ^5.2.0
   languageName: unknown
   linkType: soft
 
@@ -10703,6 +10701,7 @@ __metadata:
     "@vue/test-utils": ^2.3.2
     "@vue/tsconfig": ^0.4.0
     autoprefixer: latest
+    chart.js: ^4.4.0
     cypress: ^12.14.0
     eslint: ^8.43.0
     eslint-plugin-cypress: ^2.13.3
@@ -10722,6 +10721,7 @@ __metadata:
     vite: ^4.3.9
     vitest: ^0.32.0
     vue: ^3.3.4
+    vue-chartjs: ^5.2.0
     vue-router: ^4.2.2
     vue-template-compiler: ^2.7.14
     vue-tsc: ^1.6.5

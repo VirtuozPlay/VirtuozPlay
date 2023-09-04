@@ -73,7 +73,9 @@ const pieOptions: ChartOptions<'pie'> = {
     cutout: '40%',
     borderColor: '#4C324D',
     plugins: {
-        legend: false,
+        legend: {
+            display: false,
+        },
         shadow: {
             enable: true,
             color: '#4C324D',

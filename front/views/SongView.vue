@@ -6,26 +6,14 @@ import { useSongStore } from '@/store';
 import { SongNote } from '@/gql/types';
 
 const isPlaying = ref(false);
-const stringsFretsRef = ref(false);
+const stringsFretsRef = ref(null);
 
 const store = useSongStore();
 const title = store.currentSong.title;
 const music = store.currentSong.music_path;
 const audio = new Audio(music);
 
-// const positions: Position[] = (store.currentSong.notes ?? []).filter(
-//     (note?: SongNote | null) => note != null && note.beat !== undefined
-// ) as SongNote[];
-
-// const isPosition = (string: number | undefined, fret: number): boolean => {
-//     const currentPosition = positions[currentIndex.value];
-//     return string !== undefined && string === currentPosition.string && fret === currentPosition.fret;
-// };
-// const isCurrentFret = (fret: number) => {
-//     return positions[currentIndex.value].fret === fret;
-// };
-
-// filter = exclut les éléments vides de la liste
+// filter -> exclude empty elements from the list
 const notes = (store.currentSong.notes ?? []).filter((notes?: SongNote | null) => notes != null) as SongNote[];
 console.log('notes', notes);
 
@@ -66,11 +54,6 @@ interface ChordTable {
     start: number;
     end: number;
     chords: Chord[];
-}
-
-interface Position {
-    frets: (number | undefined)[];
-    strings: (number | undefined)[];
 }
 
 const currentIndex = ref(0);
@@ -139,31 +122,75 @@ const updateCurrentNoteName = () => {
     }
 };
 
-const positions: Position[] = chordDatas.map((item: ChordTable) => {
-    const myfrets = item.chords.map((chord) => chord.fret);
-    const mystrings = item.chords.map((chord) => chord.string);
-    console.log('myfrets', myfrets);
-    console.log('mystrings', mystrings);
-    return {
-        frets: myfrets,
-        strings: mystrings,
-    };
+console.log('chordData', chordDatas);
+
+type Positions = {
+    time: Time[];
+};
+
+type Time = {
+    [stringNumber: number]: Fret[];
+};
+
+type Fret = number;
+
+const positions: Positions = {
+    time: [],
+};
+
+for (let i = 0; i < chordDatas.length; i++) {
+    positions.time.push({
+        1: [],
+        2: [],
+        3: [],
+        4: [],
+        5: [],
+        6: [],
+    });
+}
+
+chordDatas.forEach((chordData, index) => {
+    const { chords } = chordData;
+    chords.forEach((chord) => {
+        const { string, fret } = chord;
+        positions.time[index][string].push(fret);
+    });
 });
 
 console.log('positions', positions);
 
-const isPosition = (strings: number[], frets: number[]): boolean => {
-    const currentPosition = positions[currentIndex.value];
-    console.log('strings in current position', strings, currentPosition.strings.includes(strings));
-    console.log('fret in current position', frets, currentPosition.frets.includes(frets));
-    return strings !== undefined && currentPosition.strings.includes(strings) && currentPosition.frets.includes(frets);
+// isPosition checks if the fret is currently present on the string at currentIndex.value
+// It passes the array of true false to the StringsFrets component which will display the green circles on the guitar strings
+const isPosition = (string: number, fret: number): boolean => {
+    const currentPosition = positions.time[currentIndex.value];
+    if (currentPosition && string in currentPosition) {
+        const stings = currentPosition[string];
+        const isFret = stings.includes(fret);
+        if (isFret) {
+            console.log('isFret', isFret, stings, fret);
+        }
+        return isFret;
+    }
+    return false;
 };
 
-const isCurrentFret = (frets: number): boolean => {
-    const currentPosition = positions[currentIndex.value];
-    return currentPosition && currentPosition.frets.includes(frets);
+// Function to display the strip above the guitar neck
+// If the freight is currently displayed it uses the CSS class anim-fret in the template v-for loop
+const isCurrentFret = (fret: number): boolean => {
+    const currentPosition = positions.time[currentIndex.value];
+    if (currentPosition) {
+        // Check for each string if fret is present
+        for (let string = 1; string <= 6; string++) {
+            if (currentPosition[string] && currentPosition[string].includes(fret)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 };
 
+// Function to manage animation
 const startAnimation = () => {
     console.log('Start animation');
     if (animationRunning.value) {
@@ -178,7 +205,6 @@ const startAnimation = () => {
 
     const animate = () => {
         currentIndex.value = (currentIndex.value + 1) % chordDatas.length;
-        console.log('chordDatas.length', chordDatas.length);
         const currentData = chordDatas[currentIndex.value];
         console.log('currentData', currentData);
         const nextData = chordDatas[(currentIndex.value + 1) % chordDatas.length];
@@ -235,8 +261,8 @@ const stopAnimation = () => {
                 :key="strings"
                 class="flex flex-row flex-wrap w-full justify-around text-gray-900"
             >
-                <div v-for="frets in 14" :key="frets" :class="{ 'anim-fret': isCurrentFret(frets) }">
-                    {{ frets }}
+                <div v-for="fret in 14" :key="fret" :class="{ 'anim-fret': isCurrentFret(fret) }">
+                    {{ fret }}
                 </div>
             </div>
             <div class="relative">

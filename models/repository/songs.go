@@ -31,7 +31,7 @@ var HardcodedSongs = map[models.NanoID]*models.Song{
 			{Measure: 1, Note: "B", Fret: 2, String: 2, Beat: 4, Alter: 0, Octave: 3, Duration: 2, Type: "croche", Abscissa: 10.4},
 			{Measure: 2, Note: "C", Fret: 3, String: 3, Beat: 4, Alter: 0, Octave: 3, Duration: 1, Type: "croche", Abscissa: 20.0},
 			{Measure: 2, Note: "D", Fret: 4, String: 1, Beat: 4, Alter: 0, Octave: 3, Duration: 1, Type: "croche", Abscissa: 21.0},
-			{Measure: 2, Note: "E", Fret: 5, String: 2, Beat: 4, Alter: 0, Octave: 3, Duration: 1, Type: "croche", Abscissa: 22.0},
+			{Measure: 2, Note: "E", Fret: 5, String: 2, Beat: 4, Alter: 0, Octave: 3, Duration: 1, Type: "croche", Abscissa: 21.0},
 			{Measure: 2, Note: "F", Fret: 4, String: 3, Beat: 4, Alter: 0, Octave: 3, Duration: 1, Type: "croche", Abscissa: 23.0},
 			{Measure: 3, Note: "G#", Fret: 3, String: 5, Beat: 4, Alter: 0, Octave: 3, Duration: 2, Type: "croche", Abscissa: 24.1},
 			{Measure: 3, Note: "A", Fret: 2, String: 6, Beat: 4, Alter: 0, Octave: 3, Duration: 2, Type: "croche", Abscissa: 24.1},

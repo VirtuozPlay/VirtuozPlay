@@ -12,7 +12,6 @@ import { FinishPerformanceDocument } from '@/gql/mutations/FinishPerformance';
 
 let analyser: AnalyserNode;
 
-let gainNode: GainNode;
 let hertzBinSize: number;
 let frequencyData: Uint8Array;
 let buflen: number;
@@ -40,23 +39,27 @@ export const initMicrophone = async (
     analyser.fftSize = 8192 * 4; //need at least 8192 to detect differences in low notes
 
     const sampleRate: number = audioCtx.sampleRate;
-    gainNode = audioCtx.createGain();
-    gainNode.connect(audioCtx.destination);
 
     hertzBinSize = sampleRate / analyser.fftSize;
     frequencyData = new Uint8Array(analyser.frequencyBinCount);
     buflen = frequencyData.length;
 
     // ask for microphone permission
-    let stream: MediaStream | null = await navigator.mediaDevices.getUserMedia({
-        audio: {
-            noiseSuppression: true,
-            echoCancellation: true,
-        },
-    });
+    let stream: MediaStream | null = null;
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+                noiseSuppression: true,
+                echoCancellation: true,
+            },
+        });
+    } catch (e) {
+        // if permission denied
+        console.error(e);
+        return null;
+    }
 
     const micSource: MediaStreamAudioSourceNode = audioCtx.createMediaStreamSource(stream);
-    micSource.connect(gainNode);
     micSource.connect(analyser);
 
     // reset timestamps

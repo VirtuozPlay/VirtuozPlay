@@ -55,6 +55,8 @@ watch(stream, () => {
 const onClick = async () => {
     if (stream.value === null) {
         stream.value = await initMicrophone(props.songId, sensitivity.value, apolloClient, perfID);
+        // if user denied access to microphone
+        if (stream.value === null) return;
 
         if (isLocalStorageAccessible) localStorage.setItem('mic_sensivity', String(sensitivity.value));
 

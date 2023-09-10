@@ -35,7 +35,7 @@ type Note struct {
 	Rest      xml.Name  `xml:"rest"`
 	Chord     xml.Name  `xml:"chord"`
 	Notations Notations `xml:"notations"`
-	Abscissa   float64   `xml:"default-x,attr"`
+	Abscissa  float64   `xml:"default-x,attr"`
 }
 
 type Pitch struct {

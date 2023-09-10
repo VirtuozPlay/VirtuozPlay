@@ -63,6 +63,8 @@ func (as *ActionSuite) Test_Auth_LogInSignupPage() {
 }
 
 func (as *ActionSuite) Test_Auth_SignUp_Success() {
+	// 1. Log in and get a token.
+
 	as.LoadFixture("user_basic")
 
 	res := as.JSON("/auth/signup").Post(map[string]string{
@@ -83,9 +85,30 @@ func (as *ActionSuite) Test_Auth_SignUp_Success() {
 	as.Equal("newuser", response["username"])
 	as.Equal("brand-new@example.com", response["email"])
 	as.Len(response, 3, "extra fields in response")
+
+	// 2. Validate the token by restoring a session from it.
+
+	res = as.JSON("/auth/restore-session").Post(map[string]string{
+		"Token": token.(string),
+	})
+
+	as.Equal(http.StatusOK, res.Code)
+	var validateResponse map[string]interface{}
+	err = json.NewDecoder(res.Body).Decode(&validateResponse)
+
+	as.NoError(err)
+
+	token, hasToken = validateResponse["token"]
+	as.True(hasToken, "validateResponse should have a 'token' field")
+	as.NotEmpty(token)
+	as.Equal("newuser", validateResponse["username"])
+	as.Equal("brand-new@example.com", validateResponse["email"])
+	as.Len(validateResponse, 3, "extra fields in response")
 }
 
 func (as *ActionSuite) Test_Auth_LogIn_Success() {
+	// 1. Log in and get a token.
+
 	as.LoadFixture("user_basic")
 
 	u, err := as.Users.FindByNanoID("user-5001")
@@ -108,6 +131,25 @@ func (as *ActionSuite) Test_Auth_LogIn_Success() {
 	as.Equal(u.Username, response["username"])
 	as.Equal(u.Email, response["email"])
 	as.Len(response, 3, "extra fields in response")
+
+	// 2. Validate the token by restoring a session from it.
+
+	res = as.JSON("/auth/restore-session").Post(map[string]string{
+		"Token": token.(string),
+	})
+
+	as.Equal(http.StatusOK, res.Code)
+	var validateResponse map[string]interface{}
+	err = json.NewDecoder(res.Body).Decode(&validateResponse)
+
+	as.NoError(err)
+
+	token, hasToken = validateResponse["token"]
+	as.True(hasToken, "validateResponse should have a 'token' field")
+	as.NotEmpty(token)
+	as.Equal(u.Username, validateResponse["username"])
+	as.Equal(u.Email, validateResponse["email"])
+	as.Len(validateResponse, 3, "extra fields in response")
 }
 
 func (as *ActionSuite) Test_Auth_LogIn_InvalidEmail() {

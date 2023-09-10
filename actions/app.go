@@ -85,6 +85,7 @@ func App() *buffalo.App {
 	auth.POST("/signup", SignUp)
 	auth.POST("/login", LogIn)
 	auth.POST("/logout", LogOut)
+	auth.POST("/restore-session", RestoreSession)
 
 	// Protect against CSRF attacks. https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)
 	homeHandler := csrf.New(HomeHandler)

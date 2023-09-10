@@ -35,66 +35,119 @@ export interface UserState {
     email: string;
 }
 
-export const useUserStore = defineStore('user', {
-    state: () => ({
-        user: null as UserState | null,
-    }),
-    actions: {
-        async signUp(username: string, email: string, password: string): Promise<string[]> {
-            const response = await fetch('/auth/signup', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    username,
-                    email,
-                    password,
-                }),
-            });
+export const useUserStore = () => {
+    const useInner = defineStore('user', {
+        state: () => ({
+            initialized: false,
+            user: null as UserState | null,
+        }),
+        actions: {
+            async signUp(username: string, email: string, password: string): Promise<string[]> {
+                const response = await fetch('/auth/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username,
+                        email,
+                        password,
+                    }),
+                });
 
-            if (!response.ok) {
-                return extractErrors(await response.json());
-            }
+                if (!response.ok) {
+                    return extractErrors(await response.json());
+                }
 
-            this.user = (await response.json()) as UserState;
+                this.user = (await response.json()) as UserState;
 
-            return [];
+                if ('localStorage' in window) {
+                    localStorage.setItem('token', this.user.token);
+                }
+
+                return [];
+            },
+
+            async logIn(email: string, password: string): Promise<string[]> {
+                const response = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email,
+                        password,
+                    }),
+                });
+
+                if (!response.ok) {
+                    return extractErrors(await response.json());
+                }
+
+                this.user = (await response.json()) as UserState;
+
+                if ('localStorage' in window) {
+                    localStorage.setItem('token', this.user.token);
+                }
+
+                return [];
+            },
+
+            async logOut(): Promise<string[]> {
+                const response = await fetch('/auth/logout', {
+                    method: 'POST',
+                });
+
+                if (!response.ok) {
+                    return extractErrors(await response.json());
+                }
+
+                this.user = null;
+
+                if ('localStorage' in window) {
+                    localStorage.removeItem('token');
+                }
+
+                return [];
+            },
+
+            async restoreSession(): Promise<void> {
+                this.initialized = true;
+                const token = localStorage?.getItem('token');
+
+                if (token == null) {
+                    this.user = null;
+                    return;
+                }
+
+                const response = await fetch('/auth/restore-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        token,
+                    }),
+                });
+
+                if (!response.ok) {
+                    const errors = extractErrors(await response.json());
+
+                    console.error('Failed to restore login:', errors);
+                    this.user = null;
+                } else {
+                    this.user = (await response.json()) as UserState;
+                }
+            },
         },
+    });
 
-        async logIn(email: string, password: string): Promise<string[]> {
-            const response = await fetch('/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email,
-                    password,
-                }),
-            });
+    const store = useInner();
 
-            if (!response.ok) {
-                return extractErrors(await response.json());
-            }
+    if (!store.initialized) {
+        // Attempt to validate token against the server on page load
+        void store.restoreSession();
+    }
 
-            this.user = (await response.json()) as UserState;
-
-            return [];
-        },
-
-        async logOut(): Promise<string[]> {
-            const response = await fetch('/auth/logout', {
-                method: 'POST',
-            });
-
-            if (!response.ok) {
-                return extractErrors(await response.json());
-            }
-
-            this.user = null;
-
-            return [];
-        },
-    },
-});
+    return store;
+};

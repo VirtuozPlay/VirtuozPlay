@@ -3,6 +3,7 @@ package actions
 import (
 	"crypto/rand"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/ed25519"
@@ -38,14 +39,14 @@ func LogInSignupPage(c buffalo.Context) error {
 	return csrf.New(HomeHandler)(c)
 }
 
-type NewUser struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
 func SignUp(c buffalo.Context) error {
-	params := &NewUser{}
+	type newUser struct {
+		Username string `json:"username"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	params := &newUser{}
 	if err := c.Bind(params); err != nil {
 		return errors.WithStack(err)
 	}
@@ -59,13 +60,13 @@ func SignUp(c buffalo.Context) error {
 	return respondWithJWT(c, u, http.StatusCreated)
 }
 
-type LogInParams struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
 func LogIn(c buffalo.Context) error {
-	params := &LogInParams{}
+	type logInParams struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	params := &logInParams{}
 	if err := c.Bind(params); err != nil {
 		return errors.WithStack(err)
 	}
@@ -104,15 +105,78 @@ func LogOut(c buffalo.Context) error {
 	return c.Render(http.StatusOK, r.JSON(nil))
 }
 
+func RestoreSession(c buffalo.Context) error {
+	type checkTokenParams struct {
+		Token string `json:"token"`
+	}
+
+	params := &checkTokenParams{}
+	if err := c.Bind(params); err != nil {
+		return errors.WithStack(err)
+	}
+
+	var claims jwt.MapClaims
+
+	_, err := jwt.ParseWithClaims(params.Token, &claims, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodEd25519); !ok {
+			return nil, fmt.Errorf("invalid token")
+		}
+		return publicKey, nil
+	}, jwt.WithJSONNumber(), jwt.WithValidMethods([]string{jwt.SigningMethodEdDSA.Alg()}))
+
+	fail := func(message string) error {
+		return c.Render(http.StatusUnauthorized, r.JSON(map[string]string{
+			"error": message,
+		}))
+	}
+
+	if err != nil {
+		return fail(err.Error())
+	}
+	expiryJson, ok := claims["exp"].(json.Number)
+
+	if !ok {
+		return fail("token has expired")
+	}
+	if expiry, err := expiryJson.Int64(); err != nil || time.UnixMilli(expiry).Before(time.Now()) {
+		return fail("token has expired")
+	}
+
+	jsonDbId, ok := claims["dbId"].(json.Number)
+
+	if !ok {
+		return fail("invalid user id")
+	}
+	dbId, err := jsonDbId.Int64()
+	if err != nil {
+		return fail("invalid user id")
+	}
+
+	strNanoId, ok := claims["nanoId"].(string)
+
+	if !ok {
+		return fail("invalid user id")
+	}
+
+	users := c.Value("users").(*repository.Users)
+
+	u, err := users.FindByNanoID(models.NanoID(strNanoId))
+
+	if err != nil || u.ID != dbId {
+		return fail("user not found")
+	}
+
+	return respondWithJWT(c, u, http.StatusOK)
+}
+
 const tokenExpireDuration = time.Minute * 1
 
 func generateJWT(u *models.User) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodEdDSA,
 		jwt.MapClaims{
-			"exp":        time.Now().Add(tokenExpireDuration).UnixMilli(),
-			"authorized": true,
-			"dbId":       u.ID,
-			"nanoId":     u.NanoID,
+			"exp":    time.Now().Add(tokenExpireDuration).UnixMilli(),
+			"dbId":   u.ID,
+			"nanoId": u.NanoID,
 		})
 	return token.SignedString(privateKey)
 }

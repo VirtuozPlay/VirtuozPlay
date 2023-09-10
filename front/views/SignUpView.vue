@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
 import { useUserStore } from '@/store';
+import router from '@/router';
 
 const userStore = useUserStore();
 
@@ -21,6 +22,10 @@ async function onSignup(event: Event) {
 
     errors.slice(0, errors.length);
     errors.push(...(await userStore.signUp(username.value, email.value, password.value)));
+
+    if (errors.length === 0) {
+        await router.push({ name: 'home' });
+    }
 }
 </script>
 

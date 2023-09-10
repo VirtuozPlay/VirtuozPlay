@@ -66,12 +66,12 @@ func (as *ActionSuite) Test_Auth_SignUp_Success() {
 	as.LoadFixture("user_basic")
 
 	res := as.JSON("/auth/signup").Post(map[string]string{
-		"Username": "newuser",
+		"Username": "NeWUser",
 		"Email":    "brand-new@example.com",
 		"Password": "azerty",
 	})
 
-	as.Equal(http.StatusFound, res.Code)
+	as.Equal(http.StatusCreated, res.Code)
 	var response map[string]interface{}
 	err := json.NewDecoder(res.Body).Decode(&response)
 
@@ -80,7 +80,9 @@ func (as *ActionSuite) Test_Auth_SignUp_Success() {
 	token, hasToken := response["token"]
 	as.True(hasToken, "response should have a 'token' field")
 	as.NotEmpty(token)
-	as.Len(response, 1, "response should only have a 'token' field")
+	as.Equal("newuser", response["username"])
+	as.Equal("brand-new@example.com", response["email"])
+	as.Len(response, 3, "extra fields in response")
 }
 
 func (as *ActionSuite) Test_Auth_LogIn_Success() {
@@ -94,7 +96,7 @@ func (as *ActionSuite) Test_Auth_LogIn_Success() {
 		"Password": "12345678",
 	})
 
-	as.Equal(http.StatusFound, res.Code)
+	as.Equal(http.StatusOK, res.Code)
 	var response map[string]interface{}
 	err = json.NewDecoder(res.Body).Decode(&response)
 
@@ -103,7 +105,9 @@ func (as *ActionSuite) Test_Auth_LogIn_Success() {
 	token, hasToken := response["token"]
 	as.True(hasToken, "response should have a 'token' field")
 	as.NotEmpty(token)
-	as.Len(response, 1, "response should only have a 'token' field")
+	as.Equal(u.Username, response["username"])
+	as.Equal(u.Email, response["email"])
+	as.Len(response, 3, "extra fields in response")
 }
 
 func (as *ActionSuite) Test_Auth_LogIn_InvalidEmail() {

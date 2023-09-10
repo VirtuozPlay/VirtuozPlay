@@ -56,7 +56,7 @@ func SignUp(c buffalo.Context) error {
 		return c.Render(http.StatusBadRequest, r.JSON(models.UnwrapErrors(err)))
 	}
 
-	return respondWithJWT(c, u)
+	return respondWithJWT(c, u, http.StatusCreated)
 }
 
 type LogInParams struct {
@@ -95,7 +95,7 @@ func LogIn(c buffalo.Context) error {
 		return bad()
 	}
 
-	return respondWithJWT(c, u)
+	return respondWithJWT(c, u, http.StatusOK)
 }
 
 func LogOut(c buffalo.Context) error {
@@ -117,7 +117,7 @@ func generateJWT(u *models.User) (string, error) {
 	return token.SignedString(privateKey)
 }
 
-func respondWithJWT(c buffalo.Context, u *models.User) error {
+func respondWithJWT(c buffalo.Context, u *models.User, statusCode int) error {
 	token, err := generateJWT(u)
 
 	if err != nil {
@@ -125,7 +125,9 @@ func respondWithJWT(c buffalo.Context, u *models.User) error {
 		return fmt.Errorf("encountered an error while logging in")
 	}
 
-	return c.Render(http.StatusFound, r.JSON(map[string]interface{}{
-		"token": token,
+	return c.Render(statusCode, r.JSON(map[string]string{
+		"token":    token,
+		"username": u.Username,
+		"email":    u.Email,
 	}))
 }

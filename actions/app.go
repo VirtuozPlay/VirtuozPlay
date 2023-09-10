@@ -81,6 +81,7 @@ func App() *buffalo.App {
 	// Routes for Auth
 	auth := app.Group("/auth")
 	auth.GET("/", LogInSignupPage)
+	auth.GET("/new", LogInSignupPage)
 	auth.POST("/signup", SignUp)
 	auth.POST("/login", LogIn)
 	auth.POST("/logout", LogOut)
@@ -91,7 +92,8 @@ func App() *buffalo.App {
 	app.GET("/about", homeHandler)
 	app.GET("/checkup", homeHandler)
 	app.GET("/collection", homeHandler)
-	app.GET("/collection/{songIdOrName}", homeHandler)app.GET("/profile", homeHandler)
+	app.GET("/collection/{songIdOrName}", homeHandler)
+	app.GET("/profile", homeHandler)
 	app.GET("/stats", homeHandler)
 	app.GET("/play", homeHandler)
 	app.GET("/play/{performanceId}", homeHandler)

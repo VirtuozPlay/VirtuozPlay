@@ -32,9 +32,9 @@ const handleListen = () => {
 };
 
 interface Chord {
-    note: string | undefined;
-    fret: number | undefined;
-    string: number | undefined;
+    note: string;
+    fret: number;
+    string: number;
     // alter: number | undefined;
     // octave: number | undefined;
     abscissa: number | undefined;
@@ -59,7 +59,7 @@ interface ChordTable {
 const currentIndex = ref(0);
 const animationRunning = ref(false);
 const animationPaused = ref(false);
-const currentNoteName = ref([]);
+const currentNoteName = ref<string[]>([]);
 
 function transformAndMergeData(): MergeData[] {
     const transformedData = notes.map((item: SongNote) => ({
@@ -115,11 +115,7 @@ console.log('notenames', notenames);
 const updateCurrentNoteName = () => {
     const currentNote = notenames[currentIndex.value];
     console.log('currentNote', currentNote);
-    if (currentNote) {
-        currentNoteName.value = currentNote;
-    } else {
-        currentNoteName.value = [];
-    }
+    currentNoteName.value = (currentNote || []).filter((note) => typeof note === 'string') as string[];
 };
 
 console.log('chordData', chordDatas);

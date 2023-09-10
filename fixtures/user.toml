@@ -1,0 +1,14 @@
+[[scenario]]
+name = "user_basic"
+
+[[scenario.table]]
+name = "vp_user"
+
+[[scenario.table.row]]
+id = "5001"
+nano_id = "user-5001"
+created_at = "<%= now() %>"
+updated_at = "<%= now() %>"
+username = "mark"
+email = "mark@example.com"
+password_hash = "<%= hash("12345678") %>"

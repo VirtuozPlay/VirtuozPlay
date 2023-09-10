@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 15.3
--- Dumped by pg_dump version 15.3
+-- Dumped from database version 14.8
+-- Dumped by pg_dump version 14.8
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -110,6 +110,45 @@ ALTER SEQUENCE public.song_id_seq OWNED BY public.song.id;
 
 
 --
+-- Name: vp_user; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.vp_user (
+    id bigint NOT NULL,
+    nano_id character varying(21),
+    username character varying(255),
+    email character varying(255),
+    email_confirmed boolean DEFAULT false,
+    password_hash character varying(255),
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.vp_user OWNER TO postgres;
+
+--
+-- Name: vp_user_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.vp_user_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.vp_user_id_seq OWNER TO postgres;
+
+--
+-- Name: vp_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.vp_user_id_seq OWNED BY public.vp_user.id;
+
+
+--
 -- Name: performance id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -121,6 +160,13 @@ ALTER TABLE ONLY public.performance ALTER COLUMN id SET DEFAULT nextval('public.
 --
 
 ALTER TABLE ONLY public.song ALTER COLUMN id SET DEFAULT nextval('public.song_id_seq'::regclass);
+
+
+--
+-- Name: vp_user id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.vp_user ALTER COLUMN id SET DEFAULT nextval('public.vp_user_id_seq'::regclass);
 
 
 --
@@ -145,6 +191,14 @@ ALTER TABLE ONLY public.schema_migration
 
 ALTER TABLE ONLY public.song
     ADD CONSTRAINT song_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: vp_user vp_user_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.vp_user
+    ADD CONSTRAINT vp_user_pkey PRIMARY KEY (id);
 
 
 --

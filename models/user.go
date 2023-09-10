@@ -67,7 +67,7 @@ func (u *User) Validate(tx *pop.Connection) (*validate.Errors, error) {
 		&validators.FuncValidator{
 			Field:   u.Email,
 			Name:    "credentials",
-			Message: "username or email already taken",
+			Message: "username or email already taken%.s", // "%.s" discards any extra string added py Sprintf()
 			Fn: func() bool {
 				var b bool
 				q := tx.Where("username = ? OR email = ?", u.Username, u.Email)

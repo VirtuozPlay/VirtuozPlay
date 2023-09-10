@@ -3,7 +3,6 @@ package actions
 import (
 	"net/http"
 	"virtuozplay/graph"
-	"virtuozplay/models"
 	"virtuozplay/models/repository"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -15,11 +14,16 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func init() {
+func lazyInit(c buffalo.Context) {
+	performances := c.Value("performances").(*repository.Performances)
+	songs := c.Value("songs").(*repository.Songs)
+	users := c.Value("users").(*repository.Users)
+
 	// Initialize the GraphQL server
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
-		Performances: repository.NewPerformancesRepository(models.DB),
-		Songs:        repository.NewSongsRepository(models.DB),
+		Performances: performances,
+		Songs:        songs,
+		Users:        users,
 	}}))
 
 	// Supported ways to submit queries
@@ -37,12 +41,25 @@ func init() {
 		Cache: lru.New(100),
 	})
 
-	GraphQLHandler = buffalo.WrapHandler(srv)
-	GraphQLPlaygroundHandler = buffalo.WrapHandler(playground.Handler("GraphQL playground", "/graphql"))
+	graphQLHandler = buffalo.WrapHandler(srv)
+	graphQLPlaygroundHandler = buffalo.WrapHandler(playground.Handler("GraphQL playground", "/graphql"))
 }
 
 // GraphQLHandler Manages the GraphQL endpoint of VirtuozPlay
-var GraphQLHandler buffalo.Handler
+func GraphQLHandler(c buffalo.Context) error {
+	if graphQLHandler == nil {
+		lazyInit(c)
+	}
+	return graphQLHandler(c)
+}
 
 // GraphQLPlaygroundHandler gives access to an interactive GraphQL playground in the browser
-var GraphQLPlaygroundHandler buffalo.Handler
+func GraphQLPlaygroundHandler(c buffalo.Context) error {
+	if graphQLPlaygroundHandler == nil {
+		lazyInit(c)
+	}
+	return graphQLPlaygroundHandler(c)
+}
+
+var graphQLHandler buffalo.Handler
+var graphQLPlaygroundHandler buffalo.Handler

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"github.com/gobuffalo/validate/v3"
 )
 
@@ -23,4 +24,18 @@ func WrapValidation(errors *validate.Errors, err error) error {
 		return nil
 	}
 	return &ValidationErrors{err, errors}
+}
+
+func UnwrapErrors(err error) error {
+	if err == nil {
+		return nil
+	}
+	var verr *ValidationErrors
+	if errors.As(err, &verr) {
+		if verr.Validation != nil {
+			return verr.Validation
+		}
+		return verr.Wrapped
+	}
+	return err
 }

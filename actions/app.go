@@ -2,11 +2,13 @@ package actions
 
 import (
 	csrf "github.com/gobuffalo/mw-csrf"
+	"github.com/gobuffalo/pop/v6"
 	"github.com/rs/cors"
 	"net/http"
 	"strconv"
 	"virtuozplay/locales"
 	"virtuozplay/models"
+	"virtuozplay/models/repository"
 
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/buffalo-pop/v3/pop/popmw"
@@ -41,53 +43,67 @@ var (
 // placed last in the route declarations, as it will prevent routes
 // declared after it to never be called.
 func App() *buffalo.App {
-	if app == nil {
-		options := buffalo.Options{
-			Env:         ENV,
-			SessionName: "_virtuozplay_session",
-			// Setup CORS to allow all localhost:* origins in dev mode
-			PreWares: []buffalo.PreWare{corsConfiguration().Handler},
-		}
-		if ENV != "production" {
-			// Allow incoming LAN connections
-			options.Addr = ":3000"
-		}
-		app = buffalo.New(options)
-
-		// Automatically redirect to SSL
-		app.Use(forceSSL())
-
-		// Log request parameters (filters apply).
-		app.Use(paramlogger.ParameterLogger)
-
-		// Wraps each request in a transaction.
-		//   c.Value("tx").(*pop.Connection)
-		// Remove to disable this.
-		app.Use(popmw.Transaction(models.DB))
-		// Setup and use translations:
-		app.Use(translations())
-
-		// Protect against CSRF attacks. https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)
-		homeHandler := csrf.New(HomeHandler)
-		app.GET("/", homeHandler)
-		app.GET("/about", homeHandler)
-		app.GET("/checkup", homeHandler)
-		app.GET("/collection", homeHandler)
-		app.GET("/collection/{songIdOrName}", homeHandler)
-		app.GET("/profile", homeHandler)
-		app.GET("/stats", homeHandler)
-		app.GET("/play", homeHandler)
-		app.GET("/play/{performanceId}", homeHandler)
-
-		// GraphQL endpoints
-		// TODO add CSRF protection
-		app.ANY("/graphql", GraphQLHandler)
-		if ENV != "production" {
-			app.ANY("/graphql/playground", GraphQLPlaygroundHandler)
-		}
-
-		app.ServeFiles("/", http.FS(DistFS())) // serve files from the public directory
+	if app != nil {
+		return app
 	}
+	options := buffalo.Options{
+		Env:         ENV,
+		SessionName: "_virtuozplay_session",
+		// Setup CORS to allow all localhost:* origins in dev mode
+		PreWares: []buffalo.PreWare{corsConfiguration().Handler},
+	}
+	if ENV != "production" {
+		// Allow incoming LAN connections
+		options.Addr = ":3000"
+	}
+	app = buffalo.New(options)
+
+	// Automatically redirect to SSL
+	app.Use(forceSSL())
+
+	// Log request parameters (filters apply).
+	app.Use(paramlogger.ParameterLogger)
+
+	// Wraps each request in a transaction.
+	//   c.Value("tx").(*pop.Connection)
+	// Remove to disable this.
+	app.Use(popmw.Transaction(models.DB))
+	// Setup and use translations:
+	app.Use(translations())
+	app.Use(provideRepositories(models.DB))
+
+	// NOTE: this block should go before any resources
+	// that need to be protected by buffalo-goth!
+	//AuthMiddlewares
+	//app.Use(SetCurrentUser)
+	//app.Use(Authorize)
+	//
+	// Routes for Auth
+	auth := app.Group("/auth")
+	auth.GET("/", LogInSignupPage)
+	auth.POST("/signup", SignUp)
+	auth.POST("/login", LogIn)
+	auth.POST("/logout", LogOut)
+
+	// Protect against CSRF attacks. https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)
+	homeHandler := csrf.New(HomeHandler)
+	app.GET("/", homeHandler)
+	app.GET("/about", homeHandler)
+	app.GET("/checkup", homeHandler)
+	app.GET("/collection", homeHandler)
+	app.GET("/collection/{songIdOrName}", homeHandler)app.GET("/profile", homeHandler)
+	app.GET("/stats", homeHandler)
+	app.GET("/play", homeHandler)
+	app.GET("/play/{performanceId}", homeHandler)
+
+	// GraphQL endpoints
+	// TODO add CSRF protection
+	app.ANY("/graphql", GraphQLHandler)
+	if ENV != "production" {
+		app.ANY("/graphql/playground", GraphQLPlaygroundHandler)
+	}
+
+	app.ServeFiles("/", http.FS(DistFS())) // serve files from the public directory
 
 	return app
 }
@@ -148,4 +164,19 @@ func corsConfiguration() *cors.Cors {
 			"https://localhost:*",
 		},
 	})
+}
+
+// provideRepositories makes repositories available to all handlers
+func provideRepositories(db *pop.Connection) buffalo.MiddlewareFunc {
+	performances := repository.NewPerformancesRepository(db)
+	songs := repository.NewSongsRepository(db)
+	users := repository.NewUsersRepository(db)
+	return func(next buffalo.Handler) buffalo.Handler {
+		return func(c buffalo.Context) error {
+			c.Set("performances", &performances)
+			c.Set("songs", &songs)
+			c.Set("users", &users)
+			return next(c)
+		}
+	}
 }

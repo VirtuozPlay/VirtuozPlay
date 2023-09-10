@@ -1,0 +1,8 @@
+create_table("vp_user") {
+	t.Column("id", "bigint", {primary: true})
+	t.Column("nano_id", "string", {null: false, size: 21, unique: true})
+    t.Column("username", "string", {null: false})
+    t.Column("email", "string", {null: false})
+    t.Column("email_confirmed", "boolean", {null: false, default: false})
+    t.Column("password_hash", "string", {null: false})
+}

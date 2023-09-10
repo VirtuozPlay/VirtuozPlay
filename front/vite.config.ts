@@ -11,6 +11,7 @@ export default defineConfig({
             '^/$': 'http://127.0.0.1:3000',
             '^/manifest.webmanifest$': 'http://127.0.0.1:3000',
             '^/sw/serviceWorker.js$': 'http://127.0.0.1:3000',
+            '^/auth': 'http://127.0.0.1:3000',
             '^/about$': 'http://127.0.0.1:3000',
             '^/checkup$': 'http://127.0.0.1:3000',
             '^/collection': 'http://127.0.0.1:3000',

@@ -169,7 +169,7 @@ func RestoreSession(c buffalo.Context) error {
 	return respondWithJWT(c, u, http.StatusOK)
 }
 
-const tokenExpireDuration = time.Minute * 1
+const tokenExpireDuration = 1 * time.Hour
 
 func generateJWT(u *models.User) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodEdDSA,

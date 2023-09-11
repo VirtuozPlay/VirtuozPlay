@@ -144,6 +144,11 @@ yarn lint
 yarn format
 # Runs TypeScript type-checking
 yarn type-check
+# Format back-end
+gofmt -d -s -w `find . -name '*.go' -not -path './.devenv/*'`;
+# launch tests
+buffalo test -v
+
 ```
 
 ---

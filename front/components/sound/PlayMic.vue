@@ -16,7 +16,7 @@ const apolloClient = new ApolloClient({
     cache: new InMemoryCache(),
     link: new GraphQLWsLink(
         createClient({
-            url: 'ws://127.0.0.1:5173/graphql',
+            url: `${location.protocol.includes('https') ? 'wss' : 'ws'}://${location.host}/graphql`,
         })
     ),
 });

@@ -150,6 +150,9 @@ yarn type-check
 
 **Congratulations!** You now have VirtuozPlay up and running!
 
-## Documentation
+## Mirroring
+https://github.com/VirtuozPlay/VirtuozPlay/actions/workflows/mirroring.yml
 
+## Documentation
+- Notion : https://www.notion.so/Cahier-des-charges-e76642e6044344d9b69cd6dd48eeb3f3
 - [GraphQL API](/documentation/graphql.en.md)
